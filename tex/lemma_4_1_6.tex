@@ -1,0 +1,76 @@
+\documentclass{article}
+\usepackage{xeCJK}
+\usepackage{theorem}
+\usepackage{amsmath}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{proof}{Proof}[section]
+\title{Lemma 4.1.6}
+\author{Clexma}
+\begin{document}
+\maketitle
+\begin{lemma}[4.1.6] A flow $f$ is a \textit{s-t} path flow iff $f$ satisfies the following conditions:
+\begin{itemize}
+\item If s = t then
+\begin{enumerate}
+\item $\Sigma_{w\in out(v)} f(v,w) = \Sigma_{w\in in(v)} f(w,v)$ for all v
+\item $F(f)$ is a s-t support
+
+
+\end{enumerate}
+
+
+\item If s $\ne$ t then
+\begin{enumerate}
+\item $\Sigma_{w\in out(v)} f(v,w) = \Sigma_{w\in out(v)} f(w,v)$ for all $v\in V-\{s,t\}$
+
+$\Sigma_{w\in out(s)} f(s,w) = \Sigma_{w\in out(s)} f(w,s) + 1$
+
+$\Sigma_{w\in out(t)} = \Sigma_{w\in out(t)} f(w,t) - 1$
+
+
+\item F(f) is connected.
+\end{enumerate}
+
+\end{itemize}
+
+
+
+\end{lemma}
+
+
+\begin{proof} Prove by induction on $n  = \Sigma_{e\in E} f(e)$\\
+\begin{itemize}
+\item $\Rightarrow$：
+ By definition direction of path flow the proof is obvious.
+
+\item $\Leftarrow$：
+\begin{enumerate}
+\item $s = t, F(f) is connected$, we have the conclusion that $f$ is a s-t path flow.
+
+\begin{itemize}
+\item case 1 : there is a self loop from $s$ to $s$.
+
+\item case 2 : there is no self loop from $s$ to $s$. In this case we delete an edge from $v$ to $s$ such that $v \neq s$.
+
+\begin{itemize}
+\item subcase 2.1 the resulting graph is still connectedl let the new flow be $f'$. By the induction hypothesis $f'$ is a path flow from $s$ to $v$.
+
+\item subcase 2.2 the resulting graph is not connected, in this case , there are exactly two connected components such in the resulting graph, we call them $C_1$ and $C_2$ and assume they contain $s$ and $v$ respectively.
+\begin{itemize}
+\item sub-subcase 2.2.1:
+$C_2$ contains no edges.
+
+\item sub-subcase 2.2.2:
+$C_1$ and $C_2$ both contain at least one edge.
+
+\end{itemize}
+\end{itemize}
+\end{itemize}
+
+\end{enumerate}
+\end{itemize}
+
+
+\end{proof}
+\end{document}
