@@ -208,3 +208,46 @@ Main problem: how to express the algorithm in the QFPA formula?
 ```阶段性任务完成```
 
 接下来该做的事情：根据那篇文章将整个算法的输入、输出、伪代码写出来。搞清楚一流的一些细节问题。基于前两步对算法进行优化以降低复杂度。
+
+## 三月 1日 软件所
+
+浏览论文 omega test
+
+
+整理 On the Complexity 中的算法：
+
+根据定理 4.1.14，我们有
+如果在 $T(\mathcal{A})$中有从$(q,n)\rightarrow^* (q',n')$,那么在$G_\mathcal{A}$中对应有一条从$q$ 到$q'$的路径$\pi=\pi_1\cdot\pi_2\cdot\pi_3$. 使得分别对应type 1 type 3 type 2 的 reachability certificate.
+
+整篇文章的思想是将reachability 问题转化为判定QFPA的可满足性。
+
+算法框架包含两个部分：
+1. 将问题转化为QFPA的有限集合
+2. 对集合内的每一个公式，利用Cooper算法或者OmegaTest判断其可满足性
+
+其中第一个部分的输入是一个one-counter automata和两个configuration： $\mathcal{A}$ 和 $(q,n), (q',n')$,假设$\mathcal{A}$是non 0-test的，可以很自然的将$\mathcal{A}$ 转化为其对应的weighted graph $G_\mathcal{A}$.
+
+公式4.5给出了type-1 reachability certificate的公式，得到该公式需要给定输入：
+$G, F, s,t ,(F_i,v_i,v_i',e_i)_{i\in [m]}$.
+
+问题：如何找到每个可能的 s-t support和其对应的support edge decomposition
+
+- 每个可能的 s-t support   
+```哪些s-t support 需要被考虑？```
+  - support edge decomposition 对$e_i$的要求是总的并起来要是整个$F$. 所以$m = numOfEdges(F)$  
+  - ```具体得到support edge decomposition 的算法?```
+- 每对可能的$s,t$
+
+s-t support require the connectivity of $F$.
+
+公式4.7给出了type-3 certificate 对应的QFPA表示，该公式需要给定的输入：$G,F, s,t,l,l'$
+
+- $G_\mathcal{A}$中每个可能的positive cycle template 
+- $G_{\mathcal{A}}^{op}$ 中每个可能的positive cycle template
+- 每对可能的$(s,t)$
+- 每个可能的$F$
+
+
+
+在最终的算法中 $s,t$已经固定
+
