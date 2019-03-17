@@ -1,0 +1,488 @@
+\documentclass{article}
+\usepackage{xeCJK}
+\usepackage{theorem}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{algorithmicx}
+\usepackage{algorithm}% http://ctan.org/pkg/algorithms
+\usepackage{algpseudocode}% http://ctan.org/pkg/algorithmicx
+\usepackage{xcolor}
+\newtheorem{theorem}{Theorem}
+
+\newtheorem{definition}{Definition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{proof}{\textit{Proof}}
+\algnewcommand\algorithmicforeach{\textbf{for each}}
+\algdef{S}[FOR]{ForEach}[1]{\algorithmicforeach\ #1\ \algorithmicdo}
+
+\title{Algorithm Draft}
+\author{Clexma}
+\begin{document}
+\maketitle
+
+
+
+According to the work of Haase, which gave a theoretical proof of the decidability and NP lower and upper bound for the reachability problem of one-counter automata.
+
+Given a one-counter automata $\mathcal{A}$ and its corresponding transition system $T(\mathcal{A})$ defined as Haase. The reachability problem of one-counter auotmata can be stated as follows.
+
+\paragraph{1-Counter Automata Reachability}
+
+\paragraph{INPUT:} A one-coutner automata $\mathcal{A}$ and configurations $C, C'\in C(\mathcal{A})$, where $C(\mathcal{A}) = Q \times \mathbb{N}$.
+
+\paragraph{OUTPUT:} Does $C \rightarrow^*_\mathcal{A} C'$?\\
+
+Due to the counter value and the possible infinity of the configurations of one-counter automata, finding a path in $T(\mathcal{A})$ is not realistic because it may cause exponential blow up. For example....Thus we turn to consider the flow $f: E \rightarrow \mathbb{N}$ which assigns each edge in the automata a natural number. We call a flow \textit{path flow } if the assignment of the number exactly corresponds to the number of a path $\pi$ go through the edge in the automata. 
+
+The following lemma gives neccessary conditions for a flow to be a path flow.
+
+
+
+%$\mathcal{A} = (Q, c, q_0, F, \Delta, \lambda, \epsilon)$ where $Q$ is the finite set of control locations, $c \ge 0 $ the counter value, $q_0$ the initial state, $F\subseteq Q$ the finite set of final locations and  
+\begin{lemma}[4.1.6 in Haase]  A flow $f$ is a \textit{s-t} path flow iff $f$ satisfies the following conditions:
+\begin{itemize}
+\item If s = t then
+\begin{enumerate}
+\item $\Sigma_{w\in out(v)} f(v,w) = \Sigma_{w\in in(v)} f(w,v)$ for all v
+\item $F(f)$ is a s-t support
+
+
+\end{enumerate}
+
+
+\item If s $\ne$ t then
+\begin{enumerate}
+\item $\Sigma_{w\in out(v)} f(v,w) = \Sigma_{w\in out(v)} f(w,v)$ for all $v\in V-\{s,t\}$
+
+$\Sigma_{w\in out(s)} f(s,w) = \Sigma_{w\in out(s)} f(w,s) + 1$
+
+$\Sigma_{w\in out(t)} = \Sigma_{w\in out(t)} f(w,t) - 1$
+
+
+\item F(f) is connected.
+\end{enumerate}
+
+\end{itemize}
+
+
+
+\end{lemma}
+
+
+\begin{proof} Prove by induction on $n  = \Sigma_{e\in E} f(e)$\\
+\begin{itemize}
+\item $\Rightarrow$：
+ By definition direction of path flow the proof is obvious.
+
+\item $\Leftarrow$：
+\begin{enumerate}
+\item $s = t, F(f) is connected$, we have the conclusion that $f$ is a s-t path flow.
+
+\begin{itemize}
+\item case 1 : there is a self loop from $s$ to $s$.
+
+\item case 2 : there is no self loop from $s$ to $s$. In this case we delete an edge from $v$ to $s$ such that $v \neq s$.
+
+\begin{itemize}
+\item subcase 2.1 the resulting graph is still connectedl let the new flow be $f'$. By the induction hypothesis $f'$ is a path flow from $s$ to $v$.
+
+\item subcase 2.2 the resulting graph is not connected, in this case , there are exactly two connected components such in the resulting graph, we call them $C_1$ and $C_2$ and assume they contain $s$ and $v$ respectively.
+\begin{itemize}
+\item sub-subcase 2.2.1:
+$C_2$ contains no edges.
+
+\item sub-subcase 2.2.2:
+$C_1$ and $C_2$ both contain at least one edge.
+
+\end{itemize}
+\end{itemize}
+\end{itemize}
+
+\item $s \ne t$ is the same idea, we omit the proof here.
+
+\end{enumerate}
+\end{itemize}
+
+
+\end{proof}
+
+By lemma 4.1.14 in Haase, the problem whether $(q',n')$ is reachable from $(q,n)$ can be solve by enumerate all the type-1, type-3, and type-2 reachability and guess nondeterministically the possible path between them. We now present the algorithm in detail.
+
+
+\begin{definition}[Reachability Certificate]
+..
+\end{definition}
+
+By the definition of type-3 reachability certificate which require the positive cycle template. We put positive cycle template on the level of SCC of the weighted graph.
+
+
+\begin{definition}[Weighted Graph]
+Let $\mathcal{A}$ be an one-counter automaton, the \text{weighted graph} of $\mathcal{A}$ is $G = (V,E,\mu)$ where $V$ is a finite set of vertices according to the states of $\mathcal{A}$, $E\subseteq V\times V$ is a finite set of edges correspond to the edges of $\mathcal{A}$ and $\mu : E\rightarrow \mathbb{Z}$ is weight function correspond to the changes of the counter value of $\mathcal{A}$.
+\end{definition}
+
+We call $G' = (V', E', \mu')$ a \textit{subgraph} of a weighted graph $G = (V, E, \mu)$ if $V'\subseteq V$, $E'\subseteq E$ and $\mu' = \mu$.
+
+\begin{definition}[Strongly Connected Component(SCC)]
+A strongly connected component of a weighted graph $G$ is a subgraph $G' = (V', E', \mu)$ of $G$ and for $\forall v, v'\in V'$ and $v \ne v'$, there exists paths $\pi$ from $v$ to $v'$ and $\pi'$ from $v'$ to $v$.
+
+
+\end{definition}
+
+In this paper, we have to add some more structure on an SCC to make te algorithm works. We do some classification on the number of type of vertices in an SCC:
+
+Given an SCC $G' = (V', E', \mu)$ which is the subgraph of a weighted graph $G = (V, E, \mu)$, we call a vertice $v'\in V'$ 
+
+\begin{itemize}
+\item an \textit{in-port vertex} if there exists $u \in V \wedge u \notin V'$ such that $(u,v) \in E$,
+\item an \textit{out-port vertex} if there exists $u \in V \wedge u \notin V'$ such that $(v,u) \in E$,
+\item and an \textit{internal vertex} otherwise.
+\end{itemize}
+
+
+
+In order to get a path $\Pi= \pi_1\cdot \pi_2 \cdot \pi_3$ from $s$ to $t$ in   $\mathcal{A}$ corresponding to a run in $T(\mathcal{A})$. Algorithm needs to guess the start node $v_1$ and end node $v_2$ of $\pi_2$. From lemma 4.1.17, if $|\pi_2| > 0$ there should be a  positive cycle template at $v_1$ and a positive cycle template. Intuitively, a positive cycle template gives a overlook on the possible positive cycles in a SCC. That means if there is a simple positive cycle in an SCC, all other node can find a path to a point on that cycle and by circling the simple positive cycle many times. Then we can get a positive cycle on another point.
+% TODO: the name I did not remember
+
+In the algorithm we first convert the one-counter automaton into weighted graph and then shrink the graph into a abstract graph defined on SCC. Now we define the shrinked weighted graph.
+
+\begin{definition}[Shrinked Weighted Graph]
+Given a weighted graph $G = (V, E, \mu)$ we defined its corresponding shrinked weighted graph $SWG = (SCC(V), E', \mu')$, where
+\begin{itemize}
+\item $SCC(V) \subseteq V\times \mathbb{Z}^+$ is the set of all the SCCs and vertices in the same SCC have the same integer value.
+
+\item $E'\subseteq SCC(V) \times SCC(V)$ is a finite set of transitions between the SCCs. We also require for any $v,v'\in V$ and $a,b \in \mathbb{Z}^+$, if $((v,a), (v'b)) \in E'$ then $a \ne b$
+
+\item $\mu': E' \rightarrow \mathbb{Z}$ is the weight function that assign each edge a weight. The value remain the same as $\mu$ in $G$.
+\end{itemize}
+
+\end{definition}
+
+%TODO more things internal inport outport
+By the definition of SWG, it is obvious that it is a direct acycly graph. Now we need an algorithm to convert a weighted graph into a SWG by using Tarjan's algorithm to find the SCCs in a weighted graph.
+
+[WIKI]
+\begin{algorithm}
+	\caption{WG to SWG}
+	\begin{algorithmic}[1]
+	\State $SCCIndex := 1$
+		\Function{WG2SWG}{$G$}
+		
+		\State\textbf{Input:} A weighted graph $G = (V,E,\mu)$
+		\State\textbf{Output:} A shrinked weighted graph $SWG = (SCC(V), E', \mu')$	
+		\State 
+		\State $index$ := 1
+		
+		\State $S$ := empty stack
+		\State Initialize  an empty shrinked weighted graph $G'$: 
+		\State $SCC(V) := V\times {0}, E:=E, \mu' := \mu$
+			
+		\State  
+		\ForEach {$(v,mark)\in SCC(V)$}
+			\If{mark == 0}
+				\State \Call{StrongConnect}{$(v,mark)$}
+			\EndIf
+		\EndFor
+		\State\Return $SWG$
+		\EndFunction
+		
+		\State
+		\Function{StrongConnect}{$(v, mark)$}
+			\State $v.$index := $index$
+			\State $v$.lowlink := $index$
+			\State $index$ := $index$ + 1
+			\State $S$.push($v$)
+			\State $v$.onStack := \textbf{true}
+			\State			
+			\State \Comment Consider successors of $v$
+			\ForEach{$(v,w)\in E$}
+				\If{$w.$index == 0}
+					\State\Call{StrongConnect}{$w$}
+					\State $v$.lowlink := $min(v$.lowlink$, w$.lowlink$ )$ 
+				\ElsIf{$w$.onStack}
+					\State $v$.lowlink := $min(v$.lowlink$, w. $index$)$ 
+				\EndIf
+			\EndFor
+			\State
+			\If{$v$.lowlink == $v.$index}
+				\Repeat
+					\State $w := S.pop()$					
+					\State $w$.onStack $:= $ \textbf{false}
+					\State $(w, mark) := (w, SCCIndex)$
+					\State \Comment Add $w$ to current strongly connected component 
+				
+				
+				\Until
+				$w == v$
+				\State $SCCIndex := SCCIndex + 1$ 
+				\State\Comment Output the current strongly connected component
+			\EndIf
+		\EndFunction
+	\end{algorithmic}
+
+\end{algorithm}
+\\
+ 
+Now by executing algorithm 1 we preprocess a given WG into a SWG.
+
+
+\begin{definition}[Abstract Shrinked Weighted Graph]
+	Given an $SWG = (SCC(V), E', \mu') $, we define its corresponding abstract shrinked weighted graph $ASWG = (S, E'', T, \mu', \eta)$ where 
+\begin{itemize}
+\item $S$ is a finite set of abstract state. A element  $s\in S$ represents an SCC in $SWG$.
+\item $\eta: S\rightarrow \mathbb{N}^+$ is a tagging function that maps a state in $S$ to its corresponding SCC index computed in algorithm 1,
+\item $E'' \subseteq E'$ is a set of detailed edges of the form $((v_1,a), (v_2, b))$ where $(v_1, a), (v_2, b)\in SCC(V)$ and $a \ne b$,
+\item $T\subseteq S \times S$ is a finite set of abstract edges. Given $s_1, s_2\in S$ and $(s_1, s_2)\in T$ iff there exists a edge $((v_1,t_1), (v_2, t_2))\in E''$ such that $t_1 = \eta(s_1)$ and $t_2 = \eta(s_2)$. 
+\item $\sigma: S\rightarrow \{\{+\}, \{-\}, \{+,-\}, \{0\}\}$ is a function denoting whether there is a positive cycle($\{+\}$), negative cycle($\{-\}$), both($\{+,-\}$), or none($\{0\}$).
+
+ 
+\end{itemize}
+\end{definition}
+
+We call the path $\tau: s_1\cdots s_n$ on an ASWG a $abstract $ $path$ where $s_i\in S$ and $(s_i, s_{i+1})\in T$
+
+Given a weighted graph $(V,E,\mu)$ and its corresponding ASWG $(S<E'',T,\mu,\eta)$. We now define the operator $f_{SCC}: V\rightarrow S$ that maps a vertice to the SCC contains it. 
+
+Algorithm 2 converts an SWG to an ASWG.
+
+
+
+
+\begin{algorithm}
+	\caption{SWG to ASWG}
+	\begin{algorithmic}
+		\State \Function{SWG2ASWG}{$SWG$}
+		\State \textbf{Input: }$SWG = (SCC(V), E', \mu')$
+		\State \textbf{Output: }$ASWG = (S, E'',T, \mu', \eta, \sigma)$
+		\State 		
+		\State $SCCNum := 0$	
+		\ForEach{$(v,n)\in SCC(V)$}		
+			\If{$n > SCCNum$}
+				\State $SCCNum := n$
+				\Comment Find the number of the SCCs in $SWG$.
+			\EndIf
+		\EndFor
+		\State\textit{Initialize ASWG:} 
+		\State $S := \{s_i\mid i\in [1,\ldots, SCCNum]\}$
+		\State $E'', T := \emptyset$
+		
+		
+		\ForEach{$((v_1, n_1),(v_2, n_2)\in E')$}
+			\If{$n_1 \ne n_2$}
+				\State \textit{Add }$(v_1, n_1),(v_2, n_2)$ \textit{to }$E''$.
+				\If{$(s_{n_1}, s_{n_2})\notin T$}
+					\State $T := T \cup \{(s_{n_1}, s_{n_2})\}$
+				\EndIf
+				
+			\EndIf
+		\EndFor
+		\State 
+		\ForEach{$s\in S$}
+			\State $\sigma(s) :=$ \Call{TestCycle}{S}
+		\EndFor
+		\EndFunction
+	\end{algorithmic}
+
+\end{algorithm}
+
+The idea of the algorithm goes as follows. Given an one-counter automaton we first convert it into a weighted graph[Hasse]. Then use algorithm 1 and algorithm 2 we get corresponding SWG and ASWG. Then we need to finish the $\sigma$ function in ASWG. The idea is using a Bellman-Ford like algorithm to detect whether there is a positive, negative cycle in a graph. Here is the algorithm.
+
+\begin{algorithm}
+	\caption{Compute $\sigma$ in $ASWG$}
+
+	\begin{algorithmic}
+	\State \Function{TestCycle}{$SCC$}
+		\State \textbf{Input: } $SCC = (V', E', \mu)$
+		\State \textbf{Output: } $o \in \{\{+\}, \{-\}, \{+,-\}, \{0\}\}$.
+		\State $isPos := $ \textbf{false}
+		\State $isNeg := $ \textbf{false}
+		\State \Comment test positive cycle.
+		\State $n := \#V'$
+		\For{$i = 1$ to $n$}
+			\ForEach{$v\in V'$}
+				\State$d_v^i := max(\{0\}\cup \{d_u^{i-1} + \mu(u,v) : (u,v)\in E' \})$
+			\EndFor
+		\EndFor
+		\If{there exists $v\in V'$ such that $d_v^n > d_v^{n-1}$ }
+			\State $isPos :=$ \textbf{true}
+		\EndIf
+		\State \Comment test negative cycle.
+		\For{$i = 1$ to $n$}
+			\ForEach{$v\in V'$}
+				\State$D_v^i := min(\{+\infty\}\cup \{D_u^{i-1} + \mu(u,v) : (u,v)\in E' \})$
+			\EndFor
+		\EndFor
+		\If{there exists $v\in V'$ such that $D_v^n < D_v^{n-1}$ }
+			\State $isNeg :=$ \textbf{true}
+		\EndIf
+		
+		\State
+		\If{$isPos \wedge isNeg$}
+			\State\Return $\{+,-\}$
+		\ElsIf{$isPos$}
+			\State\Return $\{+\}$
+		\ElsIf{$isNeg$}
+			\State\Return $\{-\}$
+		\Else
+			\State\Return $\{0\}$
+		\EndIf
+	\EndFunction
+	\end{algorithmic}
+
+\end{algorithm}
+
+
+\
+By [Haase] the correctness of deciding whether an SCC contains a positive cycle template is given by the following lemma.
+
+
+\begin{lemma}
+Given a strongly connected component $SCC = (V', E', \mu)$. There is a simple positive cycle in the $SCC$ iff for any $v\in V'$ there is a positive $v$-cycle template respect to a $n\in \mathbb{N}$.
+
+
+\end{lemma}
+
+\begin{proof}
+\begin{itemize}
+\item $\Leftarrow$: By the definition of $v$-cycle template this direction is obvious.                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+\item $\Rightarrow$:                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+By the definition of $v$-cycle template in [Haase] and the definition of the strongly connected component in this paper. Assume there is a positive cycle $\pi_+$ in the SCC, there exists a path from $v$ to any point one the $v$-cycle $\pi_+$. Here we only take a $p\in V'$ on $\pi_+$ and a v-p path $\pi_{v\text{-}p}$. Let $n = min(drop(\pi_+) + weight(\pi_{v\text{-}p}), drop(\pi_{v\text{-}p}))$. Then we have a positive $v$-cycle template $\pi = p_1\cdot p_2 \cdot p_3$ respect to $n$ where $p_1 = \pi_{v\text{-}p}$ and $p_2 = \pi_+$.
+
+\end{itemize}
+\end{proof}
+
+
+After computing $\sigma$ in $ASWG = (S, E'', T, \mu', \eta, \sigma)$ there are four kinds of situations to be considered:
+\begin{itemize}
+
+\item\textbf{Situation 1:} There exists $s_1, s_2\in S$ (possibly $s_1 = s_2$) such that $+ \in \sigma(s_1)$ and $-\in \sigma(s_2)$
+\item\textbf{Situation 2:}  For any $s\in S$,  $\sigma(s) = \{+\}$ or $\sigma(s) = \{0\}$
+\item\textbf{Situation 3:} For any $s\in S$,  $\sigma(s) = \{-\}$ or $\sigma(s) = \{0\}$
+\item \textbf{Situation 4:} For any $s\in S$,  $\sigma(s) = \{0\}$.
+\end{itemize}
+
+Due to the requirement that a type-3 reachability certificate require a positive cycle template and a negative cycle, we only need to find type-3 reachability certificate in \textbf{Situation 1}.
+
+
+How to find all the possible path that may cause a reachability certificate. The diffcult problem is how to settle all the nondeterminism in the algorithm. Recall the definition of strongly connected componenet and its internal, inport and outport vertices before, we will use them to analyse how to generate a QFPA formula for reachability in the different situations above.
+
+
+
+%TODO negative cycle template definition
+Assume the reachability problem ask given an-counter automaton $\mathcal{A}$ and configurations $(s,n)$ an $(t,n')$, whether there is a run $(s,n)\rightarrow ^* (t, n')$
+
+Firstly convert the one-counter automaton to a weighted graph $G = (V,E,\mu)$, an SWG $G' = (SCC(V), E', \mu')$ and an ASWG $G'' = (S,E'',T,\mu',\eta)$.
+
+Let $m = f_{SCC}(s)\in S, n = f_{SCC}(t)\in S$.
+
+\begin{itemize}
+\item \textbf{Situation 1:}
+
+Basic idea: Enumerate all the possible tuples $(p, q)$ where $p, q\in S$, $+ \in \sigma(p) $ and $- \in \sigma(q)$.
+
+We first do DFS with a depth bound $|S|$ to find all the abstract path $\tau_1: m\cdots p$ where $+ \in \sigma(p)$ and put these abstract path into set $P_1$.
+
+Likewise, do the same thing in $G''^{op}$ and find all the abstract path $\tau^{op}_3: n\cdots q$ where $-\in \sigma(q)$. convert $\tau^{op}_3$ to $\tau_3$ and put all these abstract paths into set $P_3$.
+
+Then,  we need to find whether there is a abstract path between $p$ and $q$, the idea is also finding path by DFS. For  pair $(p,q)$, put all the abstract path $\tau_2 = p\cdots q$ into a set $P^{(p,q)}_2$.
+
+With set $P_1^p, P^{(p,q)}_2, P_3^q$ where $p,q\in S$ we can now generate an abstract path that can be use to construct the reachability certificate by choosing abstract paths from $P_1^p, P_2^{(p,q)}, P_3^q$ and concatenante them. We summarize the process above in algorithm 4.
+
+\begin{algorithm}
+	\caption{Find Type-2 Abstract Paths}
+	\begin{algorithmic}
+		\State \Function{FindType2}{$WG$, $s$, $t$}
+		\State\textbf{Input:} A weighted graph $WG$, starting vertex $s$ and ending vertex $t$.
+		\State\textbf{Output:} An set of lists $\{[P_1^p, P_3^q, P_2^{(p,q)}]\}_{(p,q)}$ where $p,q$ are states in corresponding $ASWG$
+		\State $SWG$ := \Call{WG2SWG}{$WG$}
+		\State $ASWG$ := \Call{SWG2ASWG}{$SWG$}
+		
+		\State $PosSet$ := $\{s\mid s\in ASWG.S, +\in ASWG.\sigma(s)\}$
+		\State $NegSet$ := $\{s\mid s\in ASWG.S, -\in ASWG.\sigma(s)\}$
+		\State $list$ := []
+		\ForEach{$p\in PosSet$}
+			\State $P_1^p$ := \Call{DfsFindAbsPath}{$ASWG$, $s$, $p$}
+			\ForEach{$q\in NegSet$}
+				\State $P_2^{(p,q)}$ := \Call{DfsFindAbsPath}{$ASWG$, $p$, $q$}
+				\State $P_3^{(p,q)}$ := \Call{DfsFindAbsPath}{$ASWG$, $q$, $t$}
+				\State $list$ := $list \cup \{[P_1^p, P_2^{(p,q)}, P_3^q]\}$
+			\EndFor
+		\EndFor
+		\State \Return $list$
+		\EndFunction
+		
+		
+		\State \Function{DfsFindAbsPath}{$ASWG$, $p_1$, $p_2$}
+			\State \textbf{Input: }An $ASWG = (S,E'',T,\mu,\eta,\sigma)$, starting state $p_1$ and target state $p_2$.
+			\State \textbf{Output: }a set of all the abstract paths $P$.
+			\State $current$ := $p_1$
+			\State $S$ := empty stack
+			\State $S.push(p_1)$
+			\While{$\exists(current, u)\in ASWG.T$ not visited\textbf{ and }$current \neq $ \textbf{null}}
+				\State $S.push(u)$
+				\State $current$ := $u$
+				\If{$current == p_2$}
+					\State Output the stack as a path to $P$
+					\State $S.pop()$
+					\State $current$ := $S.top()$
+				\EndIf				
+				\If{all $(current, u)\in ASWG.T$ are visited}
+					\State $S.pop()$
+					\State $current$ := $S.top()$
+				\EndIf
+			\EndWhile
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
+
+Now we have solved the nondeterminism of choosing possible $(p,q)$, the nodeterminism of choosing the concrete path between SCCs and the possible paths in an SCC from inports to outports. 
+
+%TODO a lemma states the correctness of the algorithm 
+
+
+By the definition of type-1 reachability certificate in [Haase], which requries a support without positive cycles, weight and the correct sum of the weight along the path. It is obvious that on a path the concrete edges between SCCs will at most be visited once. Hence we can split the type-1 reachability certificate into SCCs the type-1 abstract path visited.
+
+
+Given a SCC $G' = (V', E', \mu)$ by the definitions above, there is a set of inports $V_{in}$ and a set of outports $V_{out}$.
+
+Let $\{(v_{i}, v_{o})\mid v_i\in V_{in}, v_o \in V_{out}\}$  be all the inport-outport tuples. Due to the storng connectivity of SCC, there exists at least one path in $G'$ starting from $v_i$ and ending at $v_o$. Since for one tuple there are often many reachable paths in the graph, we would like to introduce a dynamic programming techniques which saves time we computing the drop and weight of a path whose length is less than a integer value. We define a table that store the intermediate result of the computation.
+
+\begin{definition}[Drop-Weight Table(DWT)]
+
+Given a graph $G = (V, E, \mu)$ , we define its drop-weight table $DWT_{G}: V\times V\times \mathbb{N} \rightarrow 2^{\mathbb{Z}\times\mathbb{Z}}$ or simply use a tuple $DWT_{G}(v_1, v_2, l, P)$ to represent a entry of the table, where
+
+\begin{itemize}
+\item $v_1\in V$ is the starting node of  paths and $v_2\in V$ is the ending node of paths.
+
+\item $l\in \mathbb{N}$ denote the maximum length of paths.
+
+\item $P = {(d,w)\mid w\in \mathbb{Z}, d\in \mathbb{Z}}$ is a set remembering all the  drop-weight pairs.
+
+\end{itemize}
+
+
+
+Given a integer $n$, we use $DWT_{G}(n)$ to denote a drop-weight table of $G$ that the length of paths we consider is at most $n$.
+\end{definition}
+
+
+With the definition of drop-weight table, we now need a algorithm to compute a table.
+
+\begin{algorithm}
+	\caption{Compute DWT}
+	\begin{algorithmic}
+		
+		\State \Function{ComputeDWT}{$G$}			\State \textbf{Input:} A graph $G$ and an integer $n\in \mathbb{N}}$
+			\State \textbf{Output:} A DWT table $DWT_G(n)$
+			
+		
+		\EndFunction
+
+	\end{algorithmic}
+\end{algorithm}
+
+
+
+
+\end{itemize}
+\end{document}

@@ -27,7 +27,7 @@
 
 ### 第五次组会
 - 时间：2月27日
-- 软件所313会议室
+- 313会议室
 - 进度汇报
 
 - Edge decomposition definition
@@ -39,7 +39,7 @@
 ## 一月 18日 家中
 尝试重新证明定理4.1.6
 
-## 二月 21日 软件所
+## 二月 21日 
 
 现在已经清晰地东西：
 
@@ -119,7 +119,7 @@ W. Pugh and D. Wonnacott. Experiences with constraint-based array dependence
 analysis. In Principles and Practice of Constraint Programming, pages 312–325,
 1994.
 
-## 二月 25日  软件所
+## 二月 25日  
 
 之前读的SAT解决QFP的可满足性问题的文章主要的工作是把naive的解决方法通过对逻辑表达式的处理，尽可能的减少时间开销。
 
@@ -157,7 +157,7 @@ $\exists$的几何意义：投影
 - 是的，两个公式是对称的
   
 
-## 二月 26日 软件所
+## 二月 26日 
 今天的任务：
 1. 看完Cooper's algorithm 和 Omega test
 2. 做明天报告的slides
@@ -179,13 +179,13 @@ to write out the largest Fk
 做明天报告的slides
 
 
-## 二月 27日 软件所
+## 二月 27日 
 
 review and finding prolems:
 Main problem: how to express the algorithm in the QFPA formula?
 - Definition 14: type-1 reachability criteria.
 
-## 二月 28日 软件所
+## 二月 28日 
 
 为什么需要定义 positive v-cycle template:
 在positive v-cycle template的定义中，要求 $\pi_1, \pi_2, \pi_3$的长度都要遭$|G|$以内，这样可以将路径上可能出现的指数长度的正环找一个多项式的certificate，就是这个template。
@@ -209,7 +209,7 @@ Main problem: how to express the algorithm in the QFPA formula?
 
 接下来该做的事情：根据那篇文章将整个算法的输入、输出、伪代码写出来。搞清楚一流的一些细节问题。基于前两步对算法进行优化以降低复杂度。
 
-## 三月 1日 软件所
+## 三月 1日 
 
 浏览论文 omega test
 
@@ -249,5 +249,112 @@ s-t support require the connectivity of $F$.
 
 
 
-在最终的算法中 $s,t$已经固定
+在最终的算法中 $s,t$已经固定，需要两个中间节点。
+
+
+## 三月 4日 
+
+关键是要抓住思路：把exponential长的路径映射到多项式长度的path flow上，再对path flow做讨论。
+
+开始阅读文章 
+The Effects of Bounding Syntactic Resources on Presburger LTL
+企图寻找一些已有的关于 one counter automata的一些结论
+
+一些想法：s-t support 和 certificate的数量能够被什么限制住？
+
+路径的长度？counter的upper bound？自动机的flatness？
+
+此外这些限制不能对算法的正确性产生影响。
+
+## 三月 5日 
+明天下午讨论
+
+两个子算法：
+1. 从support edge 找出 support edge decomposition
+2. 找出 positive cycle template
+
+
+
+
+
+## 三月 6日 讨论
+
+strongly connected component.
+
+把整个图分成SCC能够有效的分析。
+
+## 三月 7日 
+
+根据老师strongly component 的思路，已经过了一遍算法，发现之中的问题， positive cycle  template 的要求还是必要的，因为需要用到定义中对于 $\verb{drop}$ 的要求来使得$\pi_3$的counter值不会小于0.
+
+
+需要考虑的问题：
+
+1、将可达性问题分为$\pi_1\cdot \pi_2 \cdot \pi_3$三段，分别为type-1 type-3 type-2
+2、吴老师的想法：SCC找到positive cycle template 
+3、在positive  SCC中可能也有一开始的simple path
+4、在$\pi_1$中可能经过positive SCC
+5、在$\pi_2$中要注意找的是positive cycle template$\rho_1\cdot \rho_2 \cdot  \rho_3$，对他们的长度要求是$|G|$.
+
+
+## 三月 8日
+
+把以上的思路整理成文章的sketch
+
+
+
+## 三月 11日
+
+问题postive cycle  template的寻找
+
+How to enumerate all the postive cycle template??
+
+不需要找，交给QFPA处理。
+
+## 三月 12日
+
+为了要转到对应的QFPA上，如果按照现在的理论框架，需要讲type-1的rechability certificate细分，感觉上是可以证明的，目前已有的结论：
+1. 对于原来的一个support $F$ 和 一个support edge decomposition $F_i$, 如果从SCC的层面上去考虑，我们只需要考虑同一个SCC里面的sub-support 的 sub-support edge dcomposition 的次序。对一个$SCC = (V,E,\mu)$来说，如果
+
+2. SCC之间的边只走了一次也就是 flow 是1
+
+3. 需要引入新的中间变量，来记录每一个SCC走完以后的权重
+
+4. ```问题： 如何处理SCC之间的concrete edges 的不确定性，如果要暴力枚举如何写公式？``` 
+
+
+5. ```问题：对于SCC里面的support edge decomposition 有什么其他的要求？比如inport和outport?``` 
+6. ASWG中不存在环。
+
+
+## 三月 13日
+
+### 讨论
+
+现在我的问题：
+
+1. 在type-1那段上面，我们需要猜每个SCC是有环还是只是一条simple path，如果有环要看是不是正环。如果我们猜一个SCC只是经过了一个simple path在这个SCC内是否还能使用动态规划的那套来计算，因为动态规划的信息只记录了路径的长度集合S中并没有记录是否存在环。
+
+
+2. 如果有环，按照上次的算法给出了一个bound，问题：长度在公式中如何表示？如果长度小于bound是否用原来的path flow的算法？如果长度大于bound是不是将路径分为三段，如何写出公式？
+
+
+### 晚上讨论内容
+
+1. 对于以上问题1确实不能直接用动态规划来做，对于SCC中应该先猜出路径的support在进行dynamic programming的计算
+
+2. type-2确实用动态规划很好做
+
+3. 如果存在权重为0的环在进行动态规划计算的过程中需要把对应的tuple去除
+
+
+### 接下来要做的事情
+
+写出对应的理论和伪代码,子问题：
+
+- 动态规划的具体算法
+
+- 
+
+
 
