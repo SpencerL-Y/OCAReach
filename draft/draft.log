@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.99992 (TeX Live 2015/Debian) (preloaded format=xelatex 2018.10.15)  17 MAR 2019 11:27
+This is XeTeX, Version 3.14159265-2.6-0.99992 (TeX Live 2015/Debian) (preloaded format=xelatex 2018.10.15)  29 MAR 2019 09:49
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1055,19 +1055,29 @@ Underfull \hbox (badness 10000) in paragraph at lines 33--34
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 72--73
+Underfull \hbox (badness 10000) in paragraph at lines 42--43
 
  []
 
 [1
 
 ]
-Overfull \hbox (13.94196pt too wide) in paragraph at lines 126--127
-[]\EU1/lmr/m/it/10 A strongly connected
+Underfull \hbox (badness 10000) in paragraph at lines 81--82
+
  []
 
 [2]
-Overfull \hbox (34.97804pt too wide) in paragraph at lines 149--150
+Overfull \hbox (13.94196pt too wide) in paragraph at lines 137--138
+[]\EU1/lmr/m/it/10 A strongly connected
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 219--220
+
+ []
+
+[3] [4]
+Overfull \hbox (34.97804pt too wide) in paragraph at lines 229--230
 \OT1/cmr/m/n/10 (\OML/cmm/m/it/10 V; E; ^^V\OT1/cmr/m/n/10 )$ \EU1/lmr/m/it/10 
 we defined its corresponding shrinked weighted graph $\OML/cmm/m/it/10 SWG \OT1
 /cmr/m/n/10 = (\OML/cmm/m/it/10 SCC\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 V\OT1/cmr/
@@ -1075,65 +1085,54 @@ m/n/10 )\OML/cmm/m/it/10 ; E[]; ^^V[]\OT1/cmr/m/n/10 )$\EU1/lmr/m/it/10 ,
  []
 
 
-LaTeX Warning: Float too large for page by 17.77237pt on input line 222.
+LaTeX Warning: Float too large for page by 17.77237pt on input line 302.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 163--224
-
- []
-
-
-Overfull \hbox (69.16869pt too wide) in paragraph at lines 229--230
+Overfull \hbox (69.16869pt too wide) in paragraph at lines 308--309
 []\EU1/lmr/m/it/10 Given an $\OML/cmm/m/it/10 SWG \OT1/cmr/m/n/10 = (\OML/cmm/m
 /it/10 SCC\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 V\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 
 ; E[]; ^^V[]\OT1/cmr/m/n/10 )$\EU1/lmr/m/it/10 ,
  []
 
 
-Overfull \hbox (22.71063pt too wide) in paragraph at lines 229--230
+Overfull \hbox (22.71063pt too wide) in paragraph at lines 308--309
 \EU1/lmr/m/it/10 we define its corresponding abstract shrinked weighted graph $
 \OML/cmm/m/it/10 ASWG \OT1/cmr/m/n/10 = (\OML/cmm/m/it/10 S; E[]; T; ^^V[]; ^^Q
 \OT1/cmr/m/n/10 )$
  []
 
-[3] [4]
-Overfull \hbox (14.64668pt too wide) in paragraph at lines 243--244
+[5] [6]
+Overfull \hbox (14.64668pt too wide) in paragraph at lines 322--323
 []\EU1/lmr/m/n/10 Given a weighted graph $\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 V; 
 E; ^^V\OT1/cmr/m/n/10 )$ \EU1/lmr/m/n/10 and its corresponding ASWG $\OT1/cmr/m
 /n/10 (\OML/cmm/m/it/10 S < E[]; T; ^^V; ^^Q\OT1/cmr/m/n/10 )$\EU1/lmr/m/n/10 .
 
  []
 
-[5] [6] [7]
-Overfull \hbox (1.32481pt too wide) in paragraph at lines 374--375
+[7] [8]
+Overfull \hbox (1.32481pt too wide) in paragraph at lines 446--447
 []\EU1/lmr/m/n/10 Firstly convert the one-counter automaton to a weighted graph
  $\OML/cmm/m/it/10 G \OT1/cmr/m/n/10 = (\OML/cmm/m/it/10 V; E; ^^V\OT1/cmr/m/n/
 10 )$\EU1/lmr/m/n/10 ,
  []
 
-[8] [9]
-Overfull \hbox (10.83508pt too wide) in paragraph at lines 452--453
-[]\EU1/lmr/m/it/10 Given a graph $\OML/cmm/m/it/10 G \OT1/cmr/m/n/10 = (\OML/cm
-m/m/it/10 V; E; ^^V\OT1/cmr/m/n/10 )$
+[9] [10] [11]
+Overfull \hbox (3.94069pt too wide) in paragraph at lines 563--564
+[]\EU1/lmr/m/it/10 Given an $\OML/cmm/m/it/10 SCC \OT1/cmr/m/n/10 = (\OML/cmm/m
+/it/10 V[]; E[]; ^^V\OT1/cmr/m/n/10 )$ \EU1/lmr/m/it/10 where we assume $\OMS/c
+msy/m/n/10 j\OML/cmm/m/it/10 V[]\OMS/cmsy/m/n/10 j \OML/cmm/m/it/10 > \OT1/cmr/
+m/n/10 2\OML/cmm/m/it/10 ; ^^V\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 E[]\OT1/cmr/m/n
+/10 ) =
  []
 
-! Extra }, or forgotten $.
-l.475 ...raph $G$ and an integer $n\in \mathbb{N}}
-                                                  $
-I've deleted a group-closing symbol because it seems to be
-spurious, as in `$x}$'. But perhaps the } is legitimate and
-you forgot something else, as in `\hbox{$x}'. In such cases
-the way to recover is to insert both the forgotten and the
-deleted material, e.g., by typing `I$}'.
-
-[10] (./draft.aux) ) 
+[12] [13] [14] [15] (./draft.aux) ) 
 Here is how much of TeX's memory you used:
- 19367 strings out of 495211
- 372882 string characters out of 6179842
- 385999 words of memory out of 5000000
- 22529 multiletter control sequences out of 15000+600000
+ 19377 strings out of 495211
+ 373039 string characters out of 6179842
+ 382999 words of memory out of 5000000
+ 22539 multiletter control sequences out of 15000+600000
  10136 words of font info for 59 fonts, out of 8000000 for 9000
  286 hyphenation exceptions out of 8191
  54i,10n,74p,10432b,466s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on draft.pdf (10 pages).
+Output written on draft.pdf (15 pages).
