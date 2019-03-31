@@ -1,4 +1,4 @@
-package graph.direct;
+package graph.directed;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +40,18 @@ public class Path {
 			}
 		}
 		return false;
+	}
+	
+	//Algorithms
+	
+	public int getWeightOfPath() {
+		//TODO
+		return 0;
+	}
+	
+	public int getDropOfPath() {
+		//TODO
+		return 0;
 	}
 	
 	// output 

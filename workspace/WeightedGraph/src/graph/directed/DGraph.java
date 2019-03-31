@@ -1,4 +1,4 @@
-package graph.direct;
+package graph.directed;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +68,9 @@ public class DGraph {
 		return this.getVertex(fromIndex).checkEdge(toIndex);
 	}
 	
+	
+	//Algorithms
+
 	public Path dfs(int vertexIndex) {
 		return this.getVertex(this.getStartVertexIndex()).dfs(this.getVertex(vertexIndex));
 	}

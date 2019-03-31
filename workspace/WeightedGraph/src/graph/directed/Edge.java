@@ -1,4 +1,4 @@
-package graph.direct;
+package graph.directed;
 
 public class Edge {
 	

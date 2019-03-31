@@ -1,4 +1,4 @@
-package graph.direct;
+package graph.directed;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -44,7 +44,8 @@ public class Vertex {
 		return false;
 	}
 	
-	//Algorithm 
+	
+	// Algorithms 
 	public Path dfs(Vertex v) {
 		Path p = new Path(this);
 		Boolean flag = false;
@@ -52,7 +53,7 @@ public class Vertex {
 		return p;
 	}
 	
-	//TODO: debug
+	//TODO: debug again
 	private void dfsRecur(Vertex v, Path path, Boolean flag) {
 		if(path.getLastVertex() == v || flag == true) {
 			// stop searching for already found
@@ -70,7 +71,9 @@ public class Vertex {
 			}
 		}
 		//del
-		path.removeLastVertex();
+		if(flag != true) {
+			path.removeLastVertex();
+		}
 		return;
 	}
 	

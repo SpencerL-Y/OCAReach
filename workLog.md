@@ -447,4 +447,10 @@ How to enumerate all the postive cycle template??
 2. 将之前写的算法的草稿再看一遍，思考是否有优化的空间或者有无错误
 3. 调研one-counter的相关工具、presburger的相关工具——需要再次调研之前看过的文章
 4. 慢慢开始写论文，先写preliminary
-5. 开始实现自己的工具
+5. 开始实现自己的工具: 图的相关结构定义完成，完成DFS的实现
+
+
+
+Table 的问题：
+1. 利用swing的table类 | 自己实现
+2. 如果用table类需要考虑需要多少列

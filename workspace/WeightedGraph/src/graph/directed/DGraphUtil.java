@@ -1,4 +1,4 @@
-package graph.direct;
+package graph.directed;
 
 public class DGraphUtil {
 	public static void printAdjMatrix(DGraph g) {
