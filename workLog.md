@@ -454,3 +454,7 @@ How to enumerate all the postive cycle template??
 Table 的问题：
 1. 利用swing的table类 | 自己实现
 2. 如果用table类需要考虑需要多少列
+
+Path 的实现问题：
+1. 每条路径是否需要存储一个drop和weight
+2. drop和weight是在需要用到时计算还是单独计算
