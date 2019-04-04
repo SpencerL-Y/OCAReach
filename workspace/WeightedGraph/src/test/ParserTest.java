@@ -6,9 +6,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import automata.counter.OCA;
 import parser.OCAParser;
 
-public class parserTest {
+public class ParserTest {
 	public static void main(String[] args) throws IOException {
 		int ch = 0;
 		InputStream input = new FileInputStream(new File("/home/clexma/Desktop/a.ocd"));
@@ -18,6 +19,8 @@ public class parserTest {
 		}
 		String ocd = sb.toString();
 		OCAParser p = new OCAParser(input);
-		p.parse(ocd);
+		OCA oca = p.parse(ocd);
+		oca.print();
 	}
 }
+  

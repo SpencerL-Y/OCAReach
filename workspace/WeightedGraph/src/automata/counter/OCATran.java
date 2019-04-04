@@ -10,10 +10,10 @@ public class OCATran implements Transition {
 	private OCAOp op;
 	
 	
-	public OCATran(State from, State to) {
+	public OCATran(State from, State to, OCAOp op) {
 		this.setFrom(from);
 		this.setTo(to);
-		this.setOp(null);
+		this.setOp(op);
 	}
 	
 	// Interface
@@ -40,6 +40,12 @@ public class OCATran implements Transition {
 		}
 	}
 	
+	
+	@Override
+	public void print() {
+		System.out.println("("+this.getFrom().getIndex()+","+this.getLabel()+","+this.getTo().getIndex()+")");
+	}
+	
 	//getters and setters
 	public void setFrom(State from) {
 		this.from = from;
@@ -56,5 +62,7 @@ public class OCATran implements Transition {
 	public void setOp(OCAOp op) {
 		this.op = op;
 	}
+
+
 
 }

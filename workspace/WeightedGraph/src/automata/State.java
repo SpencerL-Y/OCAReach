@@ -15,7 +15,11 @@ public class State {
 	}
 	
 	public void addTransition(Transition tran) {
-		this.transitions.add(tran);
+		if(this.checkTransitionExist(tran)) {
+			System.out.println("ERROR: transition already exists");
+			System.out.checkError();
+		}
+		this.transitions.add(tran);	
 	}
 	
 	public void delTransition(int to) {
@@ -28,7 +32,14 @@ public class State {
 		System.out.println("ERROR: Transition not found");
 	}
 	
-	
+	public boolean checkTransitionExist(Transition trans) {
+		for(Transition t : this.transitions) {
+			if(t.equals(trans)) {
+				return true;
+			} 
+		}
+		return false;
+	}	
 	//setters and getters
 	
 	public int getIndex() {
