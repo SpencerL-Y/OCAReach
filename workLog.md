@@ -449,12 +449,71 @@ How to enumerate all the postive cycle template??
 4. 慢慢开始写论文，先写preliminary
 5. 开始实现自己的工具: 图的相关结构定义完成，完成DFS的实现
 
+## 四月 1日 2日
+
+现在已经搭好基本的框架
+
+接下来需要做的事情：
+1. 调研 Z3的格式
+2. 实现 QFPA的相关结构
+3. 实现 QFPA公式到Z3的转换
+4. 需要思考的问题
+  - 如何从代码的运行中生成满足SMT2格式的公式
+5. 需要实现FormulaGenerator
+6. 需要
 
 
-Table 的问题：
-1. 利用swing的table类 | 自己实现
-2. 如果用table类需要考虑需要多少列
+## 四月 2 日 晚上教学楼
 
-Path 的实现问题：
-1. 每条路径是否需要存储一个drop和weight
-2. drop和weight是在需要用到时计算还是单独计算
+Syntax:
+  Lexicon :
+    <Whitespace Chars>
+    <Printable Chars> :=
+    <Digits>          := 
+    <Letters>         :=
+    <Numerals>        := ..
+    <Decimals>        := ...
+    <Hexadecimals>    := #x(0~F)* | #x(0~f)*
+    <Binaries>        := #b(0|1)*
+    <String literals> := anysequence of chars from <printable chars> or <whitespace char> dilimited by <"> and <"> cannot occur within a <string literal>
+    <Reserver words> := ...
+    <Symbol> := <simple symbol> | <quoted symbol>
+      <simple symbols> := any non-empty sequence of <letter> and <digit> and <chars: ~ ! @ $ % ^ & * _ - + = < > . ? /> that does not start with a <digit> and is not <reserved words>
+      <quoted symbol> := any sequence of <whitespace chars> and <printable chars> that starts and ends with <char: |> and does not contain <char: |> or <char: \>
+    <Keywords> := is a token of the form <:simple symbol>
+  S-expression: non-parenthesis token or a (possibly empty) sequence of <S-expression>
+  <spec_constant> := <numeral> | <decimal> | <hexadecimal> | <binary> | <string>
+  <s_expre> := <spec_constant> | <symbol> | <keyword> | (<s_expre>*)
+  Identifiers:
+    <index> := <numeral> | <symbol>
+    <identifier> := <symbol> | ( _ <symbol> <index>^+ )
+  Attributes:
+    <attribute_value> := <spec_constant> | <symbol> | (<s_expre>*)
+    <attribute> := <keyword> | <keyword><attribute_value>
+  Sorts:
+    <sort> := <identifier> | (<identifier> <sort>^+)
+  Terms and Formulas:
+    <qual_identifier> := <identifier> | (as <identifier> <sort>)
+    <var_binding> := (<symbol> <term>)
+    <sorted_var> := (<symbol> <sort>)
+    <pattern> := <symbol> | (<symbol> <symbol>^+)
+    <match_case> := (<pattern> <term>)
+    <term> := <spec_constant> 
+            | <qual_identifier>
+            | (<qual_identifier> <term>^+)       
+            | (let (<var_binding>^+) <term>)
+            | (forall (<sorted_var>^+) <term>)
+            | (exists (<sorted_var>^+) <term>)
+            | (match <term> (<match_case>^+))
+            | (! <term> <attribute>^+)
+
+
+ 
+  Variable binders:
+    (forall ((x1 s1) (x2 s2) ... (xn sn)) \phi)
+    ==
+    (forall ((x1 s1)) (forall ((x2 s2)) ..... \phi))
+  Let: 
+    (let ((x1 t1) ... (xn tn)) t) == ...
+  Match:
+    
