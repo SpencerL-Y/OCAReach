@@ -4,20 +4,20 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class DGVertex {
-	private List<Edge> edges;
+	private List<DGEdge> edges;
 	private int index;
 	
 	public DGVertex(int i) {
-		this.setEdges(new LinkedList<Edge>());
+		this.setEdges(new LinkedList<DGEdge>());
 		this.setIndex(i);
 	}
 	
 	public void addEdge(DGVertex toVertex, int weight) {
-		Edge e = new Edge(this, toVertex, weight);
+		DGEdge e = new DGEdge(this, toVertex, weight);
 		this.addEdge(e);
 	}
 	
-	private void addEdge(Edge e) {
+	private void addEdge(DGEdge e) {
 		for(int i = 0; i < this.getEdges().size(); i ++) {
 			if(this.getEdges().get(i).getTo().getIndex() > e.getTo().getIndex()) {
 				// making the list of edges in order regarding to the edge index
@@ -28,7 +28,7 @@ public class DGVertex {
 	}
 	
 	public void delEdge(int toIndex) {
-		for(Edge e : this.getEdges()){
+		for(DGEdge e : this.getEdges()){
 			if(e.getTo().getIndex() == toIndex) {
 				this.getEdges().remove(e);
 				return;
@@ -37,7 +37,7 @@ public class DGVertex {
 	}
 	
 	public Boolean checkEdge(int toIndex) {
-		for(Edge e : this.getEdges()) {
+		for(DGEdge e : this.getEdges()) {
 			if(e.getTo().getIndex() == toIndex) {
 				return true;
 			}
@@ -46,10 +46,10 @@ public class DGVertex {
 	}
 	
 	//getters and setters
-	public List<Edge> getEdges() {
+	public List<DGEdge> getEdges() {
 		return edges;
 	}
-	public void setEdges(List<Edge> edges) {
+	public void setEdges(List<DGEdge> edges) {
 		this.edges = edges;
 	}
 	public int getIndex() {

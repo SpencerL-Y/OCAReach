@@ -7,6 +7,7 @@ import java.util.Stack;
 public class SDGraph{
 	private DGraph graph;
 	private Integer sccNum;
+	private SDGVertex startingVertex;
 	private List<SDGVertex> vertices;
 	
 	public SDGraph(DGraph g) {
@@ -16,6 +17,7 @@ public class SDGraph{
 		for(DGVertex v : this.getGraph().getVertices()) {
 			this.vertices.add(new SDGVertex(v, this));
 		}
+		this.startingVertex = this.getVertex(this.getGraph().getStartVertexIndex());
 	}
 
 	// basic operation
@@ -30,6 +32,11 @@ public class SDGraph{
 		System.out.checkError();
 		return null;
 	}
+	
+	public SDGVertex getEdgeTo(DGEdge e) {
+		return this.getVertex(e.getTo().getIndex());
+	}
+	
 	// algorithm tarjan
 	public void tarjan() {
 		Integer index = 0;
@@ -40,6 +47,7 @@ public class SDGraph{
 				v.strongConnected(stack, index, sccIndex);
 			}
 		}
+		this.setSccNum(sccIndex);
 	}
 	
 	// getters and setters
@@ -66,6 +74,14 @@ public class SDGraph{
 
 	public void setSccNum(Integer sccNum) {
 		this.sccNum = sccNum;
+	}
+
+	public SDGVertex getStartingVertex() {
+		return startingVertex;
+	}
+
+	public void setStartingVertex(SDGVertex startingVertex) {
+		this.startingVertex = startingVertex;
 	}
 	
 }

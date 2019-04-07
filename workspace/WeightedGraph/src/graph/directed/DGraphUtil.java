@@ -11,7 +11,7 @@ public class DGraphUtil {
 			System.out.print(v.getIndex() + " ");
 			for(DGVertex ve : g.getVertices()) {
 				int flag = 0;
-				for(Edge e : v.getEdges()) {
+				for(DGEdge e : v.getEdges()) {
 					if(e.getTo().getIndex() == ve.getIndex()) {
 						System.out.print(e.getWeight() + " ");
 						flag = 1;

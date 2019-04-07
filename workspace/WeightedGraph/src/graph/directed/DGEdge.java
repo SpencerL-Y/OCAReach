@@ -1,12 +1,12 @@
 package graph.directed;
 
-public class Edge {
+public class DGEdge {
 	
 	private DGVertex from, to;
 	// TODO generalize int type
 	private int weight;
 	
-	public Edge(DGVertex f, DGVertex t, int w) {
+	public DGEdge(DGVertex f, DGVertex t, int w) {
 		this.from = f;
 		this.to= t;
 		this.setWeight(w);

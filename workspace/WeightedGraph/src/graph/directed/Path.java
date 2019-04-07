@@ -31,7 +31,7 @@ public class Path {
 	
 	public void concatVertex(DGVertex v) {
 		DGVertex last = this.getLastVertex();
-		for(Edge edge : last.getEdges()) {
+		for(DGEdge edge : last.getEdges()) {
 			if(edge.getTo().getIndex() == v.getIndex()) {
 				this.getPath().add(v);
 				this.setWeight(this.getWeight() + edge.getWeight());

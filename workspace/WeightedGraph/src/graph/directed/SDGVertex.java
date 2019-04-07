@@ -27,7 +27,7 @@ public class SDGVertex {
 		index = index + 1;
 		stack.push(this);
 		this.setOnStack(true);
-		for(Edge e: this.getVertex().getEdges()) {
+		for(DGEdge e: this.getVertex().getEdges()) {
 			// the edge is (this, w) in SDGraph
 			SDGVertex w  = this.getGraph().getVertex(e.getTo().getIndex());
 			if(w.getSccMark() == -1) {
