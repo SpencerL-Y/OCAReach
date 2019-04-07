@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import graph.directed.DGraph;
-import graph.directed.Vertex;
+import graph.directed.DGVertex;
 
 public class DWTable extends Table{
 	// this implementation is not so efficient
@@ -19,8 +19,8 @@ public class DWTable extends Table{
 		this.addCol("MaxLen");
 		this.addCol("DWTupleSet");
 		
-		for(Vertex v : this.getGraph().getVertices()) {
-			for(Vertex w : this.getGraph().getVertices()) {
+		for(DGVertex v : this.getGraph().getVertices()) {
+			for(DGVertex w : this.getGraph().getVertices()) {
 				this.addRow(v.getIndex(), w.getIndex(), 0, new HashSet<DWTuple>(0));
 			}
 		}

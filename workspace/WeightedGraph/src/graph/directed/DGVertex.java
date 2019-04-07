@@ -3,15 +3,16 @@ package graph.directed;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Vertex {
+public class DGVertex {
 	private List<Edge> edges;
 	private int index;
-	public Vertex(int i) {
+	
+	public DGVertex(int i) {
 		this.setEdges(new LinkedList<Edge>());
 		this.setIndex(i);
 	}
 	
-	public void addEdge(Vertex toVertex, int weight) {
+	public void addEdge(DGVertex toVertex, int weight) {
 		Edge e = new Edge(this, toVertex, weight);
 		this.addEdge(e);
 	}
@@ -42,39 +43,6 @@ public class Vertex {
 			}
 		}
 		return false;
-	}
-	
-	
-	// Algorithms 
-	public Path dfs(Vertex v) {
-		Path p = new Path(this);
-		Boolean flag = false;
-		this.dfsRecur(v, p, flag);
-		return p;
-	}
-	
-	//TODO: debug again
-	private void dfsRecur(Vertex v, Path path, Boolean flag) {
-		if(path.getLastVertex() == v || flag == true) {
-			// stop searching for already found
-			flag = true;
-			return;
-		}
-		for(Edge e : path.getLastVertex().getEdges()) {
-			if(!(path.contains(e.getTo()))) {
-				path.concatVertex(e.getTo());
-				e.getTo().dfsRecur(v, path, flag);
-			} else {
-				//del
-				path.removeLastVertex();
-				return;
-			}
-		}
-		//del
-		if(flag != true) {
-			path.removeLastVertex();
-		}
-		return;
 	}
 	
 	//getters and setters

@@ -8,29 +8,29 @@ public class Path {
 	// p = p1 p2 p3...pk
 	// where for each (pi, p_{i+1}), there is a edge from pi to p_{i+1}
 	
-	private List<Vertex> path;
+	private List<DGVertex> path;
 	private int drop;
 	private int weight;
 	private int length;
 	
-	public Path(Vertex s) {
-		path = new ArrayList<Vertex>();
+	public Path(DGVertex s) {
+		path = new ArrayList<DGVertex>();
 		path.add(s);
 		this.setDrop(0);
 		this.setLength(0);
 		this.setWeight(0);
 	}
 	
-	public Vertex getLastVertex() {
+	public DGVertex getLastVertex() {
 		return this.path.get(this.getLength());
 	}
 	
-	public Vertex getVertex(int index) {
+	public DGVertex getVertex(int index) {
 		return this.getPath().get(index);
 	}
 	
-	public void concatVertex(Vertex v) {
-		Vertex last = this.getLastVertex();
+	public void concatVertex(DGVertex v) {
+		DGVertex last = this.getLastVertex();
 		for(Edge edge : last.getEdges()) {
 			if(edge.getTo().getIndex() == v.getIndex()) {
 				this.getPath().add(v);
@@ -59,8 +59,8 @@ public class Path {
 		
 	}
 	
-	public boolean contains(Vertex v) {
-		for(Vertex ve : this.getPath()) {
+	public boolean contains(DGVertex v) {
+		for(DGVertex ve : this.getPath()) {
 			if(ve == v) {
 				return true;
 			}
@@ -91,18 +91,18 @@ public class Path {
 	// output 
 	public void printPath() {
 		System.out.print("Path: ");
-		for(Vertex v : this.getPath()) {
+		for(DGVertex v : this.getPath()) {
 			System.out.print(v.getIndex());
 		}
 		System.out.println();
 	}
 	
 	// getters and setters
-	public List<Vertex> getPath() {
+	public List<DGVertex> getPath() {
 		return this.path;
 	}
 
-	public void setPath(List<Vertex> path) {
+	public void setPath(List<DGVertex> path) {
 		this.path = path;
 	}
 

@@ -4,24 +4,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DGraph {
-	private List<Vertex> vertices;
+	private List<DGVertex> vertices;
 	private int startVertexIndex;
 	public DGraph() {
-		this.setVertices(new ArrayList<Vertex>());
+		this.setVertices(new ArrayList<DGVertex>());
 		this.setStartVertexIndex(0);
 	}
 	
 	public void addVertex(int index) {
-		for(Vertex v : this.getVertices()) {
+		for(DGVertex v : this.getVertices()) {
 			if(v.getIndex() == index) {
 				System.out.println("ERROR: Index repeat");
 			}
 		}
-		this.vertices.add(new Vertex(index));
+		this.vertices.add(new DGVertex(index));
 	}
 	
 	public void delVertex(int index) {
-		for(Vertex v : this.getVertices()) {
+		for(DGVertex v : this.getVertices()) {
 			if(v.getIndex() == index) {
 				this.getVertices().remove(v);
 				return;
@@ -30,8 +30,8 @@ public class DGraph {
 		System.out.println("ERROR: Vertex not exist");
 	}
 	
-	public Vertex getVertex(int index) {
-		for(Vertex v : this.getVertices()) {
+	public DGVertex getVertex(int index) {
+		for(DGVertex v : this.getVertices()) {
 			if(v.getIndex() == index) {
 				return v;
 			}
@@ -40,12 +40,16 @@ public class DGraph {
 		return null;
 	}
 	
-	public void setVertex(int index, Vertex v) {
-		for(Vertex ve : this.getVertices()) {
+	public void setVertex(int index, DGVertex v) {
+		for(DGVertex ve : this.getVertices()) {
 			if(ve.getIndex() == index) {
 				ve = v;
 			}
 		}
+	}
+	
+	public int size() {
+		return this.getVertices().size();
 	}
 	
 	public void addEdge(int fromIndex, int toIndex, int weight) {
@@ -71,17 +75,13 @@ public class DGraph {
 	
 	//Algorithms
 
-	public Path dfs(int vertexIndex) {
-		return this.getVertex(this.getStartVertexIndex()).dfs(this.getVertex(vertexIndex));
-	}
-	
 	
 	//getters and setters
-	public List<Vertex> getVertices() {
+	public List<DGVertex> getVertices() {
 		return vertices;
 	}
 	
-	public void setVertices(List<Vertex> vertices) {
+	public void setVertices(List<DGVertex> vertices) {
 		this.vertices = vertices;
 	}
 

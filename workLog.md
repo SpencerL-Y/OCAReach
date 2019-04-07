@@ -516,4 +516,7 @@ Syntax:
   Let: 
     (let ((x1 t1) ... (xn tn)) t) == ...
   Match:
-    
+
+
+## 四月 6日 
+完成对Z3 的调研，弄清楚了context的用法和如何生成抽象语法树

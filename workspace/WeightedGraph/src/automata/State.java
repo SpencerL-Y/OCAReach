@@ -8,7 +8,6 @@ public class State {
 	private int index;
 	private List<Transition> transitions;
 	
-	
 	public State(int index) {
 		this.setIndex(index);
 		this.transitions = new ArrayList<Transition>();
@@ -57,4 +56,5 @@ public class State {
 	public void setTransitions(List<Transition> transitions) {
 		this.transitions = transitions;
 	}
+	
 }

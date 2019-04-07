@@ -2,7 +2,7 @@ package test;
 
 import graph.directed.DGraph;
 import graph.directed.DGraphUtil;
-import graph.directed.Path;
+import graph.directed.SDGraph;
 
 public class TestGraph {
 	public static void main(String[] args) {
@@ -16,8 +16,8 @@ public class TestGraph {
 		tg.addEdge(1, 0, 1);
 		tg.addEdge(1, 2, 5);
 		tg.addEdge(2, 3, 1);
-		Path p = tg.dfs(1);
+		SDGraph sdg = new SDGraph(tg);
+		sdg.tarjan();
 		DGraphUtil.printAdjMatrix(tg);
-		p.printPath();
 	}
 }
