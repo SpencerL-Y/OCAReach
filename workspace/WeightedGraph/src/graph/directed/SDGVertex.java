@@ -20,7 +20,7 @@ public class SDGVertex {
 	}
 	
 	//algorithm 
-	
+	//TODO: debug
 	public void strongConnected(Stack<SDGVertex> stack, Integer index, Integer sccIndex) {
 		this.setSccMark(index);
 		this.setLowLink(index);

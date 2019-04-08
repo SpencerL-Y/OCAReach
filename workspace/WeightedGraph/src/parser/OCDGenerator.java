@@ -2,7 +2,6 @@ package parser;
 
 import java.util.Random;
 
-import automata.State;
 import automata.counter.OCA;
 import automata.counter.OCAOp;
 

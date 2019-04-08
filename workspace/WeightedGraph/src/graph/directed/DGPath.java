@@ -3,7 +3,7 @@ package graph.directed;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Path {
+public class DGPath {
 	// path p on a directed weighted graph is a sequence:
 	// p = p1 p2 p3...pk
 	// where for each (pi, p_{i+1}), there is a edge from pi to p_{i+1}
@@ -13,13 +13,15 @@ public class Path {
 	private int weight;
 	private int length;
 	
-	public Path(DGVertex s) {
+	public DGPath(DGVertex s) {
 		path = new ArrayList<DGVertex>();
 		path.add(s);
 		this.setDrop(0);
 		this.setLength(0);
 		this.setWeight(0);
 	}
+	
+	// basic operations
 	
 	public DGVertex getLastVertex() {
 		return this.path.get(this.getLength());
@@ -43,7 +45,7 @@ public class Path {
 		System.out.println("ERROR: Path Concat Not Valid");
 	}
 	
-	public void concatPath(Path path) {
+	public void concatPath(DGPath path) {
 		assert(this.getLastVertex() == path.getVertex(0));
 		for(int i = 1; i <= this.getLength(); i++) {
 			this.concatVertex(path.getVertex(i));
@@ -69,9 +71,9 @@ public class Path {
 	}	
 	
 	//TODO debug
-	public Path getSubpath(int startIndex, int endIndex) {
+	public DGPath getSubpath(int startIndex, int endIndex) {
 		assert(startIndex >= 0 && endIndex <= this.getLength() && startIndex <= endIndex);
-		Path p = new Path(this.getVertex(startIndex));
+		DGPath p = new DGPath(this.getVertex(startIndex));
 		for(int i = startIndex + 1; i <= endIndex; i++) {
 			p.concatVertex(this.getVertex(i));
 		}
@@ -82,7 +84,7 @@ public class Path {
 		int s = 0;
 		int minWeight = 0;
 		for(int e = 0; e <= this.getLength(); e ++) {
-			Path p = this.getSubpath(s, e);
+			DGPath p = this.getSubpath(s, e);
 			minWeight = Math.min(p.getWeight(), minWeight);
 		}
 		this.setDrop(minWeight);

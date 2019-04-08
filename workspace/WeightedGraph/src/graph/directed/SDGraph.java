@@ -19,7 +19,7 @@ public class SDGraph{
 		}
 		this.startingVertex = this.getVertex(this.getGraph().getStartVertexIndex());
 	}
-
+	
 	// basic operation
 	
 	public SDGVertex getVertex(int vertexIndex) {
@@ -37,7 +37,34 @@ public class SDGraph{
 		return this.getVertex(e.getTo().getIndex());
 	}
 	
+	//TODO: debug
+	public SDGraph getConcreteSCC(int sccIndex) {
+		DGraph graph = new DGraph();
+		for(SDGVertex v : this.getVertices()) {
+			if(v.getSccMark() == sccIndex) {
+				// add all the scc vertices into the subgraph
+				graph.addVertex(v.getVertex().getIndex());
+				for(DGEdge e : v.getVertex().getEdges()) {
+					if(this.getEdgeTo(e).getSccMark() == sccIndex) {
+						// if the transition is in the scc, add it to the sub dgraph
+						graph.addEdge(e.getFrom().getIndex(), 
+									  e.getTo().getIndex(),
+									  e.getWeight());
+					}
+				}
+			}
+		}
+		// create a conScc 
+		SDGraph conScc = new SDGraph(graph);
+		conScc.setSccNum(1);
+		for(SDGVertex v : conScc.getVertices()) {
+			v.setSccMark(sccIndex);
+		}
+		return conScc;
+	}
+	
 	// algorithm tarjan
+	//TODO: debug
 	public void tarjan() {
 		Integer index = 0;
 		Integer sccIndex = 1;

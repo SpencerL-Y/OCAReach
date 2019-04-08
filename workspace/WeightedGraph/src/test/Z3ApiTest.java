@@ -23,7 +23,6 @@ public class Z3ApiTest {
 	 */
 	public static void main(String[] args) {
 		Context ctx = new Context();
-		Sort boolSort = ctx.getBoolSort();
 		Sort[] types = new Sort[3];
 		IntExpr[] xs = new IntExpr[3];
 		Symbol[] names = new Symbol[3];

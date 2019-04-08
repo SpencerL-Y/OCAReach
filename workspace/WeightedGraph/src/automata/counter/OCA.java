@@ -7,7 +7,6 @@ import automata.Automaton;
 import automata.State;
 import automata.Transition;
 import graph.directed.DGraph;
-import graph.undirected.UDGraph;
 
 public class OCA implements Automaton{
 	private List<State> states;

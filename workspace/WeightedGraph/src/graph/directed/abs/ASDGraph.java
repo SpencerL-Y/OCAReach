@@ -2,6 +2,7 @@ package graph.directed.abs;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 import graph.directed.DGEdge;
 import graph.directed.SDGVertex;
@@ -33,6 +34,8 @@ public class ASDGraph {
 		}
 	}
 	
+	//basic operations
+	
 	public ASDGVertex getVertex(int sccIndex) {
 		for(ASDGVertex v : this.getVertices()) {
 			if(v.getSccIndex() == sccIndex) {
@@ -43,6 +46,84 @@ public class ASDGraph {
 		System.out.checkError();
 		return null;
 	}
+	
+	public Boolean checkBorderEdge(SDGVertex from, SDGVertex to) {
+		for(BorderEdge e : this.getBorderEdges()) {
+			if(e.getFromVertex() == from && e.getToVertex() == to) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	
+	public Boolean checkAbsEdge(int fromScc, int toScc) {
+		ASDGVertex v = this.getVertex(fromScc);
+		return v.checkAbsEdge(toScc);
+	}
+	
+	public Boolean checkAbsEdge(ASDGVertex from, ASDGVertex to) {
+		return this.checkAbsEdge(from.getSccIndex(), to.getSccIndex());
+	}
+	
+	public ASDGEdge getAbsEdge(int fromSccIndex, int toSccIndex) {
+		if(this.checkAbsEdge(fromSccIndex, toSccIndex)) {
+			return this.getVertex(fromSccIndex).getAbsEdge(toSccIndex);
+		}
+		System.out.println("ERROR: AbsEdge not found");
+		System.out.checkError();
+		return null;
+	}
+	
+	// algorithm
+	
+	public List<BorderEdge> getBorderEdgesByAbsEdge(int fromSccIndex, int toSccIndex){
+		List<BorderEdge> edges = new ArrayList<BorderEdge>();
+		for(BorderEdge e : this.getBorderEdges()) {
+			if(e.getFromScc() == fromSccIndex && e.getToScc() == toSccIndex) {
+				edges.add(e);
+			}
+		}
+		return edges;
+	}
+	
+	
+	//TODO: debug
+	public List<ASDGPath> DFSFindAbsPaths(int startSccIndex, int toSccIndex) {
+		List<ASDGPath> result = new ArrayList<ASDGPath>();
+		Stack<ASDGVertex> stack = new Stack<ASDGVertex>();
+		stack.push(this.getVertex(startSccIndex));
+		this.dfsProcess(result, stack, toSccIndex);
+		stack.pop();
+		return result;
+	}
+	//TODO: debug
+	private void dfsProcess(List<ASDGPath> result, Stack<ASDGVertex> stack, int toSccIndex) {
+		// termination situations 1 & 2
+		if(stack.peek().getSccIndex() == toSccIndex) {
+			// if we reach the target in dfs, store  the path into result list
+			ASDGPath path = new ASDGPath(stack.get(0));
+			for(int i = 1; i <= stack.size() - 1; i ++) {
+				path.append(stack.get(i));
+			}
+			result.add(path);
+			return;
+		} else if(stack.peek().getAbsEdges().size() == 0) {
+			// no outports
+			return;
+		} else if(stack.empty()) {
+			// stack empty (this should not happen)
+			System.out.checkError();
+			return;
+		}
+		for(ASDGEdge e : stack.peek().getAbsEdges()) {
+			stack.push(e.getTo());
+			this.dfsProcess(result, stack, toSccIndex);
+			stack.pop();
+		}
+	}
+	
+	//setters and getters
 	
 	public SDGraph getSdg() {
 		return sdg;

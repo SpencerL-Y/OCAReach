@@ -32,16 +32,31 @@ public class ASDGVertex {
 	}
 	
 	// map to concrete subgraph
-	
+	//TODO: debug
 	public SDGraph getConcreteSDGraph() {
-		// TODO
+		return this.getGraph().getSdg().getConcreteSCC(this.getSccIndex());
+	}
+	
+	//basic operations
+	
+	public ASDGEdge getAbsEdge(int toSccIndex) {
+		for(ASDGEdge e : this.getAbsEdges()) {
+			if(e.getTo().getSccIndex() == toSccIndex) {
+				return e;
+			}
+		}
+		System.out.println("ERROR: ASDGEdge not found");
+		System.out.checkError();
 		return null;
 	}
 	
-	// DFS on abstract path
-	
-	public void absDFS() {
-		//TODO
+	public Boolean checkAbsEdge(int toScc) {
+		for(ASDGEdge e : this.getAbsEdges()) {
+			if(e.getTo().getSccIndex() == toScc) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	// algorithm
