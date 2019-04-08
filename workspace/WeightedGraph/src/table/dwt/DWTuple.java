@@ -9,6 +9,8 @@ public class DWTuple {
 		this.setWeight(w);
 	}
 	
+	//basic operations
+	
 	public void printTuple() {
 		System.out.println("(" + this.getDrop() + "," + this.getWeight() +  ")");
 	}
@@ -16,6 +18,15 @@ public class DWTuple {
 	public void setTuple(int d, int w) {
 		this.setDrop(d);
 		this.setWeight(w);
+	}
+	
+	//algorithm
+	
+	public static DWTuple merge(DWTuple former, DWTuple latter) {
+		int d = Math.min(former.getDrop(), former.getWeight() + latter.getDrop());
+		int w = former.getWeight() + latter.getWeight();
+		DWTuple result = new DWTuple(d, w);
+		return result;
 	}
 	
 	//setters and getters

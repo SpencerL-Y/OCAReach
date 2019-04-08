@@ -519,4 +519,12 @@ Syntax:
 
 
 ## 四月 6日 
+
+之前的问题：
+input 自己定义一个格式并写一个oarse
+output 利用Z3的java api生成公式
+
+调研时候产生的问题：Z3的Java api仅仅有一个.java的库，并没有详细的api documentation
+但是利用仅有的example可以完成本次实验因此该问题的
+
 完成对Z3 的调研，弄清楚了context的用法和如何生成抽象语法树
