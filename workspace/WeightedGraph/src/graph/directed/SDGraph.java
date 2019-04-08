@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-public class SDGraph{
+public class SDGraph implements Graph{
 	private DGraph graph;
 	private Integer sccNum;
 	private SDGVertex startingVertex;

@@ -3,7 +3,7 @@ package graph.directed;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DGraph {
+public class DGraph implements Graph{
 	private List<DGVertex> vertices;
 	private int startVertexIndex;
 	public DGraph() {

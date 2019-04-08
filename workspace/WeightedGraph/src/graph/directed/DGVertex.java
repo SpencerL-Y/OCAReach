@@ -3,7 +3,7 @@ package graph.directed;
 import java.util.LinkedList;
 import java.util.List;
 
-public class DGVertex {
+public class DGVertex implements Vertex{
 	private List<DGEdge> edges;
 	private int index;
 	

@@ -3,7 +3,7 @@ package graph.directed;
 import java.util.Stack;
 
 
-public class SDGVertex {
+public class SDGVertex implements Vertex{
 	private SDGraph graph;
 	private DGVertex vertex;
 	private Integer sccMark;

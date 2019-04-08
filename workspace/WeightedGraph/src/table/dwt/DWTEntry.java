@@ -2,18 +2,18 @@ package table.dwt;
 
 import java.util.List;
 
-public interface DWTEntry<V, G> {
+import graph.directed.Vertex;
+
+public interface DWTEntry {
 	// V may be SDGVertex or DGVertex
-	public V getStartVertex();
-	public V getEndVertex();
+	public Vertex getStartVertex();
+	public Vertex getEndVertex();
 	public int getStartIndex();
 	public int getEndIndex();
 	public int getMaxLength();
 	public List<DWTuple> getSetOfDWTuples();
-	public V setStartVertex(V startVertex);
-	public V setEndVertex(V endVertex);
-	public int setMaxLength(int maxLength);
+	public void setStartVertex(Vertex startVertex);
+	public void setEndVertex(Vertex endVertex);
+	public void setMaxLength(int maxLength);
 	public void addDWTuple(DWTuple tuple);
-	public G getGraph();
-	public G setGraph();
 }
