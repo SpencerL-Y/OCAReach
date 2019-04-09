@@ -4,5 +4,6 @@ public enum LoopTag {
 	Pos,
 	Neg,
 	Zero,
+	PosNeg,
 	None
 }

@@ -1,41 +1,43 @@
 package table.dwt;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import graph.directed.SDGVertex;
+import graph.directed.DGVertex;
 import graph.directed.Vertex;
 
-public class SDWTEntryImpl implements DWTEntry {
+public class DWTEntryImpl implements DWTEntry {
 	
-	private SDGVertex startVertex;
-	private SDGVertex endVertex;
+	private DGVertex startVertex;
+	private DGVertex endVertex;
 	private int maxLength;
 	private List<DWTuple> setOfDWTuples;
 	
-	public SDWTEntryImpl(SDGVertex startVertex, SDGVertex endVertex){
+	public DWTEntryImpl(DGVertex startVertex, DGVertex endVertex, int maxLength){
 		this.setStartVertex(startVertex);
 		this.setEndVertex(endVertex);
-		this.maxLength = 0;
+		this.maxLength = maxLength;
+		this.setOfDWTuples = new ArrayList<DWTuple>();
 	}
 	
 	@Override
-	public SDGVertex getStartVertex() {
+	public DGVertex getStartVertex() {
 		return this.startVertex;
 	}
 
 	@Override
-	public SDGVertex getEndVertex() {
+	public DGVertex getEndVertex() {
 		return this.endVertex;
 	}
 
 	@Override
 	public int getStartIndex() {
-		return this.getStartVertex().getVertex().getIndex();
+		return this.getStartVertex().getIndex();
 	}
 
 	@Override
 	public int getEndIndex() {
-		return this.getEndVertex().getVertex().getIndex();
+		return this.getEndVertex().getIndex();
 	}
 
 	@Override
@@ -54,12 +56,12 @@ public class SDWTEntryImpl implements DWTEntry {
 
 	@Override
 	public void setStartVertex(Vertex startVertex) {
-		this.startVertex = (SDGVertex)startVertex;
+		this.startVertex = (DGVertex)startVertex;
 	}
 
 	@Override
 	public void setEndVertex(Vertex endVertex) {
-		this.endVertex = (SDGVertex)endVertex;
+		this.endVertex = (DGVertex)endVertex;
 	}
 
 	@Override

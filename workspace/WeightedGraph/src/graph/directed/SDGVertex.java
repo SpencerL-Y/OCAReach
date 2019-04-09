@@ -1,5 +1,6 @@
 package graph.directed;
 
+import java.util.List;
 import java.util.Stack;
 
 
@@ -83,5 +84,13 @@ public class SDGVertex implements Vertex{
 
 	public void setGraph(SDGraph graph) {
 		this.graph = graph;
+	}
+	
+	public List<DGEdge> getEdges(){
+		return this.getVertex().getEdges();
+	}
+	
+	public int getVertexIndex() {
+		return this.getVertex().getIndex();
 	}
 }

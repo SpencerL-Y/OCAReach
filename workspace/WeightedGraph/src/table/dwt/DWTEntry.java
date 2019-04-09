@@ -5,7 +5,6 @@ import java.util.List;
 import graph.directed.Vertex;
 
 public interface DWTEntry {
-	// V may be SDGVertex or DGVertex
 	public Vertex getStartVertex();
 	public Vertex getEndVertex();
 	public int getStartIndex();
