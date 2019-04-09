@@ -387,43 +387,6 @@ How to enumerate all the postive cycle template??
 6. 照相
 
 
-本科毕业论文／设计题目及主要内容：
-论文题目：含有一个计数器的自动机的可达关系的计算
-主要内容：
-本题目主要研究含有一个计数器的自动机(one-counter automaton)的可达性关系的算法与实现的问题。该算法的输入是一个one-counter automaton和对应自动机上的初始格局和最终格局，可达性问题询问在该自动机上是否存在从初始格局到最终格局的合法运行。在 [1] 中已经有对该问题的NP-Complete的证明，但是该文章仅在理论上给出了证明，并没有将计算该问题的算法详细给出，算法还存在很多细节上的问题，并且部分定理的证明并不完整。
-此外我们希望解决one-coutner automata可达性更一般的问题，对于给出两个自动机的运行格局，将其对应的计数器的值用变量表示，最后算法得到一个线性算数公式，该公式能够被满足当且仅当从初始格局到最终格局的合法运行，这个问题比一般的可达性关系问题更强。
-毕业论文打算先将该算法的伪代码具体给出，然后对算法进行优化，最终实现该算法。
-
-附件：
-1. Algorithm Draft：目前将 [1] 中的算法和存在的问题整理后得到的算法的雏形
-参考文献：
-[1] Christoph Haase, On the Complexity of Model Checking Counter Automata, 2011
-
-本人系中国科学院大学2015届计算机科学与技术专业本科生，目前已结束课程学习并在软件所进行实习和毕业设计，毕业论文题目及内容如上所述。
-国科大本科计算机专业开设的必修课有离散数学、计算机科学导论、数字电路、C语言、数据结构、计算机组成原理、计算机体系结构、操作系统、人工智能、计算机网络和编译原理以及其对应的实验课程，专业必修课程重心偏向于代码能力、硬件设计和计算机体系结构相关内容。此外我还选修了机器学习、面向对象和软件测试与分析。在2018年上半年利用学校的给的名额，曾在慕尼黑工大进行过半年的交换学习，选修了Model Checking课程。
-
-大学分配学业导师，本着对于形式逻辑的好感和有一定基础的德语，我选择了国重张立军老师作为我的本科导师。2016年暑期社会实践期间，张老师在组内进行了一些小项目，主要是前端可视化的相关开发工作,并且尝试用一周时间阅读了一篇论文。曾在大二学习期间周末抽出时间参加组内的讨论班讲文章并和组内同学讨论。由于对自动机理论和图论相关内容感兴趣，我跟随组内博士生进行了相关的调研。
-我以[1]为起始点调研了自动机的机器学习的相关领域的研究现状。自动机学习的基本框架为老师和学生两个模块，通过不断的询问给定的串是否被接收和学到的自动机是否和目标等价，最终可以得到一个和目标自动机等价的自动机。Angluin在[1]中首次提出学习DFA的算法L*，之后又有相关文章将该工作扩展到NFA学习[2]、符号化自动机的学习[3]。 在[4]中Angluin将学习算法扩展到了更强的omega自动机上，李勇师兄又发表了利用FDFA(family of DFAs)学习Buechi自动机的文章[5]，并基于该文章实现了工具ROLL。在2017年暑假在软件所实习期间，我基于该工具实现了[6]中提到的I/O自动机的学习算法以及设计了ROLL的可视化界面[7]，在此基础上对自动机学习理论和概率模型的结合产生想法，并在交换期间前往[6]作者Prof. Vaandrager的组内进行了一天的访问。此外，由于对于DFA已经有基于树的数据结构的算法[8]，我曾尝试能否用树的数据结构设计学习NFA的算法，但因为对NFA不存在Myhill-Nerode定理以及并没有更多的时间研究NFA的bisimulation的相关问题，该题目没有能够继续做下去。除此之外，结合学习算法，我还调研了模型检验相关理论内容[9,10]。
-目前我在软件所实习，在吴志林老师的指导下进行毕业设计，除了算法草稿给出的内容，之后计划将算法实现并进行实验。
-
-我的研究兴趣主要集中在自动机理论、形式化方法、模型检验，如果有今后有在软件所读研的机会，我想以毕业设计为出发点，继续调研这一类自动机的模型检验的问题，并尝试在这个方向上做一些工作。此外，我也希望能够利用学习算法像[11]一样做一些应用上的研究和成果。
-
-
-
-
-[1] D. Angluin, Learning Regular Sets from Queries and Counterexamples
-[2] B. Bollig et al., Angluin-Style Learning of NFA*
-[3] S. Drews and L. D’Antoni, Learning Symbolic Automata
-[4] D. Angluin and D. Fisman, Learning Regular Omega Languages
-[5] Y. Li et al., A Novel Learning Algorithm for Büchi Automata based on Family of DFAs and Classification Trees
-[6] F. Vaandrager, Learning I/O Automata
-[7] https://github.com/qq1024407215
-[8] M. J. Kearns and U. V. Vazirani. An Introduction to Computational Learning Theory
-[9] Katoen, Principle of Model Checking
-[10] D. Peled et al.,  Black Box Checking
-[11] F.W. Vaandrager. Model learning. Cover article Communications of the ACM 60(2): 86-95. February 2017. 
-
-
 ## 三月 22日
 
 打算今天将整个算法的draft给完成
@@ -465,6 +428,7 @@ How to enumerate all the postive cycle template??
 
 ## 四月 2 日 晚上教学楼
 
+SMT-LIB:
 Syntax:
   Lexicon :
     <Whitespace Chars>
@@ -525,6 +489,15 @@ input 自己定义一个格式并写一个oarse
 output 利用Z3的java api生成公式
 
 调研时候产生的问题：Z3的Java api仅仅有一个.java的库，并没有详细的api documentation
-但是利用仅有的example可以完成本次实验因此该问题的
 
 完成对Z3 的调研，弄清楚了context的用法和如何生成抽象语法树
+
+本周代码实现任务安排：
+
+0. 定义OCA输入格式并实现格式的parser
+1. 实现SWG ASWG及相关数据结构和算法
+2. 实现DWT 相关数据结构和算法
+3. 实现QFPAgenerator，将Z3的语言集合限制到QFPA上
+3.5 重构
+4. 实现 one-counter automata 的可达性问题到QFPA的算法:
+5. debug and testing
