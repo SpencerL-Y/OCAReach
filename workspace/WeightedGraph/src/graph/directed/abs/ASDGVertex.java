@@ -103,7 +103,7 @@ public class ASDGVertex {
 			} else {
 				this.setLoopTag(LoopTag.Zero);
 			}
-		}
+		}      
 	}
 	
 	// getters and setters

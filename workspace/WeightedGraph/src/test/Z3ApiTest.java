@@ -57,8 +57,7 @@ public class Z3ApiTest {
                 ctx.mkSymbol("Q1"), ctx.mkSymbol("skid1"));
         System.out.println("Quantifier X: " + x.toString());
 
-        Expr y = ctx.mkForall(xs, body_const, 1, null, null,
-                ctx.mkSymbol("Q2"), ctx.mkSymbol("skid2"));
+        Expr y = ctx.mkForall(xs, body_const, 1, null, null, null, null);
         
         Expr my = ctx.mkExists(types, names, my_body_vars, 1, null, null, 
         		null, null);
