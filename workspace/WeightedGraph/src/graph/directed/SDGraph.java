@@ -8,6 +8,7 @@ public class SDGraph implements Graph{
 	private DGraph graph;
 	private Integer sccNum;
 	private SDGVertex startingVertex;
+	private SDGVertex endingVertex;
 	private List<SDGVertex> vertices;
 	
 	public SDGraph(DGraph g) {
@@ -18,6 +19,7 @@ public class SDGraph implements Graph{
 			this.vertices.add(new SDGVertex(v, this));
 		}
 		this.startingVertex = this.getVertex(this.getGraph().getStartVertexIndex());
+		this.setEndingVertex(this.getVertex(this.getGraph().getEndingVertexIndex()));
 	}
 	
 	// basic operation
@@ -109,6 +111,14 @@ public class SDGraph implements Graph{
 
 	public void setStartingVertex(SDGVertex startingVertex) {
 		this.startingVertex = startingVertex;
+	}
+
+	public SDGVertex getEndingVertex() {
+		return endingVertex;
+	}
+
+	public void setEndingVertex(SDGVertex endingVertex) {
+		this.endingVertex = endingVertex;
 	}
 	
 }

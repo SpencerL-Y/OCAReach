@@ -28,10 +28,16 @@ public class ASDGraph {
 				}
 			}
 		}
+		if(sdg.getSccNum() == -1) {
+			System.out.println("ERROR: SDG haven't run tarjan algorithm");
+			System.out.checkError();
+		}
 		// after add all the border edges then we construct the vertices
 		for(int i = 1; i <= sdg.getSccNum(); i++) {
 			this.vertices.add(new ASDGVertex(this, i, this.borderEdges));
 		}
+		// after constructing the graph, compute the tags
+		this.computeAllLoopTag();
 	}
 	
 	//basic operations
@@ -87,7 +93,6 @@ public class ASDGraph {
 		return edges;
 	}
 	
-	
 	//TODO: debug
 	public List<ASDGPath> DFSFindAbsPaths(int startSccIndex, int toSccIndex) {
 		List<ASDGPath> result = new ArrayList<ASDGPath>();
@@ -120,6 +125,13 @@ public class ASDGraph {
 			stack.push(e.getTo());
 			this.dfsProcess(result, stack, toSccIndex);
 			stack.pop();
+		}
+	}
+	
+	//TODO: debug
+	private void computeAllLoopTag() {
+		for(ASDGVertex v : this.getVertices()) {
+			v.computeLoopTag();
 		}
 	}
 	

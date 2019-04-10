@@ -57,6 +57,33 @@ public class ASDGPath {
 		return null;
 	}
 	
+	public boolean containsPosTagVertex() {
+		for(ASDGVertex v : this.getPath()) {
+			if(v.getLoopTag() == LoopTag.Pos || v.getLoopTag() == LoopTag.PosNeg) {
+				return true;
+			} 
+		}
+		return false;
+	}
+	
+	public boolean containsNegTagVertex() {
+		for(ASDGVertex v : this.getPath()) {
+			if(v.getLoopTag() == LoopTag.Neg || v.getLoopTag() == LoopTag.PosNeg) {
+				return true;
+			} 
+		}
+		return false;
+	}
+	
+	public boolean containsCycledVertex() {
+		for(ASDGVertex v : this.getPath()) {
+			if(v.getLoopTag() != LoopTag.None) {
+				return true;
+			} 
+		}
+		return false;
+	}
+	
 	public int length() {
 		return this.getPath().size() - 1;
 	}

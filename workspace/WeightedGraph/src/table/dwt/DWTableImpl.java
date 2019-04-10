@@ -5,18 +5,17 @@ import java.util.List;
 
 import graph.directed.DGEdge;
 import graph.directed.Graph;
-import graph.directed.SDGVertex;
 import graph.directed.DGVertex;
-import graph.directed.SDGraph;
+import graph.directed.DGraph;
 
 public class DWTableImpl implements DWTable {
 	
-	private SDGraph graph;
+	private DGraph graph;
 	private int maxLength;
 	private List<DWTEntry> entryList;
 	
 	
-	public DWTableImpl(SDGraph graph) {
+	public DWTableImpl(DGraph graph) {
 		this.graph = graph;
 		this.setMaxLength(0);
 		this.setEntryList(new ArrayList<DWTEntry>());
@@ -36,9 +35,9 @@ public class DWTableImpl implements DWTable {
 			//do updating
 			if(this.getMaxLength() == 1) {
 				// just add all the edge information
-				for(SDGVertex v : this.graph.getVertices()) {
+				for(DGVertex v : this.graph.getVertices()) {
 					for(DGEdge e : v.getEdges()) {
-						DWTEntry entry = new DWTEntryImpl(v.getVertex(), e.getTo(), 1);
+						DWTEntry entry = new DWTEntryImpl(v, e.getTo(), 1);
 						this.getEntryList().add(entry);
 						//TODO use hash table to increase efficiency?
 					}
@@ -156,7 +155,7 @@ public class DWTableImpl implements DWTable {
 
 	@Override
 	public void setGraph(Graph graph) {
-		this.graph = (SDGraph)graph;
+		this.graph = (DGraph)graph;
 	}
 	
 	//getters and setters
@@ -175,7 +174,4 @@ public class DWTableImpl implements DWTable {
 	public void setEntryList(List<DWTEntry> entryList) {
 		this.entryList = entryList;
 	}
-
-	
-
 }

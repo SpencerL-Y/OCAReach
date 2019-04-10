@@ -49,6 +49,15 @@ public class OCA implements Automaton{
 		this.getState(fromIndex).addTransition(tran);
 	}
 	
+	public boolean containState(State state) {
+		for(State s : this.getStates()) {
+			if(state == s) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	// getters and setters
 	public List<State> getStates() {
 		return states;

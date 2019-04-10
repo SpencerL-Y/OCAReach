@@ -494,10 +494,13 @@ output 利用Z3的java api生成公式
 
 本周代码实现任务安排：
 
-0. 定义OCA输入格式并实现格式的parser
-1. 实现SWG ASWG及相关数据结构和算法
-2. 实现DWT 相关数据结构和算法
-3. 实现QFPAgenerator，将Z3的语言集合限制到QFPA上
+0. 定义OCA输入格式并实现格式的parser DONE
+1. 实现SWG ASWG及相关数据结构和算法 DONE
+2. 实现DWT 相关数据结构和算法 DONE
+3. 实现QFPAgenerator，将Z3的语言集合限制到QFPA上 DONE
 3.5 重构
 4. 实现 one-counter automata 的可达性问题到QFPA的算法:
+  - 怎么找到所有的可能的positive cycle template
+  - 实现DGraph的skew transpose
+  - 实现Dgraph的support的生成
 5. debug and testing

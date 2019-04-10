@@ -3,12 +3,20 @@ package graph.directed;
 import java.util.ArrayList;
 import java.util.List;
 
+import graph.directed.abs.LoopTag;
+import table.dwt.DWTEntry;
+import table.dwt.DWTable;
+import table.dwt.DWTableImpl;
+import table.dwt.DWTuple;
+
 public class DGraph implements Graph{
 	private List<DGVertex> vertices;
 	private int startVertexIndex;
+	private int endingVertexIndex;
 	public DGraph() {
 		this.setVertices(new ArrayList<DGVertex>());
 		this.setStartVertexIndex(0);
+		this.setEndingVertexIndex(0);
 	}
 	
 	public void addVertex(int index) {
@@ -74,7 +82,49 @@ public class DGraph implements Graph{
 	
 	
 	//Algorithms
-
+	//TODO: debug
+	public LoopTag computeLoopTag() {
+		DWTable table = new DWTableImpl(this);
+		for(int i = 0; i <= this.getVertices().size(); i ++) {
+			table.increMaxLenUpdate();
+		}
+		boolean hasPos = false;
+		boolean hasNeg = false;
+		boolean noCycle = true;
+		for(DGVertex v : this.getVertices()) {
+			DWTEntry entry = table.getEntry(v.getIndex(), v.getIndex());
+			if(entry.getSetOfDWTuples().size() != 0) {
+				noCycle = false;
+			}
+			for(DWTuple t : entry.getSetOfDWTuples()) {
+				if(t.getWeight() > 0) {
+					hasPos = true;
+				} else if(t.getWeight() < 0) {
+					hasNeg = true;
+				} else {
+					
+				}
+			}
+		}
+		if(noCycle) {
+			return LoopTag.None;
+		} else {
+			if(hasPos && hasNeg) {
+				return LoopTag.PosNeg;
+			} else if(hasPos) {
+				return LoopTag.Pos;
+			} else if(hasNeg) {
+				return LoopTag.Neg;
+			} else {
+				return LoopTag.Zero;
+			}
+		}      
+	}
+	
+	public List<DGraph> {
+		
+	}
+	
 	
 	//getters and setters
 	public List<DGVertex> getVertices() {
@@ -91,5 +141,13 @@ public class DGraph implements Graph{
 
 	public void setStartVertexIndex(int startVertexIndex) {
 		this.startVertexIndex = startVertexIndex;
+	}
+
+	public int getEndingVertexIndex() {
+		return endingVertexIndex;
+	}
+
+	public void setEndingVertexIndex(int endingVertexIndex) {
+		this.endingVertexIndex = endingVertexIndex;
 	}
 }

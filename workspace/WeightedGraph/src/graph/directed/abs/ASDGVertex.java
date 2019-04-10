@@ -3,12 +3,9 @@ package graph.directed.abs;
 import java.util.ArrayList;
 import java.util.List;
 
+import graph.directed.DGraph;
 import graph.directed.SDGVertex;
 import graph.directed.SDGraph;
-import table.dwt.DWTEntry;
-import table.dwt.DWTable;
-import table.dwt.DWTableImpl;
-import table.dwt.DWTuple;
 
 public class ASDGVertex {
 	
@@ -68,42 +65,8 @@ public class ASDGVertex {
 	public void computeLoopTag() {
 		//TODO debug
 		// compute loop information using DWT
-		SDGraph concreteG = this.getConcreteSDGraph();
-		DWTable table = new DWTableImpl(concreteG);
-		for(int i = 0; i <= concreteG.getVertices().size(); i ++) {
-			table.increMaxLenUpdate();
-		}
-		boolean hasPos = false;
-		boolean hasNeg = false;
-		boolean noCycle = true;
-		for(SDGVertex v : concreteG.getVertices()) {
-			DWTEntry entry = table.getEntry(v.getVertexIndex(), v.getVertexIndex());
-			if(entry.getSetOfDWTuples().size() != 0) {
-				noCycle = false;
-			}
-			for(DWTuple t : entry.getSetOfDWTuples()) {
-				if(t.getWeight() > 0) {
-					hasPos = true;
-				} else if(t.getWeight() < 0) {
-					hasNeg = true;
-				} else {
-					
-				}
-			}
-		}
-		if(noCycle) {
-			this.setLoopTag(LoopTag.None);
-		} else {
-			if(hasPos && hasNeg) {
-				this.setLoopTag(LoopTag.PosNeg);
-			} else if(hasPos) {
-				this.setLoopTag(LoopTag.Pos);
-			} else if(hasNeg) {
-				this.setLoopTag(LoopTag.Neg);
-			} else {
-				this.setLoopTag(LoopTag.Zero);
-			}
-		}      
+		DGraph concreteG = this.getConcreteSDGraph().getGraph();
+		this.setLoopTag(concreteG.computeLoopTag());
 	}
 	
 	// getters and setters
