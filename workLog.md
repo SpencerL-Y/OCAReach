@@ -501,6 +501,12 @@ output 利用Z3的java api生成公式
 3.5 重构
 4. 实现 one-counter automata 的可达性问题到QFPA的算法:
   - 怎么找到所有的可能的positive cycle template
-  - 实现DGraph的skew transpose
+  - 实现DGraph的skew transpose DONE
   - 实现Dgraph的support的生成
+    - 实现边集的幂集的计算 DONE
+    - 对于每个边子集生成的图，选出最大的没有正环的边子集用来生成support(type1)
+       - 实现边集到图 DONE
+       - 判断图是否连通
+          -利用DFS判断是否连通（仅仅判断是否能从startVertex到达每个Vertex）
+       - 判断图是否有正环
 5. debug and testing

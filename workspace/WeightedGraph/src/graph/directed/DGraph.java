@@ -2,6 +2,7 @@ package graph.directed;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 import graph.directed.abs.LoopTag;
 import table.dwt.DWTEntry;
@@ -81,6 +82,15 @@ public class DGraph implements Graph{
 	}
 	
 	
+	private Boolean checkVertex(int vertexIndex) {
+		for(DGVertex v : this.getVertices()) {
+			if(v.getIndex() == vertexIndex) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	//Algorithms
 	//TODO: debug
 	public LoopTag computeLoopTag() {
@@ -121,10 +131,64 @@ public class DGraph implements Graph{
 		}      
 	}
 	
-	public List<DGraph> {
-		
+	public List<DGraph> getAllPossibleSupport(int startIndex, int endIndex){
+		// find the supports that contains startVertex and endVertex
+		// the support also needs to be a strong connect component
+		return null;
 	}
 	
+	//TODO: debug
+	public DGraph getSkewTranspose() {
+		DGraph g = new DGraph();
+		for(DGVertex v : this.getVertices()) {
+			g.addVertex(v.getIndex());
+		}
+		for(DGVertex v : this.getVertices()) {
+			for(DGEdge e : v.getEdges()) {
+				g.addEdge(e.getTo().getIndex(), e.getFrom().getIndex(), -e.getWeight());
+			}
+		} h
+		return g;
+	}
+	
+	
+	//TODO: debug
+	public DGraph edgeListToGraph(List<DGEdge> list) {
+		DGraph g = new DGraph();
+		for(DGEdge e : list) {
+			if(this.checkVertex(e.getTo().getIndex())) {
+				g.addVertex(e.getTo().getIndex());
+			}
+			if(this.checkVertex(e.getFrom().getIndex())) {
+				g.addVertex(e.getFrom().getIndex());
+			}
+			g.addEdge(e.getFrom().getIndex(), e.getTo().getIndex(), e.getWeight());
+		}
+		return g;
+	}
+	
+	//TODO: debug
+	public boolean isConnected() {
+		// return true if the graph is a connected graph
+		// here we only need the integrity of the graph
+		// idea? use DWT? or use DFS
+		
+		//TODO imple
+		DGVertex startVertex = this.getVertex(this.getStartVertexIndex());
+		Stack<DGVertex> stack = new Stack<DGVertex>();
+		stack.push(startVertex);
+		List<DGVertex> visited = new ArrayList<DGVertex>();
+		//TODO imple
+		return false;
+	}
+	
+	//TODO debug
+	private void connectedBFS(Stack<Vertex> stack, DGVertex currrentVertex, List<DGVertex> visited) {
+		// add all the vertices into a list
+		// do dfs and remove the object when reaching the vertex
+		// after finishing if there exists a vertex in the list, the graph is not connected
+		//TODO imple
+	}
 	
 	//getters and setters
 	public List<DGVertex> getVertices() {
