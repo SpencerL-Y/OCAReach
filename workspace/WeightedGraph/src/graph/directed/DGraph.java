@@ -14,12 +14,16 @@ public class DGraph implements Graph{
 	private List<DGVertex> vertices;
 	private int startVertexIndex;
 	private int endingVertexIndex;
+	private DWTable table;
 	public DGraph() {
 		this.setVertices(new ArrayList<DGVertex>());
 		this.setStartVertexIndex(0);
 		this.setEndingVertexIndex(0);
+		this.table = null;
 	}
 	
+	
+	// basic operations
 	public void addVertex(int index) {
 		for(DGVertex v : this.getVertices()) {
 			if(v.getIndex() == index) {
@@ -55,6 +59,8 @@ public class DGraph implements Graph{
 		System.out.println("ERROR: Vertex not found");
 		return null;
 	}
+	
+	
 	
 	public void setVertex(int index, DGVertex v) {
 		for(DGVertex ve : this.getVertices()) {
@@ -102,6 +108,7 @@ public class DGraph implements Graph{
 	//TODO: debug
 	public LoopTag computeLoopTag() {
 		DWTable table = new DWTableImpl(this);
+		this.table = table;
 		for(int i = 0; i <= this.getVertices().size(); i ++) {
 			table.increMaxLenUpdate();
 		}
@@ -151,7 +158,10 @@ public class DGraph implements Graph{
 		}
 		List<List<DGEdge>> edgePow = DGraphUtil.getPowerSet(edges);
 		for(List<DGEdge> list : edgePow) {
-			graphs.add(this.edgeListToGraph(list));
+			DGraph temp = this.edgeListToGraph(list);
+			if(temp.containsVertex(startIndex) && temp.containsVertex(endIndex)) {
+				graphs.add(temp);
+			}
 		}
 		return graphs;
 	}
@@ -167,6 +177,8 @@ public class DGraph implements Graph{
 				g.addEdge(e.getTo().getIndex(), e.getFrom().getIndex(), -e.getWeight());
 			}
 		}
+		g.setStartVertexIndex(this.getEndingVertexIndex());
+		g.setEndingVertexIndex(this.getStartVertexIndex());
 		return g;
 	}
 	
@@ -225,7 +237,7 @@ public class DGraph implements Graph{
 	
 	public boolean isSubgraphOf(DGraph graph) {
 		//TODO: debug
-		// a graph is a subgraph if the vertices are convered
+		// a graph is a subgraph if the vertices are covered
 		for(DGVertex v : this.getVertices()) {
 			if(!graph.getVertices().contains(v)) {
 				return false;
@@ -233,7 +245,8 @@ public class DGraph implements Graph{
 		}
 		return true;
 	}
-	
+
+	//TODO: debug
 	public DGraph union(DGraph graph) {
 		DGraph newG = new DGraph();
 		for(DGVertex v : this.getVertices()) {
@@ -245,8 +258,48 @@ public class DGraph implements Graph{
 		return newG;
 	}
 	
+	//TODO: debug
 	public boolean containsCycle() {
-		
+		if(this.table == null) {
+			this.computeLoopTag();
+		}
+		for(DGVertex v : this.getVertices()) {
+			if(this.getTable().getEntry(v.getIndex(), v.getIndex()).getSetOfDWTuples().size() != 0) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean containsVertex(int index) {
+		for(DGVertex v : this.getVertices()) {
+			if(v.getIndex() == index) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+
+	//TODO: debug
+	public List<PosCycleTempl> getAllPosCycleTempls(int startIndex){
+		List<PosCycleTempl> cyclTempls = new ArrayList<PosCycleTempl>();
+		//TODO: imple
+		return cyclTempls;
+	}
+	
+
+	//TODO: debug
+	private List<DGCycle> getAllSimplePosCycles(){
+		//TODO: imple
+		// find all the simple positive cycles length in |V|
+		return null;
+	}
+	
+	
+	public void increaseDWTLenLimit() {
+		//TODO imple
+		// increase the length limit to 3|V|^2 + 1 and 
 	}
 	
 	//getters and setters
@@ -272,5 +325,13 @@ public class DGraph implements Graph{
 
 	public void setEndingVertexIndex(int endingVertexIndex) {
 		this.endingVertexIndex = endingVertexIndex;
+	}
+
+	public DWTable getTable() {
+		return table;
+	}
+
+	public void setTable(DWTable table) {
+		this.table = table;
 	}
 }

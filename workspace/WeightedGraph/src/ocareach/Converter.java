@@ -14,7 +14,6 @@ import graph.directed.SDGraph;
 import graph.directed.abs.ASDGPath;
 import graph.directed.abs.ASDGVertex;
 import graph.directed.abs.ASDGraph;
-import graph.directed.abs.LoopTag;
 
 public class Converter {
 	// TODO: imple
@@ -117,8 +116,12 @@ public class Converter {
 	private void genType1Formulae(ASDGPath p, List<Expr> type1Forms) {
 		//TODO imple
 		//assertion
+		IntExpr sVar = this.getQfpaGen().mkVariableInt("xs");
+		IntExpr tVar = this.getQfpaGen().mkVariableInt("xt");
 		for(ASDGVertex v : p.getPath()) {
-			assert(v.getLoopTag()!= LoopTag.Pos && v.getLoopTag() != LoopTag.PosNeg);
+			// for each scc
+			DGraph gTemp = v.getConcreteDGraph();
+			
 		}
 		
 		

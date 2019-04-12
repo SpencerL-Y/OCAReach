@@ -7,6 +7,7 @@ import parser.OCDGenerator;
 
 public class OcaTest {
 	public static void main(String[] args) {
+		System.out.checkError();
 		OCDGenerator ocdg = new OCDGenerator();
 		OCA a = ocdg.genRandomOca(6);
 		a.print();

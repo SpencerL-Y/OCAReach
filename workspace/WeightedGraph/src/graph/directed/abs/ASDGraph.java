@@ -93,6 +93,11 @@ public class ASDGraph {
 		return edges;
 	}
 	
+	public ASDGraph getSkewTranspose() {
+		ASDGraph sktASG = new ASDGraph(this.getSdg().getSkewTranspose());
+		return sktASG;
+	}
+	
 	//TODO: debug
 	public List<ASDGPath> DFSFindAbsPaths(int startSccIndex, int toSccIndex) {
 		List<ASDGPath> result = new ArrayList<ASDGPath>();

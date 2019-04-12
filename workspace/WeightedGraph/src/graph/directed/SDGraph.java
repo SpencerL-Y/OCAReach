@@ -79,6 +79,15 @@ public class SDGraph implements Graph{
 		this.setSccNum(sccIndex);
 	}
 	
+	public SDGraph getSkewTranspose() {
+		//TODO: debug
+		// tarjan must be computed before computing skew transpose
+		assert(this.getSccNum() != -1);
+		DGraph sktG = this.getGraph().getSkewTranspose();
+		SDGraph sktSG = new SDGraph(sktG);
+		return sktSG;
+	}
+	
 	// getters and setters
 
 	public DGraph getGraph() {

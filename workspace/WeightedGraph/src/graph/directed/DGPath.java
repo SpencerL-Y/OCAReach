@@ -77,6 +77,24 @@ public class DGPath {
 		return false;
 	}
 	
+	public boolean isPosCycle() {
+		if(this.isCycle() && this.getWeight() > 0) {
+			return true;
+		}
+		return false;
+	}
+	
+	public int getVertexIndex(DGVertex vertex) {
+		for(int i = 0; i <= this.getLength(); i ++) {
+			if(this.getVertex(i) == vertex) {
+				return i;
+			}
+		}
+		System.out.println("ERROR: Vertex not in the path");
+		System.out.checkError();
+		return -1;
+	}
+	
 	//TODO debug
 	public DGPath getSubpath(int startIndex, int endIndex) {
 		assert(startIndex >= 0 && endIndex <= this.getLength() && startIndex <= endIndex);

@@ -3,7 +3,6 @@ package graph.directed.abs;
 import java.util.ArrayList;
 import java.util.List;
 
-import graph.directed.DGEdge;
 import graph.directed.DGraph;
 import graph.directed.SDGVertex;
 
