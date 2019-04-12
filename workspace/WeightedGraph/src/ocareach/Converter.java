@@ -3,16 +3,18 @@ package ocareach;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.microsoft.z3.Expr;
+import com.microsoft.z3.*;
 
 import automata.State;
 import automata.counter.OCA;
 import formula.generator.QFPAGenerator;
+import graph.directed.DGPath;
 import graph.directed.DGraph;
 import graph.directed.SDGraph;
 import graph.directed.abs.ASDGPath;
 import graph.directed.abs.ASDGVertex;
 import graph.directed.abs.ASDGraph;
+import graph.directed.abs.LoopTag;
 
 public class Converter {
 	// TODO: imple
@@ -89,12 +91,37 @@ public class Converter {
 	}
 	
 	private Expr genTrivialFormula(ASDGPath p) {
-		//TODO imple
-		return null;
+		//TODO debug
+		// convert abstract vertices to concrete vertices
+		DGPath cp = new DGPath(p.getVertex(0).getConcreteDGraph().getVertices().get(0));
+		for(int i = 1; i <= p.length(); i++) {
+			cp.concatVertex(p.getVertex(i).getConcreteDGraph().getVertices().get(0));
+		}
+		IntExpr sVar = this.getQfpaGen().mkVariableInt("xs");
+		IntExpr tVar = this.getQfpaGen().mkVariableInt("xt");
+		Expr result = this.getQfpaGen()
+						  .mkAndBool(this.getQfpaGen().mkEqBool(this.getQfpaGen().mkSubInt(tVar, sVar), 
+								  								this.getQfpaGen().mkConstantInt(cp.getWeight())),// weight correctly summed
+								  	 this.getQfpaGen().mkGeBool(this.getQfpaGen().mkAddInt(sVar, this.getQfpaGen().mkConstantInt(cp.getDrop())), 
+								  			 					this.getQfpaGen().mkConstantInt(0)), // counter value does not drop below 0
+								  	 this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(0)), // sVar >= 0
+								  	 this.getQfpaGen().mkGeBool(tVar, this.getQfpaGen().mkConstantInt(0)) // tVar >= 0
+								    );
+		return result;
 	}
 	
+	// two kinds of implementation :
+	// 1. guess support then determine which type certificate
+	// 2. check the possible types of certificates then guess the support with requirements
+	// Here we use the second one
 	private void genType1Formulae(ASDGPath p, List<Expr> type1Forms) {
 		//TODO imple
+		//assertion
+		for(ASDGVertex v : p.getPath()) {
+			assert(v.getLoopTag()!= LoopTag.Pos && v.getLoopTag() != LoopTag.PosNeg);
+		}
+		
+		
 	}
 	
 	private void genType12Formulae(ASDGPath p, List<Expr> type12Forms) {

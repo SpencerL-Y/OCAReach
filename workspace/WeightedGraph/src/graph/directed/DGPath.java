@@ -70,6 +70,13 @@ public class DGPath {
 		return false;
 	}	
 	
+	public boolean isCycle() {
+		if(this.getVertex(0) == this.getLastVertex()) {
+			return true;
+		}
+		return false;
+	}
+	
 	//TODO debug
 	public DGPath getSubpath(int startIndex, int endIndex) {
 		assert(startIndex >= 0 && endIndex <= this.getLength() && startIndex <= endIndex);

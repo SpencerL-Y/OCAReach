@@ -29,6 +29,10 @@ public class QFPAGenerator {
 		return (IntExpr) this.getCtx().mkAdd(exp1, exp2);
 	}
 	
+	public IntExpr mkSubInt(IntExpr exp1, IntExpr exp2) {
+		return (IntExpr) this.getCtx().mkSub(exp1, exp2);
+	}
+	
 	// binary relations
 	public BoolExpr mkEqBool(IntExpr left, IntExpr right) {
 		return this.getCtx().mkEq(left, right);

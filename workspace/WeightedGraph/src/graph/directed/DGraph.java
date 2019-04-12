@@ -1,9 +1,9 @@
 package graph.directed;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
-
+import java.util.Queue;
 import graph.directed.abs.LoopTag;
 import table.dwt.DWTEntry;
 import table.dwt.DWTable;
@@ -27,6 +27,13 @@ public class DGraph implements Graph{
 			}
 		}
 		this.vertices.add(new DGVertex(index));
+	}
+	
+	public void addVertex(DGVertex v) {
+		if(!this.getVertices().contains(v)) {
+			this.getVertices().add(v);
+		}
+	
 	}
 	
 	public void delVertex(int index) {
@@ -134,7 +141,19 @@ public class DGraph implements Graph{
 	public List<DGraph> getAllPossibleSupport(int startIndex, int endIndex){
 		// find the supports that contains startVertex and endVertex
 		// the support also needs to be a strong connect component
-		return null;
+		// TODO: debug
+		List<DGraph> graphs = new ArrayList<DGraph>();
+		List<DGEdge> edges = new ArrayList<DGEdge>();
+		for(DGVertex v : this.getVertices()) {
+			for(DGEdge e : v.getEdges()) {
+				edges.add(e);
+			}
+		}
+		List<List<DGEdge>> edgePow = DGraphUtil.getPowerSet(edges);
+		for(List<DGEdge> list : edgePow) {
+			graphs.add(this.edgeListToGraph(list));
+		}
+		return graphs;
 	}
 	
 	//TODO: debug
@@ -147,7 +166,7 @@ public class DGraph implements Graph{
 			for(DGEdge e : v.getEdges()) {
 				g.addEdge(e.getTo().getIndex(), e.getFrom().getIndex(), -e.getWeight());
 			}
-		} h
+		}
 		return g;
 	}
 	
@@ -155,6 +174,10 @@ public class DGraph implements Graph{
 	//TODO: debug
 	public DGraph edgeListToGraph(List<DGEdge> list) {
 		DGraph g = new DGraph();
+		if(list.size() == 0 && this.getVertices().size() == 1) {
+			// trivial case
+			g.addVertex(this.getVertices().get(0));
+		}
 		for(DGEdge e : list) {
 			if(this.checkVertex(e.getTo().getIndex())) {
 				g.addVertex(e.getTo().getIndex());
@@ -171,23 +194,59 @@ public class DGraph implements Graph{
 	public boolean isConnected() {
 		// return true if the graph is a connected graph
 		// here we only need the integrity of the graph
-		// idea? use DWT? or use DFS
+		// if there is a vertex not appear in the visited list
+		// the graph is not connected
 		
-		//TODO imple
 		DGVertex startVertex = this.getVertex(this.getStartVertexIndex());
-		Stack<DGVertex> stack = new Stack<DGVertex>();
-		stack.push(startVertex);
+		Queue<DGVertex> list = new LinkedList<DGVertex>();
 		List<DGVertex> visited = new ArrayList<DGVertex>();
-		//TODO imple
-		return false;
+		list.add(startVertex);
+		this.connectedBFS(list,  visited);
+		for(DGVertex v : this.getVertices()) {
+			if(!visited.contains(v)) {
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	//TODO debug
-	private void connectedBFS(Stack<Vertex> stack, DGVertex currrentVertex, List<DGVertex> visited) {
-		// add all the vertices into a list
-		// do dfs and remove the object when reaching the vertex
-		// after finishing if there exists a vertex in the list, the graph is not connected
-		//TODO imple
+	private void connectedBFS(Queue<DGVertex> list, List<DGVertex> visited) {
+		// BFS and store all the reached vertices into list visited
+		while(!list.isEmpty()) {
+			visited.add(list.peek());
+			for(DGEdge e : list.poll().getEdges()) {
+				if(!visited.contains(e.getTo())) {
+					list.add(e.getTo());
+				}
+			}
+		}
+	}
+	
+	public boolean isSubgraphOf(DGraph graph) {
+		//TODO: debug
+		// a graph is a subgraph if the vertices are convered
+		for(DGVertex v : this.getVertices()) {
+			if(!graph.getVertices().contains(v)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public DGraph union(DGraph graph) {
+		DGraph newG = new DGraph();
+		for(DGVertex v : this.getVertices()) {
+			newG.addVertex(v);
+		}
+		for(DGVertex w : graph.getVertices()) {
+			newG.addVertex(w);
+		}
+		return newG;
+	}
+	
+	public boolean containsCycle() {
+		
 	}
 	
 	//getters and setters

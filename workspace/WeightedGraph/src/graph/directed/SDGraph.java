@@ -40,7 +40,7 @@ public class SDGraph implements Graph{
 	}
 	
 	//TODO: debug
-	public SDGraph getConcreteSCC(int sccIndex) {
+	public DGraph getConcreteSCC(int sccIndex) {
 		DGraph graph = new DGraph();
 		for(SDGVertex v : this.getVertices()) {
 			if(v.getSccMark() == sccIndex) {
@@ -57,12 +57,12 @@ public class SDGraph implements Graph{
 			}
 		}
 		// create a conScc 
-		SDGraph conScc = new SDGraph(graph);
-		conScc.setSccNum(1);
-		for(SDGVertex v : conScc.getVertices()) {
-			v.setSccMark(sccIndex);
-		}
-		return conScc;
+		//SDGraph conScc = new SDGraph(graph);
+		//conScc.setSccNum(1);
+		//for(SDGVertex v : conScc.getVertices()) {
+		//	v.setSccMark(sccIndex);
+		//}
+		return graph;
 	}
 	
 	// algorithm tarjan

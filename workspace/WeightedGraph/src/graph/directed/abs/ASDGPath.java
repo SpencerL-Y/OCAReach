@@ -3,6 +3,8 @@ package graph.directed.abs;
 import java.util.ArrayList;
 import java.util.List;
 
+import graph.directed.SDGVertex;
+
 public class ASDGPath {
 	private List<ASDGVertex> path;
 	
@@ -13,7 +15,7 @@ public class ASDGPath {
 	
 	//basic operations
 	
-	public void append(ASDGVertex vertex) {
+	public void concatVertex(ASDGVertex vertex) {
 		ASDGVertex v = this.getLastVertex();
 		if(v.checkAbsEdge(vertex.getSccIndex())) {
 			this.getPath().add(vertex);
@@ -42,7 +44,7 @@ public class ASDGPath {
 		return this.getPath().get(0);
 	}
 	
-	public ASDGPath concat(ASDGPath suffix) {
+	public ASDGPath concatPath(ASDGPath suffix) {
 		ASDGPath p = new ASDGPath(this.getInit());
 		for(int i = 1; i <= this.length(); i++) {
 			p.getPath().add(p.getVertex(i));
@@ -87,6 +89,9 @@ public class ASDGPath {
 	public int length() {
 		return this.getPath().size() - 1;
 	}
+	
+	// algorithm
+	
 	
 	//getters and setters
 	public List<ASDGVertex> getPath() {

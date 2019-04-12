@@ -109,7 +109,7 @@ public class ASDGraph {
 			// if we reach the target in dfs, store  the path into result list
 			ASDGPath path = new ASDGPath(stack.get(0));
 			for(int i = 1; i <= stack.size() - 1; i ++) {
-				path.append(stack.get(i));
+				path.concatVertex(stack.get(i));
 			}
 			result.add(path);
 			return;
@@ -133,6 +133,10 @@ public class ASDGraph {
 		for(ASDGVertex v : this.getVertices()) {
 			v.computeLoopTag();
 		}
+	}
+	
+	public List<BorderEdge> getConcreteEdges(int formScc, int toScc){
+		return this.getVertex(formScc).getAllConcreteEdgesTo(this.getVertex(toScc));
 	}
 	
 	//setters and getters

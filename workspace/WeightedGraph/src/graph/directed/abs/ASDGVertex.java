@@ -3,9 +3,9 @@ package graph.directed.abs;
 import java.util.ArrayList;
 import java.util.List;
 
+import graph.directed.DGEdge;
 import graph.directed.DGraph;
 import graph.directed.SDGVertex;
-import graph.directed.SDGraph;
 
 public class ASDGVertex {
 	
@@ -34,7 +34,7 @@ public class ASDGVertex {
 	
 	// map to concrete subgraph
 	//TODO: debug
-	public SDGraph getConcreteSDGraph() {
+	public DGraph getConcreteDGraph() {
 		return this.getGraph().getSdg().getConcreteSCC(this.getSccIndex());
 	}
 	
@@ -65,8 +65,18 @@ public class ASDGVertex {
 	public void computeLoopTag() {
 		//TODO debug
 		// compute loop information using DWT
-		DGraph concreteG = this.getConcreteSDGraph().getGraph();
+		DGraph concreteG = this.getConcreteDGraph();
 		this.setLoopTag(concreteG.computeLoopTag());
+	}
+	
+	public List<BorderEdge> getAllConcreteEdgesTo(ASDGVertex v) {
+		List<BorderEdge> conEdges = new ArrayList<BorderEdge>();
+		for(BorderEdge e : this.getGraph().getBorderEdges()) {
+			if(e.getFromScc() == this.getSccIndex() && e.getToScc() == v.getSccIndex()) {
+				conEdges.add(e);
+			}
+		}
+		return conEdges;
 	}
 	
 	// getters and setters
