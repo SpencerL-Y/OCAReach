@@ -506,7 +506,8 @@ output 利用Z3的java api生成公式
     - 实现边集的幂集的计算 DONE
     - 对于每个边子集生成的图，选出最大的没有正环的边子集用来生成support(type1)
        - 实现边集到图 DONE
-       - 判断图是否连通
-          -利用DFS判断是否连通（仅仅判断是否能从startVertex到达每个Vertex）
-       - 判断图是否有正环
+       - 判断图是否连通 DONE
+          -利用BFS判断是否连通（仅仅判断是否能从startVertex到达每个Vertex）DONE
+       - 判断图是否有正环 DONE
+    - 对于type3中的positive cycle template需要一个算法找出所有的simplecycle和所有从inport到正环的路径，也就是找到所有的poscycletemplate
 5. debug and testing

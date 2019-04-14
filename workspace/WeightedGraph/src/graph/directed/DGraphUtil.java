@@ -54,13 +54,17 @@ public class DGraphUtil {
 		return DGraphUtil.union(result, tempResult);
 	}
 	
-	private static <T> List<T> union(List<T> set1, List<T> set2){
+	public static <T> List<T> union(List<T> set1, List<T> set2){
 		List<T> list = new ArrayList<T>();
 		for(T t : set1) {
-			list.add(t);
+			if(!list.contains(t)) {
+				list.add(t);
+			}
 		}
 		for(T t : set2) {
-			list.add(t);
+			if(!list.contains(t)) {
+				list.add(t);
+			}
 		}
 		return list;
 	}

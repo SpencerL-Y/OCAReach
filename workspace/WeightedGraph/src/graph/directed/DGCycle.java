@@ -1,14 +1,14 @@
 package graph.directed;
 
 public class DGCycle extends DGPath{
-	
+	//TODO: debug
 	public DGCycle(DGPath s, DGVertex start) {
 		super(start);
 		assert(s.isCycle() && s.contains(start));
 		if(start == s.getVertex(0)) {
 			this.setPath(s.getPath());
 		} else {
-			for(int i = s.getVertexIndex(start); i <= s.getLength(); i ++) {
+			for(int i = s.getVertexIndex(start); i <= s.length(); i ++) {
 				this.concatVertex(s.getVertex(i));
 			}
 			for(int i = 0; i <= s.getVertexIndex(start); i++) {

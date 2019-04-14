@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Stack;
+
 import graph.directed.abs.LoopTag;
 import table.dwt.DWTEntry;
 import table.dwt.DWTable;
@@ -291,11 +293,70 @@ public class DGraph implements Graph{
 
 	//TODO: debug
 	private List<DGCycle> getAllSimplePosCycles(){
-		//TODO: imple
 		// find all the simple positive cycles length in |V|
-		return null;
+		if(this.getTable() == null) {
+			this.computeLoopTag();
+		}
+		List<DGCycle> cycles = new ArrayList<DGCycle>();
+		for(DGVertex v : this.getVertices()) {
+			boolean hasPosCycle = false;
+			List<DWTuple> set = this.getTable().getEntry(v.getIndex(), v.getIndex()).getSetOfDWTuples(); 
+			if(set.size() != 0) {
+				for(DWTuple t : set) {
+					if(t.getWeight() > 0) {
+						// if there is a positive cycle here, check a simple cycle
+						hasPosCycle = true;
+						break;
+					}
+				}
+			}
+			if(hasPosCycle) {
+				List<DGCycle> cycleList = this.dfsGetPosCycles(v);
+				cycles = DGraphUtil.union(cycles, cycleList);
+			}
+		}
+		
+		return cycles;
 	}
 	
+	//TODO: debug
+	private List<DGCycle> dfsGetPosCycles(DGVertex v){
+		Stack<DGVertex> stack = new Stack<DGVertex>();
+		List<DGCycle> cycles = new ArrayList<DGCycle>();
+		stack.push(v);
+		this.dfsGetPosCycle(stack, cycles);
+		stack.pop();
+		return cycles;
+	}
+	
+	
+	//TODO: debug
+	private void dfsGetPosCycle(Stack<DGVertex> stack, List<DGCycle> cycles) {
+		if(stack.peek() == stack.get(0) && stack.size() != 1) {
+			DGPath p = new DGPath(stack.get(0));
+			for(int i = 1; i < stack.size(); i++) {
+				p.concatVertex(stack.get(i));
+			}
+			if(p.getWeight() > 0) {
+				cycles.add(new DGCycle(p, p.getVertex(0)));
+			}
+			return;
+		} else if(stack.contains(stack.peek())) {
+			return;
+		}
+		
+		for(DGEdge e : stack.peek().getEdges()) {
+			stack.push(e.getTo());
+			this.dfsGetPosCycle(stack, cycles);
+			stack.pop();
+		}
+	}
+	
+	private List<DGCycle> dfsGetPathToCycle(DGVertex start, DGCycle cycle){
+		//TODO: imple
+		// if the vertex is on the cycle, over
+		// else dfs for each vertex on the cycle
+	}
 	
 	public void increaseDWTLenLimit() {
 		//TODO imple

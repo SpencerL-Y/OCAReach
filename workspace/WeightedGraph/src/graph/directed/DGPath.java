@@ -11,20 +11,18 @@ public class DGPath {
 	private List<DGVertex> path;
 	private int drop;
 	private int weight;
-	private int length;
 	
 	public DGPath(DGVertex s) {
 		path = new ArrayList<DGVertex>();
 		path.add(s);
 		this.setDrop(0);
-		this.setLength(0);
 		this.setWeight(0);
 	}
 	
 	// basic operations
 	
 	public DGVertex getLastVertex() {
-		return this.path.get(this.getLength());
+		return this.path.get(this.length());
 	}
 	
 	public DGVertex getVertex(int index) {
@@ -47,16 +45,15 @@ public class DGPath {
 	
 	public void concatPath(DGPath path) {
 		assert(this.getLastVertex() == path.getVertex(0));
-		for(int i = 1; i <= this.getLength(); i++) {
+		for(int i = 1; i <= this.length(); i++) {
 			this.concatVertex(path.getVertex(i));
 		}
 	}
 
 	public void removeLastVertex() {
 		this.setWeight(this.getWeight() - 
-					   this.getSubpath(this.getLength() - 1, this.getLength()).getWeight());
+					   this.getSubpath(this.length() - 1, this.length()).getWeight());
 		this.getPath().remove(this.getPath().size() - 1);
-		this.setLength(this.getLength() - 1);
 		this.updateDrop();
 		
 	}
@@ -71,7 +68,7 @@ public class DGPath {
 	}	
 	
 	public boolean isCycle() {
-		if(this.getVertex(0) == this.getLastVertex()) {
+		if(this.getVertex(0) == this.getLastVertex() && this.length() > 0) {
 			return true;
 		}
 		return false;
@@ -84,8 +81,16 @@ public class DGPath {
 		return false;
 	}
 	
+	
+	//TODO: debug
+	public DGCycle toCycle() {
+		assert(this.isCycle());
+		DGCycle cycle = new DGCycle(this, this.getVertex(0));
+		return cycle;
+	}
+	
 	public int getVertexIndex(DGVertex vertex) {
-		for(int i = 0; i <= this.getLength(); i ++) {
+		for(int i = 0; i <= this.length(); i ++) {
 			if(this.getVertex(i) == vertex) {
 				return i;
 			}
@@ -95,9 +100,13 @@ public class DGPath {
 		return -1;
 	}
 	
+	public int length() {
+		return this.getPath().size() - 1;
+	}
+	
 	//TODO debug
 	public DGPath getSubpath(int startIndex, int endIndex) {
-		assert(startIndex >= 0 && endIndex <= this.getLength() && startIndex <= endIndex);
+		assert(startIndex >= 0 && endIndex <= this.length() && startIndex <= endIndex);
 		DGPath p = new DGPath(this.getVertex(startIndex));
 		for(int i = startIndex + 1; i <= endIndex; i++) {
 			p.concatVertex(this.getVertex(i));
@@ -108,7 +117,7 @@ public class DGPath {
 	private void updateDrop() {
 		int s = 0;
 		int minWeight = 0;
-		for(int e = 0; e <= this.getLength(); e ++) {
+		for(int e = 0; e <= this.length(); e ++) {
 			DGPath p = this.getSubpath(s, e);
 			minWeight = Math.min(p.getWeight(), minWeight);
 		}
@@ -147,13 +156,5 @@ public class DGPath {
 
 	public void setWeight(int weight) {
 		this.weight = weight;
-	}
-
-	public int getLength() {
-		return length;
-	}
-
-	public void setLength(int length) {
-		this.length = length;
 	}
 }
