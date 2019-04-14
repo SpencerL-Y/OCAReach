@@ -356,6 +356,7 @@ public class DGraph implements Graph{
 		//TODO: imple
 		// if the vertex is on the cycle, over
 		// else dfs for each vertex on the cycle
+		// and the path must be a first touch
 	}
 	
 	public void increaseDWTLenLimit() {
