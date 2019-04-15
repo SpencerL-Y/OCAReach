@@ -3,6 +3,7 @@ package graph.directed.abs;
 import java.util.ArrayList;
 import java.util.List;
 
+import graph.directed.DGVertex;
 import graph.directed.DGraph;
 import graph.directed.SDGVertex;
 
@@ -59,6 +60,15 @@ public class ASDGVertex {
 		return false;
 	}
 	
+	public boolean containIndex(int index) {
+		for(DGVertex v : this.getGraph().getSdg().getGraph().getVertices()) {
+			if(v.getIndex() == index) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	// algorithm
 	
 	public void computeLoopTag() {
@@ -85,7 +95,7 @@ public class ASDGVertex {
 	public void setSccIndex(int sccIndex) {
 		this.sccIndex = sccIndex;
 	}
-	public List<SDGVertex> getOurports() {
+	public List<SDGVertex> getOutports() {
 		return outports;
 	}
 	public void setOurports(List<SDGVertex> ourports) {

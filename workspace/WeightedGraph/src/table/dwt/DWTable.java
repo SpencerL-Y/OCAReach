@@ -10,7 +10,9 @@ public interface DWTable {
 	public List<DWTEntry> getStartEntryList(int startIndex);
 	public List<DWTEntry> getEndEntryList(int endIndex);
 	public List<DWTEntry> getMaxLengthList(int maxLen);
+	public List<DWTEntry> getEntryList();
 	public void increMaxLenUpdate();
+	public int getMaxLength();
 	public Graph getGraph();
 	public void setGraph(Graph graph);
 }

@@ -17,6 +17,7 @@ public class DGraph implements Graph{
 	private int startVertexIndex;
 	private int endingVertexIndex;
 	private DWTable table;
+	private LoopTag tag;
 	public DGraph() {
 		this.setVertices(new ArrayList<DGVertex>());
 		this.setStartVertexIndex(0);
@@ -77,7 +78,7 @@ public class DGraph implements Graph{
 	}
 	
 	public void addEdge(int fromIndex, int toIndex, int weight) {
-		if(this.checkEdge(fromIndex, toIndex)) {
+		if(this.containsEdge(fromIndex, toIndex)) {
 			System.out.println("ERROR: Add edge error, Edge already exists");
 			return;
 		} 
@@ -85,30 +86,23 @@ public class DGraph implements Graph{
 	}
 	
 	public void delEdge(int fromIndex, int toIndex) {
-		if(!this.checkEdge(fromIndex, toIndex)) {
+		if(!this.containsEdge(fromIndex, toIndex)) {
 			System.out.println("ERROR: Del edge error, edge does not exists");
 			return;
 		}
 		this.getVertex(fromIndex).delEdge(toIndex);
 	}
 	
-	private Boolean checkEdge(int fromIndex, int toIndex) {
-		return this.getVertex(fromIndex).checkEdge(toIndex);
-	}
-	
-	
-	private Boolean checkVertex(int vertexIndex) {
-		for(DGVertex v : this.getVertices()) {
-			if(v.getIndex() == vertexIndex) {
-				return true;
-			}
-		}
-		return false;
+	private Boolean containsEdge(int fromIndex, int toIndex) {
+		return this.getVertex(fromIndex).containsEdge(toIndex);
 	}
 	
 	//Algorithms
 	//TODO: debug
 	public LoopTag computeLoopTag() {
+		if(this.table != null) {
+			return this.getTag();
+		}
 		DWTable table = new DWTableImpl(this);
 		this.table = table;
 		for(int i = 0; i <= this.getVertices().size(); i ++) {
@@ -136,12 +130,16 @@ public class DGraph implements Graph{
 			return LoopTag.None;
 		} else {
 			if(hasPos && hasNeg) {
+				this.setTag(LoopTag.PosNeg);
 				return LoopTag.PosNeg;
 			} else if(hasPos) {
+				this.setTag(LoopTag.Pos);
 				return LoopTag.Pos;
 			} else if(hasNeg) {
+				this.setTag(LoopTag.Neg);
 				return LoopTag.Neg;
 			} else {
+				this.setTag(LoopTag.Zero);
 				return LoopTag.Zero;
 			}
 		}      
@@ -193,10 +191,10 @@ public class DGraph implements Graph{
 			g.addVertex(this.getVertices().get(0));
 		}
 		for(DGEdge e : list) {
-			if(this.checkVertex(e.getTo().getIndex())) {
+			if(this.containsVertex(e.getTo().getIndex())) {
 				g.addVertex(e.getTo().getIndex());
 			}
-			if(this.checkVertex(e.getFrom().getIndex())) {
+			if(this.containsVertex(e.getFrom().getIndex())) {
 				g.addVertex(e.getFrom().getIndex());
 			}
 			g.addEdge(e.getFrom().getIndex(), e.getTo().getIndex(), e.getWeight());
@@ -244,6 +242,11 @@ public class DGraph implements Graph{
 			if(!graph.getVertices().contains(v)) {
 				return false;
 			}
+			for(DGEdge e : v.getEdges()) {
+				if(!graph.containsEdge(e.getFrom().getIndex(), e.getTo().getIndex())) {
+					return false;
+				}
+			}
 		}
 		return true;
 	}
@@ -265,12 +268,11 @@ public class DGraph implements Graph{
 		if(this.table == null) {
 			this.computeLoopTag();
 		}
-		for(DGVertex v : this.getVertices()) {
-			if(this.getTable().getEntry(v.getIndex(), v.getIndex()).getSetOfDWTuples().size() != 0) {
-				return true;
-			}
+		if(this.getTag() == LoopTag.None){
+			return false;
+		} else {
+			return true;
 		}
-		return false;
 	}
 	
 	public boolean containsVertex(int index) {
@@ -357,11 +359,17 @@ public class DGraph implements Graph{
 		// if the vertex is on the cycle, over
 		// else dfs for each vertex on the cycle
 		// and the path must be a first touch
+		return null;
 	}
 	
 	public void increaseDWTLenLimit() {
 		//TODO imple
 		// increase the length limit to 3|V|^2 + 1 and 
+		for(int i = this.getTable().getMaxLength(); 
+				i < 3 * this.getVertices().size() * this.getVertices().size() + 1; 
+				i = this.getTable().getMaxLength()) {
+			this.getTable().increMaxLenUpdate();
+		}
 	}
 	
 	//getters and setters
@@ -395,5 +403,13 @@ public class DGraph implements Graph{
 
 	public void setTable(DWTable table) {
 		this.table = table;
+	}
+	
+	public LoopTag getTag() {
+		return this.tag;
+	}
+	
+	public void setTag(LoopTag tag) {
+		this.tag = tag;
 	}
 }

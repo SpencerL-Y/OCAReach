@@ -27,6 +27,6 @@ public class UDGraph extends DGraph{
 	}
 
 	private Boolean checkEdge(int fromIndex, int toIndex) {
-		return this.getVertex(fromIndex).checkEdge(toIndex) || this.getVertex(toIndex).checkEdge(fromIndex);
+		return this.getVertex(fromIndex).containsEdge(toIndex) || this.getVertex(toIndex).containsEdge(fromIndex);
 	}
 }

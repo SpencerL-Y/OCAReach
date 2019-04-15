@@ -53,7 +53,7 @@ public class ASDGraph {
 		return null;
 	}
 	
-	public Boolean checkBorderEdge(SDGVertex from, SDGVertex to) {
+	public Boolean containsBorderEdge(SDGVertex from, SDGVertex to) {
 		for(BorderEdge e : this.getBorderEdges()) {
 			if(e.getFromVertex() == from && e.getToVertex() == to) {
 				return true;
@@ -63,17 +63,17 @@ public class ASDGraph {
 	}
 	
 	
-	public Boolean checkAbsEdge(int fromScc, int toScc) {
+	public Boolean containsAbsEdge(int fromScc, int toScc) {
 		ASDGVertex v = this.getVertex(fromScc);
 		return v.checkAbsEdge(toScc);
 	}
 	
-	public Boolean checkAbsEdge(ASDGVertex from, ASDGVertex to) {
-		return this.checkAbsEdge(from.getSccIndex(), to.getSccIndex());
+	public Boolean containsAbsEdge(ASDGVertex from, ASDGVertex to) {
+		return this.containsAbsEdge(from.getSccIndex(), to.getSccIndex());
 	}
 	
 	public ASDGEdge getAbsEdge(int fromSccIndex, int toSccIndex) {
-		if(this.checkAbsEdge(fromSccIndex, toSccIndex)) {
+		if(this.containsAbsEdge(fromSccIndex, toSccIndex)) {
 			return this.getVertex(fromSccIndex).getAbsEdge(toSccIndex);
 		}
 		System.out.println("ERROR: AbsEdge not found");

@@ -36,7 +36,7 @@ public class DGVertex implements Vertex{
 		}
 	}
 	
-	public Boolean checkEdge(int toIndex) {
+	public Boolean containsEdge(int toIndex) {
 		for(DGEdge e : this.getEdges()) {
 			if(e.getTo().getIndex() == toIndex) {
 				return true;

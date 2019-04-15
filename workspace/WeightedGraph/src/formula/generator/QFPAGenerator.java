@@ -25,6 +25,15 @@ public class QFPAGenerator {
 		return this.getCtx().mkInt(i);
 	}
 	
+
+	public BoolExpr mkTrue() {
+		return this.getCtx().mkTrue();
+	}
+	
+	public BoolExpr mkFalse() {
+		return this.getCtx().mkFalse();
+	}
+	
 	public IntExpr mkAddInt(IntExpr exp1, IntExpr exp2) {
 		return (IntExpr) this.getCtx().mkAdd(exp1, exp2);
 	}

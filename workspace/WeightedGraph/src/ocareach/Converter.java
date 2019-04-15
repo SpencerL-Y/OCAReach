@@ -10,10 +10,15 @@ import automata.counter.OCA;
 import formula.generator.QFPAGenerator;
 import graph.directed.DGPath;
 import graph.directed.DGraph;
+import graph.directed.SDGVertex;
 import graph.directed.SDGraph;
 import graph.directed.abs.ASDGPath;
 import graph.directed.abs.ASDGVertex;
 import graph.directed.abs.ASDGraph;
+import graph.directed.abs.BorderEdge;
+import graph.directed.abs.LoopTag;
+import table.dwt.DWTEntry;
+import table.dwt.DWTuple;
 
 public class Converter {
 	// TODO: imple
@@ -70,7 +75,7 @@ public class Converter {
 				trivialForm = this.genTrivialFormula(p);
 			}
 			if(type1) {
-				this.genType1Formulae(p, type1Forms);
+				this.genType1Formulae(p, type1Forms, startState.getIndex(), endState.getIndex());
 			}
 			if(type12) {
 				this.genType12Formulae(p, type12Forms);
@@ -113,18 +118,136 @@ public class Converter {
 	// 1. guess support then determine which type certificate
 	// 2. check the possible types of certificates then guess the support with requirements
 	// Here we use the second one
-	private void genType1Formulae(ASDGPath p, List<Expr> type1Forms) {
+	// TODO: debug trivial case from abstract state to concreate graph
+	private void genType1Formulae(ASDGPath p, List<Expr> type1Forms, int startIndex, int endIndex) {
 		//TODO imple
 		//assertion
 		IntExpr sVar = this.getQfpaGen().mkVariableInt("xs");
 		IntExpr tVar = this.getQfpaGen().mkVariableInt("xt");
-		for(ASDGVertex v : p.getPath()) {
-			// for each scc
-			DGraph gTemp = v.getConcreteDGraph();
-			
+		List<List<SDGVertex>> allPossibleInOut = p.inportsOutportsCartesianProduct(p.getG().getSdg().getVertex(startIndex),
+																				   p.getG().getSdg().getVertex(endIndex));
+		int inOutSeqSize = allPossibleInOut.get(0).size();
+		IntExpr[] absPathVars = new IntExpr[l.size() - 2];
+		for(int i = 0; i < l.size() - 2; i ++) {
+			if(i % 2 == 0) {
+				absPathVars[i] = this.getQfpaGen().mkVariableInt("v_o_" + p.getVertex((i)/2).getSccIndex());
+			} else {
+				absPathVars[i] = this.getQfpaGen().mkVariableInt("v_i_" + p.getVertex((i+1)/2).getSccIndex());
+			}
+		}
+		for(List<SDGVertex> l : allPossibleInOut) {
+			// for every possible sequence of inoutports
+			Expr type1Form = this.getQfpaGen().mkTrue();
+			for(int i = 0; i <= p.length(); i ++) {
+				if(i == 0) {
+					List<Expr> sccExprs = this.genAbsStateNoPosCycle(p.getVertex(i), 
+						p.getG().getSdg().getVertex(startIndex), l.get(i/2),
+						null, p.getG().getBorderEdgesByAbsEdge(l.get(i/2).getSccMark(), l.get((i+1)/2).getSccMark()),
+						sVar, absPathVars[i], 
+						null, absPathVars[i+1]);
+				} else if(i == p.length()) {
+					// TODO: imple BREAKPOINT, CHECK THE ARGUMENTS..
+					List<Expr> sccExprs = this.genAbsStateNoPosCycle(p.getVertex(i), 
+						l.get((i-1)/2), p.getG().getSdg().getVertex(endIndex),
+						p.getG().getBorderEdgesByAbsEdge(l.get(i/2).getSccMark(), l.get), ),
+						sVar, absPathVars[i], 
+						null, absPathVars[i+1]);
+				}
+			}
 		}
 		
-		
+	}
+	
+	//TODO: imple add variable positive requirement
+	private List<Expr> genAbsStateNoPosCycle(ASDGVertex v, SDGVertex inport, SDGVertex outport, 
+														   BorderEdge in, BorderEdge out, 
+														   IntExpr thisInVar,  IntExpr thisOutVar,
+														   IntExpr lastOutVar, IntExpr nextInVar) {
+		//TODO: imple add special case the start vertex and the end vertex
+		assert(v.containIndex(inport.getVertexIndex()) && v.containIndex(outport.getVertexIndex()));
+		List<Expr> exprs = new ArrayList<Expr>();
+		DGraph conGraph = v.getConcreteDGraph();
+		if(conGraph.getVertices().size() == 1) {
+			// if the scc is trivial
+			Expr formula = this.getQfpaGen().mkAndBool(
+				this.borderEdgeWeightAndDropRequirements(in, out, thisInVar, thisOutVar, nextInVar, lastOutVar),
+				// border edge weight add correctly
+				//TODO: the formula can be redundant here
+				this.getQfpaGen().mkEqBool(
+					this.getQfpaGen().mkSubInt(nextInVar, thisOutVar), 
+					this.getQfpaGen().mkConstantInt(out.getWeight()))
+			);
+			exprs.add(formula);
+			return exprs;
+		}
+		List<DGraph> supports = conGraph.getAllPossibleSupport(inport.getVertexIndex(), outport.getVertexIndex());
+		for(DGraph support : supports) {
+			// assert there is no positive cycle in the support
+			assert(support.computeLoopTag() != LoopTag.Pos && support.computeLoopTag() != LoopTag.PosNeg);
+			if(support.containsCycle()) {
+				//TODO: correctness check
+				// increase the max length to 3n^2 + 1
+				support.increaseDWTLenLimit();
+				// guess that there is a cycle and apply the lemma
+				// length <= 3n^2 + 1
+				Expr formLt = this.getQfpaGen().mkFalse();
+				for(DWTuple t : support.getTable().getEntry(inport.getVertexIndex(), outport.getVertexIndex()).getSetOfDWTuples()) {
+					formLt = this.getQfpaGen().mkAndBool(
+						// weight sum correctly in the concreteScc
+						this.getQfpaGen().mkEqBool(
+							thisOutVar, 
+							this.getQfpaGen().mkAddInt(thisInVar, this.getQfpaGen().mkConstantInt(t.getWeight()))),
+							// the minimum counter value >= 0
+						this.getQfpaGen().mkGeBool(
+								this.getQfpaGen().mkAddInt(thisInVar, this.getQfpaGen().mkConstantInt(t.getDrop())), 
+								this.getQfpaGen().mkConstantInt(0))
+					);
+				}
+			} else {
+				BoolExpr concretePathFormula = this.getQfpaGen().mkFalse();
+				DWTEntry entry = support.getTable().getEntry(inport.getVertexIndex(), outport.getVertexIndex());
+				for(DWTuple t : entry.getSetOfDWTuples()) {
+					concretePathFormula = this.getQfpaGen().mkOrBool(
+						concretePathFormula, 
+						this.getQfpaGen().mkAndBool(
+							// weight sum correctly in the concreteScc
+							this.getQfpaGen().mkEqBool(
+								thisOutVar, 
+								this.getQfpaGen().mkAddInt(thisInVar, this.getQfpaGen().mkConstantInt(t.getWeight()))),
+								// the minimum counter value >= 0
+							this.getQfpaGen().mkGeBool(
+									this.getQfpaGen().mkAddInt(thisInVar, this.getQfpaGen().mkConstantInt(t.getDrop())), 
+									this.getQfpaGen().mkConstantInt(0))
+						)
+					);
+				}
+				// guess it is a simple path
+				Expr formula = this.getQfpaGen().mkAndBool(
+					this.borderEdgeWeightAndDropRequirements(in, out, thisInVar, thisOutVar, nextInVar, lastOutVar),
+					// there is a concrete path from inport to outport in concreteScc
+					concretePathFormula
+				);
+				exprs.add(formula);
+			}
+		}
+		return exprs;
+	}
+	
+	private BoolExpr borderEdgeWeightAndDropRequirements(BorderEdge in, BorderEdge out, 
+													IntExpr thisInVar, IntExpr thisOutVar, 
+													IntExpr nextInVar, IntExpr lastOutVar) {
+		BoolExpr formula = this.getQfpaGen().mkAndBool(
+				// border edge weight add correctly
+				this.getQfpaGen().mkEqBool(
+					this.getQfpaGen().mkSubInt(thisInVar, lastOutVar), 
+					this.getQfpaGen().mkConstantInt(in.getWeight())),
+				// border edge weight add correctly
+				//TODO: the formula can be redundant here
+				this.getQfpaGen().mkEqBool(
+					this.getQfpaGen().mkSubInt(nextInVar, thisOutVar), 
+					this.getQfpaGen().mkConstantInt(out.getWeight()))
+		);
+		return formula;
 	}
 	
 	private void genType12Formulae(ASDGPath p, List<Expr> type12Forms) {
