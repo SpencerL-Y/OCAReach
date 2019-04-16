@@ -1,4 +1,6 @@
 package formula.generator;
+import java.util.List;
+
 import com.microsoft.z3.*;
 
 public class QFPAGenerator {
@@ -42,6 +44,14 @@ public class QFPAGenerator {
 		return (IntExpr) this.getCtx().mkSub(exp1, exp2);
 	}
 	
+	//TODO: debug
+	public IntExpr sumUpVars(List<IntExpr> l) {
+		IntExpr result = this.getCtx().mkInt(0);
+		for(IntExpr e : l) {
+			result = this.mkAddInt(e, result);
+		}
+		return result;
+	}
 	// binary relations
 	public BoolExpr mkEqBool(IntExpr left, IntExpr right) {
 		return this.getCtx().mkEq(left, right);

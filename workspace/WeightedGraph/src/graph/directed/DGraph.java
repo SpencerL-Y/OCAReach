@@ -93,6 +93,16 @@ public class DGraph implements Graph{
 		this.getVertex(fromIndex).delEdge(toIndex);
 	}
 	
+	public List<DGEdge> getEdges(){
+		List<DGEdge> edgeList = new ArrayList<DGEdge>();
+		for(DGVertex v : this.getVertices()) {
+			for(DGEdge e : v.getEdges()) {
+				edgeList.add(e);
+			}
+		}
+		return edgeList;
+	}
+	
 	private Boolean containsEdge(int fromIndex, int toIndex) {
 		return this.getVertex(fromIndex).containsEdge(toIndex);
 	}

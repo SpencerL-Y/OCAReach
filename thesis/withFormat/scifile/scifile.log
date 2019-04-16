@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.99992 (TeX Live 2015/Debian) (preloaded format=xelatex 2018.10.15)  29 MAR 2019 11:14
+This is XeTeX, Version 3.14159265-2.6-0.99992 (TeX Live 2015/Debian) (preloaded format=xelatex 2018.10.15)  23 MAR 2019 22:17
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -209,75 +209,65 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <12> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 94.
-LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <17.28> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 98.
-LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <14.4> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 101.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <12> not available
+(Font)              Font shape `OT1/ptm/b/it' tried instead on input line 95.
+ [1
 
-Overfull \hbox (9.91576pt too wide) in paragraph at lines 104--105
-[]\OT1/ptm/m/it/12 A $\OML/cmm/m/it/12 k$\OT1/ptm/m/it/12 -counter au-toma-ton 
-$\OMS/cmsy/m/n/12 A$ \OT1/ptm/m/it/12 is a tu-ple $\OMS/cmsy/m/n/12 A \OT1/cmr/
-m/n/12 = (\OML/cmm/m/it/12 Q; \OT1/cmr/m/n/12 ^^C\OML/cmm/m/it/12 ; q[]; F; \OT
-1/cmr/m/n/12 ^^A\OML/cmm/m/it/12 ; ^^U; ^^O\OT1/cmr/m/n/12 )$
+]
+Underfull \hbox (badness 10000) in paragraph at lines 117--118
+
  []
 
-LaTeX Font Info:    Try loading font information for OMS+ptm on input line 106.
+LaTeX Font Info:    Try loading font information for OMS+ptm on input line 128.
 
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/omsptm.fd
 File: omsptm.fd 
 )
 LaTeX Font Info:    Font shape `OMS/ptm/m/it' in size <12> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 106.
- [1
-
-]
-Underfull \hbox (badness 10000) in paragraph at lines 151--152
-
- []
-
-[2]
-LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <12> not available
-(Font)              Font shape `OT1/ptm/b/it' tried instead on input line 160.
-
-Underfull \hbox (badness 10000) in paragraph at lines 190--191
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 128.
+ [2]
+Underfull \hbox (badness 10000) in paragraph at lines 156--157
 
  []
 
 Missing character: There is no ： in font ptmri7t!
 Missing character: There is no ： in font ptmri7t!
-[3] [4]
+[3]
 LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <12> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 256.
-
-Underfull \hbox (badness 10000) in paragraph at lines 328--329
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 222.
+ [4]
+Underfull \hbox (badness 10000) in paragraph at lines 294--295
 
  []
 
-[5] [6] [7]
+[5] [6]
 
-LaTeX Warning: Float too large for page by 86.20317pt on input line 411.
+LaTeX Warning: Float too large for page by 86.20317pt on input line 377.
 
 
-Overfull \hbox (1.24474pt too wide) in paragraph at lines 417--418
+Overfull \hbox (1.24474pt too wide) in paragraph at lines 383--384
 []\OT1/ptm/m/it/12 Given an $\OML/cmm/m/it/12 SWG \OT1/cmr/m/n/12 = (\OML/cmm/m
 /it/12 SCC\OT1/cmr/m/n/12 (\OML/cmm/m/it/12 V\OT1/cmr/m/n/12 )\OML/cmm/m/it/12 
 ; E[]; ^^V[]\OT1/cmr/m/n/12 )$\OT1/ptm/m/it/12 , we
  []
 
-[8] [9] [10] [11] [12]
+[7] [8] [9] [10] [11] [12]
 
-LaTeX Warning: Float too large for page by 8.33257pt on input line 629.
+LaTeX Warning: Float too large for page by 8.33257pt on input line 595.
 
-[13] [14] [15] [16] [17] [18] [19] [20] (./scifile.bbl) [21
+[13] [14] [15] [16] [17] [18] [19] (./scifile.bbl
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <17.28> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 1.
+) [20
 
 ] (./scifile.aux) ) 
 Here is how much of TeX's memory you used:
- 2801 strings out of 495211
- 34869 string characters out of 6179842
- 103610 words of memory out of 5000000
- 6072 multiletter control sequences out of 15000+600000
- 17799 words of font info for 56 fonts, out of 8000000 for 9000
+ 2799 strings out of 495211
+ 34836 string characters out of 6179842
+ 97610 words of memory out of 5000000
+ 6070 multiletter control sequences out of 15000+600000
+ 17280 words of font info for 55 fonts, out of 8000000 for 9000
  286 hyphenation exceptions out of 8191
  27i,10n,35p,668b,369s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on scifile.pdf (21 pages).
+Output written on scifile.pdf (20 pages).

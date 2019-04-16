@@ -504,10 +504,16 @@ output 利用Z3的java api生成公式
   - 实现DGraph的skew transpose DONE
   - 实现Dgraph的support的生成
     - 实现边集的幂集的计算 DONE
-    - 对于每个边子集生成的图，选出最大的没有正环的边子集用来生成support(type1)
+    - 对于每个边子集生成的图，选出最大的没有正环的边子集用来生成support(type1): neet to refine
        - 实现边集到图 DONE
        - 判断图是否连通 DONE
           -利用BFS判断是否连通（仅仅判断是否能从startVertex到达每个Vertex）DONE
        - 判断图是否有正环 DONE
     - 对于type3中的positive cycle template需要一个算法找出所有的simplecycle和所有从inport到正环的路径，也就是找到所有的poscycletemplate
 5. debug and testing
+
+## 四月 16日
+
+代码实现中的遗漏： 
+在type1的SCC中如果存在环，需要分开路径长度 3N^2+1,如果大于这个长度，需要用path flow，需要实现给定一个图，开始节点和终结节点，给出根据oath flow 生成公式的函数
+

@@ -8,7 +8,10 @@ import com.microsoft.z3.*;
 import automata.State;
 import automata.counter.OCA;
 import formula.generator.QFPAGenerator;
+import graph.directed.DGEdge;
+import graph.directed.DGFlowTuple;
 import graph.directed.DGPath;
+import graph.directed.DGVertex;
 import graph.directed.DGraph;
 import graph.directed.SDGVertex;
 import graph.directed.SDGraph;
@@ -68,7 +71,7 @@ public class Converter {
 			// there might be type-1 . type-3 . type-2 certificate
 			boolean type132 = p.containsNegTagVertex() && p.containsPosTagVertex();
 			Expr trivialForm = null;
-			Expr type1Form;
+			Expr type1Form = null;
 			List<Expr> type12Forms = new ArrayList<Expr>();
 			List<Expr> type132Forms = new ArrayList<Expr>();
 			if(trivial) {
@@ -78,7 +81,7 @@ public class Converter {
 				type1Form = this.genType1Formulae(p, startState.getIndex(), endState.getIndex());
 			}
 			if(type12) {
-				this.genType12Formulae(p, type12Forms);
+				this.genType12Formulae(p, startState.getIndex(), endState.getIndex());
 			}
 			if(type132) {
 				this.genType132Formula(p, type132Forms);
@@ -119,6 +122,7 @@ public class Converter {
 	// 2. check the possible types of certificates then guess the support with requirements
 	// Here we use the second one
 	// TODO: debug trivial case from abstract state to concreate graph
+	//TODO: debug
 	private Expr genType1Formulae(ASDGPath p, int startIndex, int endIndex) {
 		//TODO imple
 		//assertion
@@ -168,10 +172,20 @@ public class Converter {
 			}
 			type1FormBody = this.getQfpaGen().mkOrBool(type1FormBody, type1FormBodyItem);
 		}
+		// add ge 0 requirement
+		BoolExpr posRequires = this.getQfpaGen().mkTrue();
+		for(int i = 0; i < absPathVars.length; i++) {
+			posRequires = this.getQfpaGen().mkAndBool(
+				posRequires, 
+				this.getQfpaGen().mkGeBool(absPathVars[i], this.getQfpaGen().mkConstantInt(0))
+			);
+		}
+		type1FormBody = this.getQfpaGen().mkAndBool(type1FormBody, posRequires);
 		Expr type1Form = this.getQfpaGen().mkExistsQuantifier(absPathVars, type1FormBody);
 		return type1Form;
 	}
 	
+	//TODO: debug
 	//TODO: imple add variable positive requirement
 	private List<BoolExpr> genAbsStateNoPosCycle(ASDGVertex v, SDGVertex inport, SDGVertex outport, 
 														   BorderEdge in, BorderEdge out, 
@@ -194,7 +208,7 @@ public class Converter {
 				exprs.add(formula);
 				return exprs;
 			} 
-			return this.type1ConcreteGraphPathFormual(v, inport, outport, in, out, thisInVar, thisOutVar, lastOutVar, nextInVar);
+			return this.type1ConcreteGraphPathFormula(v, inport, outport, in, out, thisInVar, thisOutVar, lastOutVar, nextInVar);
 		} else if(out == null && nextInVar == null) {
 			// end absVertex
 			if(conGraph.getVertices().size() == 1) {
@@ -205,7 +219,7 @@ public class Converter {
 				);
 				exprs.add(formula);
 			}
-			return this.type1ConcreteGraphPathFormual(v, inport, outport, in, out, thisInVar, thisOutVar, lastOutVar, nextInVar);
+			return this.type1ConcreteGraphPathFormula(v, inport, outport, in, out, thisInVar, thisOutVar, lastOutVar, nextInVar);
 		} else {
 			if(conGraph.getVertices().size() == 1) {
 				// if the scc is trivial
@@ -221,10 +235,10 @@ public class Converter {
 				return exprs;
 			}
 			
-			return this.type1ConcreteGraphPathFormual(v, inport, outport, in, out, thisInVar, thisOutVar, lastOutVar, nextInVar);
+			return this.type1ConcreteGraphPathFormula(v, inport, outport, in, out, thisInVar, thisOutVar, lastOutVar, nextInVar);
 		}
 	}
-	
+	//TODO: debug
 	private BoolExpr borderEdgeWeightAndDropRequirements(BorderEdge in, BorderEdge out, 
 													IntExpr thisInVar, IntExpr thisOutVar, 
 													IntExpr nextInVar, IntExpr lastOutVar) {
@@ -241,7 +255,7 @@ public class Converter {
 		);
 		return formula;
 	}
-	
+	//TODO: debug
 	private BoolExpr startVertexBorderEdgeWeigthAndDropRequirements(BorderEdge out, 
 																	IntExpr thisInVar, IntExpr thisOutVar,
 																	IntExpr nextInVar) {
@@ -250,7 +264,7 @@ public class Converter {
 					this.getQfpaGen().mkConstantInt(out.getWeight()));
 		return formula;
 	}
-	
+	//TODO: debug
 	private BoolExpr endVertexBorderEdgeWeightAndDropRequirements(BorderEdge in,
 																  IntExpr thisInVar, IntExpr thisOutVar,
 																  IntExpr lastOutVar) {
@@ -259,8 +273,8 @@ public class Converter {
 					this.getQfpaGen().mkConstantInt(in.getWeight()));
 		return formula;
 	}
-	
-	private List<BoolExpr> type1ConcreteGraphPathFormual(ASDGVertex v, SDGVertex inport, SDGVertex outport, 
+	//TODO: debug
+	private List<BoolExpr> type1ConcreteGraphPathFormula(ASDGVertex v, SDGVertex inport, SDGVertex outport, 
 			   										 BorderEdge in, BorderEdge out, 
 			   										 IntExpr thisInVar,  IntExpr thisOutVar,
 			   										 IntExpr lastOutVar, IntExpr nextInVar) {
@@ -272,11 +286,17 @@ public class Converter {
 			assert(support.computeLoopTag() != LoopTag.Pos && support.computeLoopTag() != LoopTag.PosNeg);
 			if(support.containsCycle()) {
 				//TODO: correctness check
+				//TODO: imple path flow for path length greater than 3n^2 + 1
+				// PATHFLOW!!
 				// increase the max length to 3n^2 + 1
 				support.increaseDWTLenLimit();
 				// guess that there is a cycle and apply the lemma
-				// length <= 3n^2 + 1
-				BoolExpr concretePathFormula = this.getQfpaGen().mkFalse();
+				
+				// length > 3n^2
+				BoolExpr formGe = this.getQfpaGen().mkFalse();
+				
+				// length < 3n^2 + 1
+				BoolExpr formLt = this.getQfpaGen().mkFalse();
 				for(DWTuple t : support.getTable().getEntry(inport.getVertexIndex(), outport.getVertexIndex()).getSetOfDWTuples()) {
 					BoolExpr temp = this.getQfpaGen().mkAndBool(
 						// weight sum correctly in the concreteScc
@@ -288,9 +308,9 @@ public class Converter {
 								this.getQfpaGen().mkAddInt(thisInVar, this.getQfpaGen().mkConstantInt(t.getDrop())), 
 								this.getQfpaGen().mkConstantInt(0))
 					);
-					concretePathFormula = this.getQfpaGen().mkOrBool(concretePathFormula, temp);
+					formLt = this.getQfpaGen().mkOrBool(formLt, temp);
 				}
-				BoolExpr formula = this.getQfpaGen().mkAndBool(concretePathFormula, 
+				BoolExpr formula = this.getQfpaGen().mkAndBool(formLt, 
 						this.borderEdgeWeightAndDropRequirements(in, out, thisInVar, thisOutVar, nextInVar, lastOutVar));
 				exprs.add(formula);
 			} else {
@@ -323,13 +343,77 @@ public class Converter {
 		return exprs;
 	}
 	
-	private void genType12Formulae(ASDGPath p, List<Expr> type12Forms) {
+	private BoolExpr genType1PathFlowFormula(DGraph g, int startIndex, int endIndex) {
+		//TODO debug
+		List<DGEdge> edgeList = g.getEdges();
+		IntExpr[] flowVars = new IntExpr[edgeList.size()];
+		DGFlowTuple[] flowTuples = new DGFlowTuple[edgeList.size()];
+		for(int i = 0; i < edgeList.size(); i ++) {
+			flowVars[i] = this.getQfpaGen().mkVariableInt("f_" + edgeList.get(i).getFrom().getIndex() + "_" +
+																 edgeList.get(i).getTo().getIndex());
+			flowTuples[i] = new DGFlowTuple(edgeList.get(i),flowVars[i]);
+		}
+		if(g.isConnected()) {
+			DGVertex vs = g.getVertex(startIndex);
+			DGVertex vt = g.getVertex(endIndex);
+			BoolExpr body = this.getQfpaGen().mkTrue();
+			// start vertex flow requirements
+			BoolExpr startVertexForm = this.getQfpaGen().mkEqBool(
+				this.getQfpaGen().mkAddInt(this.getQfpaGen().sumUpVars(this.getAllFlowInVars(vs, flowTuples)), this.getQfpaGen().mkConstantInt(1)),
+				this.getQfpaGen().sumUpVars(this.getAllFlowOutVars(vs, flowTuples))
+			);
+			//end vertex flow requirements
+			BoolExpr endVertexForm = this.getQfpaGen().mkEqBool(
+				this.getQfpaGen().sumUpVars(this.getAllFlowInVars(vt, flowTuples)), 
+				this.getQfpaGen().mkAddInt(this.getQfpaGen().sumUpVars(this.getAllFlowOutVars(vt, flowTuples)), this.getQfpaGen().mkConstantInt(1))
+			);
+			body = this.getQfpaGen().mkAndBool(startVertexForm, endVertexForm);
+			for(DGVertex v : g.getVertices()) {
+				// all other internal vertices flow requirements
+				if(v.getIndex() != startIndex && v.getIndex() != endIndex) {
+					BoolExpr vertexForm = this.getQfpaGen().mkEqBool(
+						this.getQfpaGen().sumUpVars(this.getAllFlowInVars(v, flowTuples)), 
+						this.getQfpaGen().sumUpVars(this.getAllFlowOutVars(v, flowTuples)));
+					body = this.getQfpaGen().mkAndBool(vertexForm, body);
+				}
+			}
+			return body;
+		} else {
+			return this.getQfpaGen().mkFalse();
+		}
+	}
+	
+	private List<IntExpr> getAllFlowInVars(DGVertex v, DGFlowTuple[] flowTuples){
+		List<IntExpr> inVars = new ArrayList<IntExpr>();
+		for(DGFlowTuple t : flowTuples) {
+			if(t.getEdgeTo().getIndex() == v.getIndex()) {
+				inVars.add(t.getEdgeVar());
+			}
+		}
+		return inVars;
+	}
+	
+	private List<IntExpr> getAllFlowOutVars(DGVertex v, DGFlowTuple[] flowTuples){
+		List<IntExpr> outVars = new ArrayList<IntExpr>();
+		for(DGFlowTuple t : flowTuples) {
+			if(t.getEdgeTo().getIndex() == v.getIndex()) {
+				outVars.add(t.getEdgeVar());
+			}
+		}
+		return outVars;
+	}	
+	private void genType12Formulae(ASDGPath p, int startIndex, int endIndex) {
 		//TODO imple
 		// assert that there exists a postive tag absVertex
 		assert(p.containsPosTagVertex());
 		BoolExpr type12Form = this.getQfpaGen().mkFalse();
-		for()
+		List<ASDGVertex> posVertices = new ArrayList<ASDGVertex>();
+		for(ASDGVertex v : p.getPath()) {
+			// split the path at v
+			
+		}
 	}
+	
 	
 	private void genType132Formula(ASDGPath p, List<Expr> type132Forms) {
 		//TODO imple
