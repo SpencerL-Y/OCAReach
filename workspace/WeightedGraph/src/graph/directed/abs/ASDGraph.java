@@ -93,6 +93,16 @@ public class ASDGraph {
 		return edges;
 	}
 	
+	public BorderEdge getBorderEdgeByInportOutport(SDGVertex inport, SDGVertex outport) {
+		List<BorderEdge> list = this.getBorderEdgesByAbsEdge(inport.getSccMark(), outport.getSccMark());
+		for(BorderEdge e : list) {
+			if(e.getFromVertex() == inport && e.getToVertex() == outport) {
+				return e;
+			}
+		}
+		return null;
+	}
+	
 	public ASDGraph getSkewTranspose() {
 		ASDGraph sktASG = new ASDGraph(this.getSdg().getSkewTranspose());
 		return sktASG;
