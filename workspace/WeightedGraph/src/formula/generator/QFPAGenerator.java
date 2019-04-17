@@ -44,6 +44,9 @@ public class QFPAGenerator {
 		return (IntExpr) this.getCtx().mkSub(exp1, exp2);
 	}
 	
+	public IntExpr mkScalarTimes(IntExpr constant, IntExpr exp) {
+		return (IntExpr) this.getCtx().mkMul(constant, exp);
+	}
 	//TODO: debug
 	public IntExpr sumUpVars(List<IntExpr> l) {
 		IntExpr result = this.getCtx().mkInt(0);

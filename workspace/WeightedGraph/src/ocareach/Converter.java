@@ -285,16 +285,25 @@ public class Converter {
 			// assert there is no positive cycle in the support
 			assert(support.computeLoopTag() != LoopTag.Pos && support.computeLoopTag() != LoopTag.PosNeg);
 			if(support.containsCycle()) {
-				//TODO: correctness check
+				//TODO: debug
 				//TODO: imple path flow for path length greater than 3n^2 + 1
 				// PATHFLOW!!
 				// increase the max length to 3n^2 + 1
 				support.increaseDWTLenLimit();
 				// guess that there is a cycle and apply the lemma
-				
 				// length > 3n^2
 				BoolExpr formGe = this.getQfpaGen().mkFalse();
-				
+				// guess the mid vertex and init a int variable for it
+				for(DGVertex ve : support.getVertices()) {
+					IntExpr midVar = this.getQfpaGen().mkVariableInt("z"+ ve.getIndex());
+					formGe = this.getQfpaGen().mkOrBool(
+						formGe, 
+						this.getQfpaGen().mkAndBool(
+							this.genType1PathFlowFormula(support, inport.getVertexIndex(), ve.getIndex(), thisInVar, midVar),
+							this.getQfpaGen().mkGeBool(midVar, this.getQfpaGen().mkConstantInt(support.getVertices().size()))
+						)
+					);
+				}
 				// length < 3n^2 + 1
 				BoolExpr formLt = this.getQfpaGen().mkFalse();
 				for(DWTuple t : support.getTable().getEntry(inport.getVertexIndex(), outport.getVertexIndex()).getSetOfDWTuples()) {
@@ -310,8 +319,9 @@ public class Converter {
 					);
 					formLt = this.getQfpaGen().mkOrBool(formLt, temp);
 				}
-				BoolExpr formula = this.getQfpaGen().mkAndBool(formLt, 
+				formLt = this.getQfpaGen().mkAndBool(formLt, 
 						this.borderEdgeWeightAndDropRequirements(in, out, thisInVar, thisOutVar, nextInVar, lastOutVar));
+				BoolExpr formula = this.getQfpaGen().mkOrBool(formLt, formGe);
 				exprs.add(formula);
 			} else {
 				BoolExpr concretePathFormula = this.getQfpaGen().mkFalse();
@@ -343,7 +353,8 @@ public class Converter {
 		return exprs;
 	}
 	
-	private BoolExpr genType1PathFlowFormula(DGraph g, int startIndex, int endIndex) {
+	private BoolExpr genType1PathFlowFormula(DGraph g, int startIndex, int endIndex,
+													   IntExpr startVar, IntExpr endVar) {
 		//TODO debug
 		List<DGEdge> edgeList = g.getEdges();
 		IntExpr[] flowVars = new IntExpr[edgeList.size()];
@@ -377,7 +388,20 @@ public class Converter {
 					body = this.getQfpaGen().mkAndBool(vertexForm, body);
 				}
 			}
-			return body;
+			// weight requirements
+			// drop requirements are guranteed by the 3n^2 + 1 or type3 certificate
+			IntExpr sum = this.getQfpaGen().mkConstantInt(0);
+			for(DGFlowTuple t : flowTuples) {
+				sum = this.getQfpaGen().mkAddInt(
+					sum, 
+					this.getQfpaGen().mkScalarTimes(this.getQfpaGen().mkConstantInt(t.getEdge().getWeight()), t.getEdgeVar())
+				);
+			}
+			BoolExpr weightSumCorrect = this.getQfpaGen().mkEqBool(sum, this.getQfpaGen().mkSubInt(endVar, startVar));
+			body = this.getQfpaGen().mkAndBool(body, weightSumCorrect);
+			//TODO: debug BoolExpr type
+			BoolExpr result = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(flowVars, body);
+			return result;
 		} else {
 			return this.getQfpaGen().mkFalse();
 		}
