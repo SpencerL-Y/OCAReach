@@ -81,14 +81,6 @@ public class DGPath {
 		return false;
 	}
 	
-	
-	//TODO: debug
-	public DGCycle toCycle() {
-		assert(this.isCycle());
-		DGCycle cycle = new DGCycle(this, this.getVertex(0));
-		return cycle;
-	}
-	
 	public int getVertexIndex(DGVertex vertex) {
 		for(int i = 0; i <= this.length(); i ++) {
 			if(this.getVertex(i) == vertex) {

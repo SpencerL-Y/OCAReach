@@ -286,7 +286,6 @@ public class Converter {
 			assert(support.computeLoopTag() != LoopTag.Pos && support.computeLoopTag() != LoopTag.PosNeg);
 			if(support.containsCycle()) {
 				//TODO: debug
-				//TODO: imple path flow for path length greater than 3n^2 + 1
 				// PATHFLOW!!
 				// increase the max length to 3n^2 + 1
 				support.increaseDWTLenLimit();
@@ -300,6 +299,7 @@ public class Converter {
 						formGe, 
 						this.getQfpaGen().mkAndBool(
 							this.genType1PathFlowFormula(support, inport.getVertexIndex(), ve.getIndex(), thisInVar, midVar),
+							// z > |V|, this gurantee the counter value to be positive
 							this.getQfpaGen().mkGeBool(midVar, this.getQfpaGen().mkConstantInt(support.getVertices().size()))
 						)
 					);
