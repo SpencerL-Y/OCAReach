@@ -406,7 +406,7 @@ public class Converter {
 			return this.getQfpaGen().mkFalse();
 		}
 	}
-	
+	//TODO: debug
 	private List<IntExpr> getAllFlowInVars(DGVertex v, DGFlowTuple[] flowTuples){
 		List<IntExpr> inVars = new ArrayList<IntExpr>();
 		for(DGFlowTuple t : flowTuples) {
@@ -416,7 +416,7 @@ public class Converter {
 		}
 		return inVars;
 	}
-	
+	//TODO: debug
 	private List<IntExpr> getAllFlowOutVars(DGVertex v, DGFlowTuple[] flowTuples){
 		List<IntExpr> outVars = new ArrayList<IntExpr>();
 		for(DGFlowTuple t : flowTuples) {
@@ -438,6 +438,12 @@ public class Converter {
 		}
 	}
 	
+	//TODO: formula for postive cycle template
+	
+	private BoolExpr genPosCycleTemplateFormula(DGraph g, int startIndex, IntExpr startVar, IntExpr endVar) {
+		//TODO: imple
+		return null;
+	}
 	
 	private void genType132Formula(ASDGPath p, List<Expr> type132Forms) {
 		//TODO imple
