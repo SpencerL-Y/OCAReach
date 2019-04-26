@@ -34,8 +34,12 @@ public class ASDGVertex {
 	
 	// map to concrete subgraph
 	//TODO: debug
-	public DGraph getConcreteDGraph() {
-		return this.getGraph().getSdg().getConcreteSCC(this.getSccIndex());
+	public DGraph getConcreteDGraph(boolean isSkew) {
+		if(!isSkew) {
+			return this.getGraph().getSdg().getConcreteSCC(this.getSccIndex());
+		} else {
+			return this.getGraph().getSdg().getConcreteSCC(this.getSccIndex()).getSkewTranspose();
+		}
 	}
 	
 	//basic operations
@@ -74,7 +78,7 @@ public class ASDGVertex {
 	public void computeLoopTag() {
 		//TODO debug
 		// compute loop information using DWT
-		DGraph concreteG = this.getConcreteDGraph();
+		DGraph concreteG = this.getConcreteDGraph(false);
 		this.setLoopTag(concreteG.computeLoopTag());
 	}
 	

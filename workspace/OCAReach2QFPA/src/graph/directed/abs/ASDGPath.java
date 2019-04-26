@@ -93,6 +93,37 @@ public class ASDGPath {
 	}
 	
 	// algorithm
+	//TODO: debug
+	public ASDGPath getSkewPath() {
+		ASDGPath skewP = new ASDGPath(this.getLastVertex());
+		for(int i = this.getPath().size()-2; i >= 1; i++) {
+			skewP.concatVertex(this.getVertex(i));
+		}
+		return skewP;
+	}
+	
+	
+	// TODO: debug
+	public ASDGPath[] splitPathAt(ASDGVertex v) {
+		// return a pair of absPaths, the first is type1 and the second is type1 in G^{op}
+		// v cannot be a repeat vertex by definition
+		ASDGPath[] paths = new ASDGPath[2];
+		int breakPoint = 0;
+		for(int i = 0; i <= this.length(); i++) {
+			if(this.getVertex(i) == v) {
+				breakPoint = i;
+			}
+		}
+		paths[0] = new ASDGPath(this.getVertex(0));
+		for(int i = 1; i < breakPoint; i ++) {
+			paths[0].concatVertex(this.getVertex(i));
+		}
+		paths[1] = new ASDGPath(this.getVertex(breakPoint));
+		for(int i = breakPoint+1; i < this.getPath().size(); i ++) {
+			paths[1].concatVertex(this.getVertex(i));
+		}
+		return paths;
+	}
 	
 	//TODO: debug
 	public List<List<SDGVertex>>inportsOutportsCartesianProduct(SDGVertex start, SDGVertex end) {
@@ -145,6 +176,37 @@ public class ASDGPath {
 		list = newList;
 	}
 	
+	
+	//TODO: debug
+	
+	public List<ASDGVertex> getAllType12Split(){
+		List<ASDGVertex> list = new ArrayList<ASDGVertex>();
+		for(ASDGVertex v : this.getPath()) {
+			// add all the possible split points
+			if(v.getLoopTag() == LoopTag.PosNeg || v.getLoopTag() == LoopTag.Pos) {
+				list.add(v);
+			}
+		}
+		return list;
+	}
+	
+	//TODO: debug
+	public List<ASDGVertex[]> getAllType132Split(){
+		List<ASDGVertex[]> list = new ArrayList<ASDGVertex[]>();
+		for(int i = 0; i < this.getPath().size(); i++) {
+			if(this.getVertex(i).getLoopTag() == LoopTag.Pos || this.getVertex(i).getLoopTag() == LoopTag.PosNeg) {
+				for(int j = i; j < this.getPath().size(); j ++) {
+					if(this.getVertex(j).getLoopTag() == LoopTag.PosNeg || this.getVertex(j).getLoopTag() == LoopTag.Neg) {
+						ASDGVertex[] pair = new ASDGVertex[2];
+						pair[0] = this.getVertex(i);
+						pair[1] = this.getVertex(j);
+						list.add(pair);
+					}
+				}
+			}
+		}
+		return list;
+	}
 	
 	//getters and setters
 	public List<ASDGVertex> getPath() {

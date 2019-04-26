@@ -7,6 +7,7 @@ public class BorderEdge {
 	private int fromScc, toScc;
 	private SDGVertex fromVertex, toVertex;
 	private int weight;
+	private DGEdge concreteEdge;
 	
 	public BorderEdge(SDGVertex from, SDGVertex to) {
 		this.setFromVertex(from);
@@ -16,10 +17,11 @@ public class BorderEdge {
 		for(DGEdge e : from.getEdges()) {
 			if(e.getTo().getIndex() == to.getVertexIndex()) {
 				this.weight = e.getWeight();
+				this.concreteEdge = e;
 			}
 		}
 	}
-	
+
 	//setters and getters
 	public int getFromScc() {
 		return fromScc;
@@ -59,5 +61,13 @@ public class BorderEdge {
 
 	public void setWeight(int weight) {
 		this.weight = weight;
+	}
+	
+	public DGEdge getConcreteEdge() {
+		return this.concreteEdge;
+	}
+	
+	public void setConcreteEdge(DGEdge concreteEdge) {
+		this.concreteEdge = concreteEdge;
 	}
 }
