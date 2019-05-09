@@ -113,7 +113,9 @@ public class OCAParser {
 		System.out.println(tuples[0]);
 		for(String t : tuples) {
 			t = t.trim();
-
+			if(t == "") {
+				break;
+			}
 			System.out.println(t);
 			String[] tMem = t.split(",");
 			String tFrom = tMem[0].trim();

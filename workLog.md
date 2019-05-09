@@ -517,3 +517,15 @@ output 利用Z3的java api生成公式
 代码实现中的遗漏： 
 在type1的SCC中如果存在环，需要分开路径长度 3N^2+1,如果大于这个长度，需要用path flow，需要实现给定一个图，开始节点和终结节点，给出根据oath flow 生成公式的函数
 
+
+## 四月29日
+
+1. 实现部分的图和文字要对上，说明图是数据流图 DONE
+2. QFPA输出格式加个例子 DONE
+3. 具体描述每个模块如何实现，特别是Reach模块 DONE
+4. 修改翻译
+5. 调整第三章结构，DWT, then definition of the certificate, then the algorithm and pseudocode.
+
+
+逻辑：
+给出SCC和DWT的定义，给出问题的定义，给出我们的可达证书的定义，证明我们的证书是正确的，证明我们的证书是多项式的，

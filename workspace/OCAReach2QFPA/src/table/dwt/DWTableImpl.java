@@ -131,7 +131,6 @@ public class DWTableImpl implements DWTable {
 		return endList;
 	}
 	
-	@Override
 	public List<DWTEntry> getMaxLengthList(int maxLen) {
 		List<DWTEntry> list = new ArrayList<DWTEntry>();
 		for(DWTEntry e : this.getEntryList()) {

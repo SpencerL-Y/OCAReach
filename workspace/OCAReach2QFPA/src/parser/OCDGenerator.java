@@ -47,6 +47,7 @@ public class OCDGenerator {
 				}
 			}
 		}
+		ocd += "]\n";
 		return ocd;
 	}
 	

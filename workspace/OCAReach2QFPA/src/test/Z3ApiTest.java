@@ -62,6 +62,8 @@ public class Z3ApiTest {
         Expr my = ctx.mkExists(types, names, my_body_vars, 1, null, null, 
         		null, null);
         
+       
+        
         System.out.println("Quantifier Y: " + y.toString());
 		System.out.println("Quantifier Z: " + my.toString());
         ctx.close();

@@ -86,7 +86,7 @@ public class Converter {
 				type12Form = this.genType12Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar);
 			}
 			if(type132) {
-				type132Form = this.genType132Formula(p, startState.getIndex(), endState.getIndex());
+				type132Form = this.genType132Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar);
 			}
 			Expr temp = (trivial)? trivialForm : this.combineAllFormlae(type1Form, type12Form, type132Form);
 			formulae.add(temp);
@@ -455,10 +455,10 @@ public class Converter {
 	
 	
 	
-	private BoolExpr genType132Forms(ASDGPath p, int startIndex, int endIndex, 
+	private BoolExpr genType132Formulae(ASDGPath p, int startIndex, int endIndex, 
 												 IntExpr startVar, IntExpr endVar) {
-		//TODO: imple
-		// assert there is a condition for type132e
+		//TODO: debug
+		// assert there is a condition for type132
 		assert(p.containsNegTagVertex() && p.containsNegTagVertex());
 		List<ASDGVertex[]> splitVertices = p.getAllType132Split();
 		IntExpr[] splitVars = new IntExpr[4];
@@ -468,19 +468,83 @@ public class Converter {
 		splitVars[3] = this.getQfpaGen().mkVariableInt("vs_2");
 		BoolExpr type132Form = this.getQfpaGen().mkFalse();
 		for(ASDGVertex[] s : splitVertices) {
-			//TODO
+			ASDGPath[] paths = p.getAllType132SplitPaths(s);
+			BoolExpr portForm = this.getQfpaGen().mkTrue();
+			for(SDGVertex[] inouts : p.getType132LinkInportOutport(s)) {
+				portForm = this.getQfpaGen().mkAndBool(
+						this.genType1Formulae(paths[0], startIndex, inouts[0].getVertexIndex(), startVar, splitVars[0], false),
+						this.genType3Formula(paths[1], inouts[1].getVertexIndex(), inouts[2].getVertexIndex(), splitVars[1], splitVars[2]),
+						this.genType1Formulae(paths[2], inouts[3].getVertexIndex(), endIndex, splitVars[3], endVar, true),
+						this.getQfpaGen().mkEqBool(
+								splitVars[1], 
+								this.getQfpaGen().mkAddInt(
+										splitVars[0], 
+										this.getQfpaGen().mkConstantInt(p.getG().getBorderEdgeByInportOutport(inouts[0], inouts[1]).getWeight())
+								)
+						),
+						this.getQfpaGen().mkEqBool(
+								splitVars[3], 
+								this.getQfpaGen().mkAddInt(
+										splitVars[3], 
+										this.getQfpaGen().mkConstantInt(p.getG().getBorderEdgeByInportOutport(inouts[2], inouts[3]).getWeight())
+								)
+						)
+						
+				);
+			}
+			type132Form = this.getQfpaGen().mkOrBool(portForm, type132Form);
 		}
+		type132Form = this.getQfpaGen().mkAndBool(
+				type132Form,
+				this.genVarNonNegRequirement(splitVars)
+		);
+		type132Form = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(splitVars, type132Form);
+		return type132Form;
 		
 	}
 	
+	private BoolExpr genVarNonNegRequirement(IntExpr[] vars) {
+		BoolExpr result = this.getQfpaGen().mkTrue();
+		for(IntExpr var : vars) {
+			this.getQfpaGen().mkAndBool(
+					result,
+					this.getQfpaGen().mkGeBool(var, this.getQfpaGen().mkConstantInt(0))
+			);
+		}
+		return result;
+	}
 	
+	//TODO: debug
 	private BoolExpr genType3Formula(ASDGPath p3, int startIndex, int endIndex,
 												  IntExpr startVar, IntExpr endVar) {
 		ASDGVertex startVertex = p3.getInit();
 		ASDGVertex endVertex   = p3.getLastVertex();
 		assert(startVertex.containIndex(startIndex) && endVertex.containIndex(endIndex));
-		//TODO
-		
+		DGraph p3Graph = this.genType3ConcreteGraph(p3);
+		DGraph p3SkewGraph = p3Graph.getSkewTranspose();
+		assert(p3Graph.containsVertex(startIndex) && p3Graph.containsVertex(endIndex));
+		IntExpr startMidVar = this.getQfpaGen().mkVariableInt("vm_3_s");
+		IntExpr endMidVar = this.getQfpaGen().mkVariableInt("vm_3_e");
+		IntExpr[] boundVars = new IntExpr[2];
+		boundVars[0] = startMidVar;
+		boundVars[1] = endMidVar;
+		BoolExpr startPosTemp = this.getQfpaGen().mkFalse();
+		BoolExpr endPosTemp = this.getQfpaGen().mkFalse();
+		for(DGVertex vms : p3Graph.getVertices()) {
+			startPosTemp = this.getQfpaGen().mkOrBool(startPosTemp, this.genPosCycleTemplateFormula(p3Graph, startIndex, vms.getIndex(), startVar, startMidVar));
+		}
+		for(DGVertex vme : p3SkewGraph.getVertices()) {
+			endPosTemp = this.getQfpaGen().mkOrBool(endPosTemp, this.genPosCycleTemplateFormula(p3SkewGraph, endIndex, vme.getIndex(), endVar, endMidVar));
+		}
+		BoolExpr posTemp = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(boundVars, this.getQfpaGen().mkAndBool(
+																											startPosTemp, endPosTemp,
+																											this.genVarNonNegRequirement(boundVars)));
+		BoolExpr pathFlow = this.genPathFlowFormula(p3Graph, startIndex, endIndex, startVar, endVar);
+		BoolExpr result = this.getQfpaGen().mkAndBool(
+				posTemp, 
+				pathFlow
+		);
+		return result;
 	}
 	
 	private DGraph genType3ConcreteGraph(ASDGPath p3) {

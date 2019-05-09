@@ -3,6 +3,7 @@ package graph.directed.abs;
 import java.util.ArrayList;
 import java.util.List;
 
+import graph.directed.DGVertex;
 import graph.directed.SDGVertex;
  
 public class ASDGPath {
@@ -87,6 +88,16 @@ public class ASDGPath {
 		}
 		return false;
 	}
+	
+	public boolean containsVertex(ASDGVertex v) {
+		for(ASDGVertex ve : this.getPath()) {
+			if(ve == v) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	
 	public int length() {
 		return this.getPath().size() - 1;
@@ -208,6 +219,66 @@ public class ASDGPath {
 		return list;
 	}
 	
+	public ASDGPath[] getAllType132SplitPaths(ASDGVertex[] splitVertices){
+		assert(this.containsVertex(splitVertices[0]) && this.containsVertex(splitVertices[1]));
+		ASDGPath p1 = new ASDGPath(this.getInit());
+		int i = 0;
+		for(i = 0; i < this.getPath().size() && this.getVertex(i) != splitVertices[0]; i ++) {
+			p1.concatVertex(this.getVertex(i));
+		}
+		ASDGPath p3 = new ASDGPath(splitVertices[0]);
+		for(     ; i < this.getPath().size() && this.getVertex(i) != splitVertices[1]; i++) {
+			p3.concatVertex(this.getVertex(i));
+		}
+		p3.concatVertex(this.getVertex(i));
+		i = i + 1;
+		ASDGPath p2 = new ASDGPath(this.getVertex(i));
+		for(     ; i < this.getPath().size(); i++) {
+			p2.concatVertex(this.getVertex(i));
+		}
+		ASDGPath[] splittedPaths = new ASDGPath[3];
+		splittedPaths[0] = p1;
+		splittedPaths[1] = p3;
+		splittedPaths[2] = p2;
+		return splittedPaths;
+	}
+	
+	public List<SDGVertex[]> getType132LinkInportOutport(ASDGVertex[] splitVertices){
+		ASDGVertex last = null;
+		ASDGVertex now = this.getInit();
+		List<SDGVertex[]> list = new ArrayList<SDGVertex[]>();
+		int i = 0;
+		for(i = 0; i < this.getPath().size() && now != splitVertices[0]; i++) {
+			last = now;
+			now = this.getVertex(i+1);
+		}
+		ASDGVertex last2 = last;
+		ASDGVertex now2 = now;
+		for(     ; i < this.getPath().size() && last2 != splitVertices[1]; i++) {
+			last2 = now2;
+			now2 = this.getVertex(i+1);
+		}
+		for(SDGVertex vo1 : last.getOutports()) {
+			for(SDGVertex vi1 : now.getInports()) {
+				if(this.getG().containsBorderEdge(vo1, vi1)) {
+					for(SDGVertex vo2 : last2.getOutports()) {
+						for(SDGVertex vi2 : now2.getInports()) {
+							if(this.getG().containsBorderEdge(vo2, vi2)) {
+								SDGVertex[] inouts = new SDGVertex[4];
+								inouts[0] = vo1;
+								inouts[1] = vi1;
+								inouts[2] = vo2;
+								inouts[2] = vi2;
+								list.add(inouts);
+							}
+						}
+					}
+				}
+			}
+		}
+		return list;
+	}
+
 	//getters and setters
 	public List<ASDGVertex> getPath() {
 		return path;
