@@ -500,16 +500,16 @@ output 利用Z3的java api生成公式
 3. 实现QFPAgenerator，将Z3的语言集合限制到QFPA上 DONE
 3.5 重构
 4. 实现 one-counter automata 的可达性问题到QFPA的算法:
-  - 怎么找到所有的可能的positive cycle template
+  - 怎么找到所有的可能的positive cycle template DONE
   - 实现DGraph的skew transpose DONE
   - 实现Dgraph的support的生成
     - 实现边集的幂集的计算 DONE
-    - 对于每个边子集生成的图，选出最大的没有正环的边子集用来生成support(type1): neet to refine
+    - 对于每个边子集生成的图，选出最大的没有正环的边子集用来生成support(type1): need to refine DONE
        - 实现边集到图 DONE
        - 判断图是否连通 DONE
           -利用BFS判断是否连通（仅仅判断是否能从startVertex到达每个Vertex）DONE
        - 判断图是否有正环 DONE
-    - 对于type3中的positive cycle template需要一个算法找出所有的simplecycle和所有从inport到正环的路径，也就是找到所有的poscycletemplate
+    - 对于type3中的positive cycle template需要一个算法找出所有的simplecycle和所有从inport到正环的路径，也就是找到所有的poscycletemplate DONE
 5. debug and testing
 
 ## 四月 16日
@@ -523,9 +523,24 @@ output 利用Z3的java api生成公式
 1. 实现部分的图和文字要对上，说明图是数据流图 DONE
 2. QFPA输出格式加个例子 DONE
 3. 具体描述每个模块如何实现，特别是Reach模块 DONE
-4. 修改翻译
-5. 调整第三章结构，DWT, then definition of the certificate, then the algorithm and pseudocode.
+4. 修改翻译 DONE
+5. 调整第三章结构，DWT, then definition of the certificate, then the algorithm and pseudocode. DONE
 
 
 逻辑：
-给出SCC和DWT的定义，给出问题的定义，给出我们的可达证书的定义，证明我们的证书是正确的，证明我们的证书是多项式的，
+给出SCC和DWT的定义，给出问题的定义，给出我们的可达证书的定义，证明我们的证书是正确的，证明我们的证书是多项式的， DONE
+
+# 五月 2日
+
+读了一下尼采的东西：权力意志、主人-奴隶道德学说
+
+# 五月 7日 8日
+
+自学模型论中....
+
+# 五月 9日
+
+完成了OCAReach2QFPA的逻辑实现，接下来就要开始漫长的debug和refactor了。
+
+
+# 五月 10日
