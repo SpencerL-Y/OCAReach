@@ -1,18 +1,20 @@
-package test;
+package other;
 
 import automata.counter.OCA;
 import graph.directed.DGraph;
 import graph.directed.DGraphUtil;
 import parser.OCDGenerator;
 
-public class OcaTest {
+public class DGraphTest {
 	public static void main(String[] args) {
-		System.out.checkError();
 		OCDGenerator ocdg = new OCDGenerator();
 		OCA a = ocdg.genRandomOca(6);
 		a.print();
 		DGraph dg = a.toDGraph();
-		
 		DGraphUtil.printAdjMatrix(dg);
+	}
+	
+	public void addVertex() {
+		
 	}
 }

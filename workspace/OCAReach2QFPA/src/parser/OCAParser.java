@@ -93,20 +93,33 @@ public class OCAParser {
 		String initNum = initFmt[1].trim();
 		int initId = Integer.parseInt(initNum);
 		oca.setInitIndex(initId);
+		String target = text[3].trim();
+		String[] targetFmt = target.split(":");
+		String targetStr = targetFmt[0].trim().substring(1);
+		if(!targetStr.equals("Target")) {
+			System.out.println(targetStr);
+			System.out.println(false);
+			return false;
+		}
+		String targetNum = targetFmt[1].trim();
+		int targetId = Integer.parseInt(targetNum);
+		oca.setTargetIndex(targetId);
 		System.out.println(true);
 		return true;
 	}
 	
 	private boolean parseTransitions(String[] text, OCA oca) {
 		System.out.println("parseTransitions");
-		String trans = text[3].trim();
+		String trans = text[4].trim();
 		String[] transFmt = trans.split(":");
 		String transStr = transFmt[0].trim().substring(1);
 		if(!transStr.equals("Delta")) {
 			System.out.println(false + "Delta" + transStr);
 			return false;
 		}
-
+		if(transFmt.length == 1) {
+			return true;
+		}
 		System.out.println(transFmt[1]);	
 		String[] tuples =  transFmt[1].trim().split(";");
 

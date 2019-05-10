@@ -1,4 +1,4 @@
-package test;
+package other;
 
 import com.microsoft.z3.*;
 

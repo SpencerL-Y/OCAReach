@@ -1,10 +1,10 @@
-package test;
+package other;
 
 import graph.directed.DGraph;
 import graph.directed.DGraphUtil;
 import graph.directed.SDGraph;
 
-public class TestGraph {
+public class GraphTest {
 	public static void main(String[] args) {
 		DGraph tg = new DGraph();
 		tg.addVertex(0);

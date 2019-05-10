@@ -22,6 +22,7 @@ public class DGVertex implements Vertex{
 			if(this.getEdges().get(i).getTo().getIndex() > e.getTo().getIndex()) {
 				// making the list of edges in order regarding to the edge index
 				this.getEdges().add(i, e);
+				return;
 			}
 		}
 		this.getEdges().add(e);

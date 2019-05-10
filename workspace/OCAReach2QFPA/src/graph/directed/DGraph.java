@@ -37,10 +37,13 @@ public class DGraph implements Graph{
 	}
 	
 	public void addVertex(DGVertex v) {
-		if(!this.getVertices().contains(v)) {
-			this.getVertices().add(v);
+		for(DGVertex ve : this.getVertices()) {
+			if(ve.getIndex() == v.getIndex()) {
+				System.out.println("ERROR: Index repeat");
+				return;
+			}
 		}
-	
+		this.getVertices().add(v);
 	}
 	
 	public void delVertex(int index) {
@@ -77,7 +80,10 @@ public class DGraph implements Graph{
 		return this.getVertices().size();
 	}
 	
+	// mark: generalize here, we require the weight of an edge is fixed. 
+	// there does not exist an edge with different weight
 	public void addEdge(int fromIndex, int toIndex, int weight) {
+		assert(this.containsVertex(fromIndex) && this.containsVertex(toIndex));
 		if(this.containsEdge(fromIndex, toIndex)) {
 			System.out.println("ERROR: Add edge error, Edge already exists");
 			return;
@@ -104,7 +110,13 @@ public class DGraph implements Graph{
 	}
 	
 	private Boolean containsEdge(int fromIndex, int toIndex) {
-		return this.getVertex(fromIndex).containsEdge(toIndex);
+		for(DGEdge e : this.getEdges()) {
+			if(e.getFrom().getIndex() == fromIndex 
+			&& e.getTo().getIndex() == toIndex) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	//Algorithms
@@ -246,12 +258,12 @@ public class DGraph implements Graph{
 	}
 	
 	public boolean isSubgraphOf(DGraph graph) {
-		//TODO: debug
 		// a graph is a subgraph if the vertices are covered
 		for(DGVertex v : this.getVertices()) {
-			if(!graph.getVertices().contains(v)) {
+			if(!graph.containsVertex(v.getIndex())) {
 				return false;
 			}
+			
 			for(DGEdge e : v.getEdges()) {
 				if(!graph.containsEdge(e.getFrom().getIndex(), e.getTo().getIndex())) {
 					return false;
@@ -295,7 +307,6 @@ public class DGraph implements Graph{
 	}
 	
 	public void increaseDWTLenLimit() {
-		//TODO imple
 		// increase the length limit to 3|V|^2 + 1 and 
 		for(int i = this.getTable().getMaxLength(); 
 				i < 3 * this.getVertices().size() * this.getVertices().size() + 1; 

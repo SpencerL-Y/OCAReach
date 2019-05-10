@@ -13,6 +13,7 @@ public class OCDGenerator {
 	}
 	
 	public String generateRandomOcd(int stateNum) {
+		assert(stateNum > 0);
 		this.generateRandomOca(stateNum);
 		return this.generateOcd();
 	}
@@ -31,6 +32,9 @@ public class OCDGenerator {
 		ocd += "\n";
 		ocd += "[Init:";
 		ocd += this.getTempOca().getInitIndex();
+		ocd += "]\n";
+		ocd += "[Target:";
+		ocd += this.getTempOca().getTargetIndex(); 
 		ocd += "]\n";
 		ocd +=  "[Delta:";
 		for(int i = 0; i <  this.getTempOca().getStates().size(); i ++) {
@@ -52,25 +56,26 @@ public class OCDGenerator {
 	}
 	
 	private void generateRandomOca(int stateNum) {
-		this.tempOca = new OCA();
+		assert(stateNum > 0);
 		Random r = new Random();
+		this.tempOca = new OCA();
 		for(int i = 0; i < stateNum; i ++) {
 			this.getTempOca().addState(i);
 		}
 		for(int i = 0; i < stateNum; i ++) {
 			for(int j = 0; j < stateNum; j ++) {
 				if(r.nextInt() % 3 == 0) {
-					int op = r.nextInt(3);
+					int op = r.nextInt(2);
 					if(op == 0) {
 						this.getTempOca().addTransition(i, OCAOp.Add, j);
-					} else if(op == 1) {
-						this.getTempOca().addTransition(i, OCAOp.Sub, j);
 					} else {
-						this.getTempOca().addTransition(i, OCAOp.Zero, j);
+						this.getTempOca().addTransition(i, OCAOp.Sub, j);
 					}
 				}
 			}
-		} 
+		}
+		tempOca.setInitIndex(0);
+		tempOca.setTargetIndex(r.nextInt(stateNum));
 	}
 	
 	public OCA genRandomOca(int stateNum) {

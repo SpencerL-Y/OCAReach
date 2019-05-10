@@ -33,7 +33,9 @@ public class State {
 	
 	public boolean checkTransitionExist(Transition trans) {
 		for(Transition t : this.transitions) {
-			if(t.equals(trans)) {
+			if(t.getFrom().getIndex() == trans.getFrom().getIndex() 
+			&& t.getTo().getIndex() == trans.getTo().getIndex()
+			&& t.getLabel().equals(trans.getLabel())) {
 				return true;
 			} 
 		}

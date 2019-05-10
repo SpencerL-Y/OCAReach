@@ -11,10 +11,12 @@ import graph.directed.DGraph;
 public class OCA implements Automaton{
 	private List<State> states;
 	private int initIndex;
+	private int targetIndex;
 	
 	public OCA() {
 		this.states = new ArrayList<State>();
-		this.setInitIndex(-1);
+		this.initIndex = -1;
+		this.targetIndex = -1;
 	}
 	
 	//basic operations
@@ -49,7 +51,7 @@ public class OCA implements Automaton{
 		this.getState(fromIndex).addTransition(tran);
 	}
 	
-	public boolean containState(State state) {
+	public boolean containsState(State state) {
 		for(State s : this.getStates()) {
 			if(state == s) {
 				return true;
@@ -103,12 +105,13 @@ public class OCA implements Automaton{
 				} else if(t.getLabel().equals("zero")) {
 					weight = 0;
 				} else {
-					System.out.checkError();
+					assert(false);
 				}
 				udg.addEdge(fromIndex, toIndex, weight);
 			}
 		}
 		udg.setStartVertexIndex(this.getInitIndex());
+		udg.setEndingVertexIndex(this.getTargetIndex());
 		return udg;
 	}
 	
@@ -116,6 +119,7 @@ public class OCA implements Automaton{
 	@Override
 	public void print() {
 		System.out.println("InitState: "+this.getInitIndex());
+		System.out.println("TargetState: " + this.getTargetIndex());
 		for(State s : this.getStates()) {
 			System.out.println("State: " + s.getIndex()+" ");
 			for(Transition t : s.getTransitions()) {
@@ -123,5 +127,21 @@ public class OCA implements Automaton{
 			}
 		}
 		System.out.println();
+	}
+
+	public int getTargetIndex() {
+		return targetIndex;
+	}
+
+	public void setTargetIndex(int targetIndex) {
+		for(State s : this.getStates()) {
+			if(s.getIndex() == targetIndex) {
+				this.targetIndex = targetIndex;
+				return;
+			}
+		}
+		if(initIndex != -1) {
+			System.out.println("ERROR: init index does not exists");
+		}
 	}
 }

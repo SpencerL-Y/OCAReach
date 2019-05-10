@@ -285,7 +285,7 @@ strongly connected component.
 
 ## 三月 7日 
 
-根据老师strongly component 的思路，已经过了一遍算法，发现之中的问题， positive cycle  template 的要求还是必要的，因为需要用到定义中对于 $\verb{drop}$ 的要求来使得$\pi_3$的counter值不会小于0.
+根据老师strongly component 的思路，已经过了一遍算法，发现之中的问题， positive cycle  template 的要求还是必要的，因为需要用到定义中对于 $\verb|drop|$ 的要求来使得$\pi_3$的counter值不会小于0.
 
 
 需要考虑的问题：
@@ -544,3 +544,6 @@ output 利用Z3的java api生成公式
 
 
 # 五月 10日
+
+开始利用JUnit对工具的每个部分，特别是和算法有关的方法进行单元测试。
+目前已完成了 OCA， OCDGenerator和OCAParser的测试。

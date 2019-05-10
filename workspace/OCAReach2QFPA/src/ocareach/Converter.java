@@ -24,7 +24,7 @@ import table.dwt.DWTEntry;
 import table.dwt.DWTuple;
 
 public class Converter {
-	// TODO: imple
+	// TODO: debug
 	// input: A One-Counter Automaton and two states s, t of it
 	// output: A QFPA formula that is satisfiable if there is a 
 	// a possible run from (s,x) to (t,y) where x and y are integer
@@ -48,7 +48,7 @@ public class Converter {
 	
 	// ALGORITHM
 	public String convert(State startState, State endState) {
-		assert(this.getOca().containState(startState) && this.getOca().containState(endState));
+		assert(this.getOca().containsState(startState) && this.getOca().containsState(endState));
 		//set starting and ending vertex in dg
 		this.getDgraph().setStartVertexIndex(startState.getIndex());
 		this.getDgraph().setEndingVertexIndex(endState.getIndex());
@@ -60,7 +60,7 @@ public class Converter {
 		ASDGVertex absEnd = this.getAsdg().getVertex(this.getSdg().getEndingVertex().getSccMark());
 		// get all the possible abstract path
 		List<ASDGPath> paths = this.getAsdg().DFSFindAbsPaths(absStart.getSccIndex(), absEnd.getSccIndex());
-		List<Expr> formulae = new ArrayList<Expr>();
+		List<BoolExpr> formulae = new ArrayList<BoolExpr>();
 		for(ASDGPath p : paths) {
 			// there is no cycles in the SCCs (trivial case: every scc is a concrete vertex)
 			boolean trivial = !p.containsCycledVertex();
@@ -88,14 +88,16 @@ public class Converter {
 			if(type132) {
 				type132Form = this.genType132Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar);
 			}
-			Expr temp = (trivial)? trivialForm : this.combineAllFormlae(type1Form, type12Form, type132Form);
+			BoolExpr temp = (trivial)? trivialForm : this.combineAllFormlae(type1Form, type12Form, type132Form);
 			formulae.add(temp);
 		}
 		
 		
 		String result = null;
-		
-		//TODO imple
+		BoolExpr resultExpr = this.getQfpaGen().mkFalse();
+		for(BoolExpr formula : formulae) {
+			resultExpr = this.getQfpaGen().mkOrBool(resultExpr, formula);
+		}
 		return result;
 	}
 	
@@ -128,7 +130,6 @@ public class Converter {
 	private BoolExpr genType1Formulae(ASDGPath p, int startIndex, int endIndex,
 									              IntExpr startVar, IntExpr endVar
 									              , boolean isSkew) {
-		//TODO imple
 		//assertion
 		IntExpr sVar = startVar;
 		IntExpr tVar = endVar;
@@ -568,7 +569,7 @@ public class Converter {
 	//TODO: formula for postive cycle template
 	
 	private BoolExpr genPosCycleTemplateFormula(DGraph g, int startIndex, int guessIndex, IntExpr startVar, IntExpr guessVar) {
-		//TODO: imple
+		//TODO: debug
 		// desciption: return the possible positive cycle template with the minimum drop, if none return null
 		assert(g.containsVertex(startIndex) && g.containsVertex(guessIndex));
 		if(g.getTag() == null) {
@@ -592,8 +593,8 @@ public class Converter {
 		return form;
 	}
 	
-	private Expr combineAllFormlae(BoolExpr type1, BoolExpr type12, BoolExpr type132) {
-		Expr result = this.getQfpaGen().mkOrBool(
+	private BoolExpr combineAllFormlae(BoolExpr type1, BoolExpr type12, BoolExpr type132) {
+		BoolExpr result = this.getQfpaGen().mkOrBool(
 			type1, type12, type132
 		);
 		return result;
