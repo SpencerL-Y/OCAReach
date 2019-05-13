@@ -31,6 +31,9 @@ public class DWTableImpl implements DWTable {
 				updated = false;
 			}
 		}
+		if(this.getEntryList().size() == 0) {
+			updated = false;
+		}
 		if(!updated) {
 			//do updating
 			if(this.getMaxLength() == 1) {
@@ -38,6 +41,8 @@ public class DWTableImpl implements DWTable {
 				for(DGVertex v : this.graph.getVertices()) {
 					for(DGEdge e : v.getEdges()) {
 						DWTEntry entry = new DWTEntryImpl(v, e.getTo(), 1);
+						DWTuple t = new DWTuple(Math.min(e.getWeight(), 0), e.getWeight());
+						entry.addDWTuple(t);
 						this.getEntryList().add(entry);
 						//TODO use hash table to increase efficiency?
 					}
@@ -49,16 +54,19 @@ public class DWTableImpl implements DWTable {
 					for(DWTEntry ep : this.getMaxLengthList(prefix)) {
 						for(DWTEntry es : this.getMaxLengthList(suffix)) {
 							if(ep.getEndIndex() == es.getStartIndex()) {
+								
 								// merge the path 
 								DWTEntryImpl addToEntry = (DWTEntryImpl) this.getEntry(ep.getStartIndex(), es.getEndIndex());
+								
 								if(addToEntry == null) {
 									addToEntry = new DWTEntryImpl((DGVertex)ep.getStartVertex(), 
 																  (DGVertex)es.getEndVertex(), this.getMaxLength());
-									this.mergeTupleList(ep.getSetOfDWTuples(), es.getSetOfDWTuples(), addToEntry.getSetOfDWTuples());
+									addToEntry.setSetOfDWTuples(this.mergeTupleList(ep.getSetOfDWTuples(), es.getSetOfDWTuples(), addToEntry.getSetOfDWTuples()));
+									this.getEntryList().add(addToEntry);
 								} else {
-									//update the length
+									// update the length
 									addToEntry.setMaxLength(this.getMaxLength());
-									this.mergeTupleList(ep.getSetOfDWTuples(), es.getSetOfDWTuples(), addToEntry.getSetOfDWTuples());
+									addToEntry.setSetOfDWTuples(this.mergeTupleList(ep.getSetOfDWTuples(), es.getSetOfDWTuples(), addToEntry.getSetOfDWTuples()));
 								}
 							}
 						}
@@ -68,13 +76,18 @@ public class DWTableImpl implements DWTable {
 		}
 	}
 	
-	private void mergeTupleList(List<DWTuple> pre, List<DWTuple> suf, List<DWTuple> merge) {
+	private List<DWTuple> mergeTupleList(List<DWTuple> pre, List<DWTuple> suf, List<DWTuple> merge) {
+		List<DWTuple> newList = new ArrayList<DWTuple>();
+		for(DWTuple t : merge) {
+			newList.add(t);
+		}
 		for(DWTuple tp : pre) {
 			for(DWTuple ts : suf) {
-				DWTuple newT = DWTuple.merge(tp, ts);
-				this.wiselyAddTuple(merge, newT);
+				DWTuple newT = DWTuple.merge(tp, ts); 
+				this.wiselyAddTuple(newList, newT);
 			}
 		}
+		return newList;
 	}
 	
 	private void wiselyAddTuple(List<DWTuple> merge, DWTuple add) {
@@ -105,7 +118,7 @@ public class DWTableImpl implements DWTable {
 				return e;
 			}
 		}
-		//System.out.println("WARNING: DWTEntry not found");
+		//System.out.println("WARNING: DWTEntry( "+startIndex+" to "+endIndex+" ) not found");
 		return null;
 	}
 

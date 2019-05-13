@@ -109,7 +109,7 @@ public class DGraph implements Graph{
 		return edgeList;
 	}
 	
-	private Boolean containsEdge(int fromIndex, int toIndex) {
+	public Boolean containsEdge(int fromIndex, int toIndex) {
 		for(DGEdge e : this.getEdges()) {
 			if(e.getFrom().getIndex() == fromIndex 
 			&& e.getTo().getIndex() == toIndex) {
@@ -277,10 +277,26 @@ public class DGraph implements Graph{
 	public DGraph union(DGraph graph) {
 		DGraph newG = new DGraph();
 		for(DGVertex v : this.getVertices()) {
-			newG.addVertex(v);
+			newG.addVertex(v.getIndex());
 		}
 		for(DGVertex w : graph.getVertices()) {
-			newG.addVertex(w);
+			if(!newG.containsVertex(w.getIndex())) {
+				newG.addVertex(w.getIndex());
+			}
+		}
+		for(DGVertex v : this.getVertices()) {
+			for(DGEdge e : v.getEdges()) {
+				if(newG.containsVertex(v.getIndex()) && newG.containsVertex(e.getTo().getIndex())) {
+					newG.addEdge(v.getIndex(), e.getTo().getIndex(), e.getWeight());
+				}
+			}
+		}
+		for(DGVertex w : graph.getVertices()) {
+			for(DGEdge e : w.getEdges()) {
+				if(newG.containsVertex(w.getIndex()) && newG.containsVertex(e.getTo().getIndex())) {
+					newG.addEdge(w.getIndex(), e.getTo().getIndex(), e.getWeight());
+				}
+			}
 		}
 		return newG;
 	}

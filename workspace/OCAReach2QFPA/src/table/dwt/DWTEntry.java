@@ -15,4 +15,5 @@ public interface DWTEntry {
 	public void setEndVertex(Vertex endVertex);
 	public void setMaxLength(int maxLength);
 	public void addDWTuple(DWTuple tuple);
+	public void printEntry();
 }

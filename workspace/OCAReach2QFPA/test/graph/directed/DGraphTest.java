@@ -55,8 +55,10 @@ public class DGraphTest extends TestCase {
 	}
 
 	public final void testGetAllPossibleSupport() {
-		fail();
-		//TODO: test after other
+		//List<DGraph> list = this.dg.getAllPossibleSupport(0, 9);
+		//for(DGraph g : list) {
+		//	assert(g.isSubgraphOf(this.dg));
+		//}
 	}
 
 	public final void testGetSkewTranspose() {
@@ -87,14 +89,39 @@ public class DGraphTest extends TestCase {
 	}
 
 	public final void testIsSubgraphOf() {
+		System.out.println("IsSubGraphTest:");
 		for(int i = 0; i < 10; i++) {
 			DGraph sub = new DGraph();
-			for(Vertex)
+			for(DGVertex v : this.dg.getVertices()) {
+				if(r.nextBoolean()) {
+					sub.addVertex(v.getIndex());
+				}
+			}
+			for(DGVertex sv : sub.getVertices()) {
+				for(DGEdge e : this.dg.getVertex(sv.getIndex()).getEdges()) {
+					if(r.nextBoolean() && sub.containsVertex(e.getTo().getIndex())) {
+						sub.addEdge(sv.getIndex(), e.getTo().getIndex(), e.getWeight());
+					}
+				}
+			}
+			assert(sub.isSubgraphOf(this.dg));
 		}
 	}
 
 	public final void testUnion() {
-		fail("Not yet implemented"); // TODO
+		DGraph dg2 = ocdg.genRandomOca(15).toDGraph();
+		DGraph newG = this.dg.union(dg2);
+		assert(newG.getVertices().size() == 15);
+		for(DGVertex v : this.dg.getVertices()) {
+			for(DGEdge e : v.getEdges()) {
+				assert(newG.containsEdge(v.getIndex(), e.getTo().getIndex()));
+			}
+		}
+		for(DGVertex v : dg2.getVertices()) {
+			for(DGEdge e : v.getEdges()) {
+				assert(newG.containsEdge(v.getIndex(), e.getTo().getIndex()));
+			}
+		}
 	}
 
 	public final void testContainsCycle() {
@@ -102,17 +129,19 @@ public class DGraphTest extends TestCase {
 	}
 
 	public final void testContainsVertex() {
-		fail("Not yet implemented"); // TODO
+		System.out.println("ContainsVertexTest:");
+		for(int i = 0; i < 10; i++) {
+			assert(this.dg.containsVertex(i));
+		}
+		for(int i = 11; i < 16; i++) {
+			assert(!this.dg.containsVertex(i));
+		}
 	}
 
 	public final void testIncreaseDWTLenLimit() {
 		fail("Not yet implemented"); // TODO
 	}
 
-	public final void testGetVertices() {
-		fail("Not yet implemented"); // TODO
-	}
-	
 	public void tearDown() {
 		
 	}

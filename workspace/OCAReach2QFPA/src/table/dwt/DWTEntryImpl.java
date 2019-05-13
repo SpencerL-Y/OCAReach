@@ -73,4 +73,14 @@ public class DWTEntryImpl implements DWTEntry {
 	public void addDWTuple(DWTuple tuple) {
 		this.getSetOfDWTuples().add(tuple);
 	}
+
+	@Override
+	public void printEntry() {
+		System.out.println("----------------DWTEntry( " + this.getStartIndex()+" to " +this.getEndIndex()+" )---------------------");
+		System.out.println("Tuples:");
+		for(DWTuple t : this.getSetOfDWTuples()) {
+			t.printTuple();
+		}
+		System.out.println("-------------------------------------------------------");
+	}
 }
