@@ -32,6 +32,7 @@ public class ASDGraph {
 			System.out.println("ERROR: SDG haven't run tarjan algorithm");
 			System.out.checkError();
 		}
+		System.out.println("scc Num :" + sdg.getSccNum());
 		// after add all the border edges then we construct the vertices
 		for(int i = 1; i <= sdg.getSccNum(); i++) {
 			this.vertices.add(new ASDGVertex(this, i, this.borderEdges));

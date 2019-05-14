@@ -36,6 +36,7 @@ public class ASDGVertex {
 	//TODO: debug
 	public DGraph getConcreteDGraph(boolean isSkew) {
 		if(!isSkew) {
+			System.out.println("get scc index " + this.getSccIndex());
 			return this.getGraph().getSdg().getConcreteSCC(this.getSccIndex());
 		} else {
 			return this.getGraph().getSdg().getConcreteSCC(this.getSccIndex()).getSkewTranspose();

@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.Stack;
-
 import graph.directed.abs.LoopTag;
 import table.dwt.DWTEntry;
 import table.dwt.DWTable;

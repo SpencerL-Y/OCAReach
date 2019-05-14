@@ -46,7 +46,8 @@ public class SDGraph implements Graph{
 		for(SDGVertex v : this.getVertices()) {
 			if(v.getSccMark() == sccIndex) {
 				// add all the scc vertices into the subgraph
-				graph.addVertex(v.getVertex().getIndex());
+				System.out.println("vertex:" + v.getVertexIndex() + "scc:" + sccIndex);
+				graph.addVertex(v.getVertexIndex());
 			}
 		}
 		for(SDGVertex v : this.getVertices()) {

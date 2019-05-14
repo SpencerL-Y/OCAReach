@@ -1,7 +1,5 @@
 package graph.directed;
 
-import java.util.Random;
-
 import junit.framework.TestCase;
 import parser.OCDGenerator;
 
@@ -10,11 +8,9 @@ public class SDGraphTest extends TestCase {
 	private OCDGenerator ocdg;
 	private DGraph kdg;
 	private DGraph rdg;
-	private Random r;
 	private SDGraph sdg;
 
 	protected void setUp() throws Exception {
-		this.r = new Random();
 		this.ocdg = new OCDGenerator();
 		this.kdg = new DGraph();
 		for(int i = 0; i < 6; i++) {
@@ -26,7 +22,7 @@ public class SDGraphTest extends TestCase {
 		this.kdg.addEdge(1, 3, 1);
 		this.kdg.addEdge(1, 5, 1);
 		this.kdg.addEdge(5, 3, -1);
-		this.kdg.addEdge(5, 2, 1);
+		//this.kdg.addEdge(5, 2, 1);
 		this.kdg.addEdge(3, 4, 1);
 		this.kdg.addEdge(4, 3, -1);
 		
@@ -40,14 +36,19 @@ public class SDGraphTest extends TestCase {
 		System.out.println("GetConcreteSCCTest:");
 		this.sdg = new SDGraph(kdg);
 		this.sdg.tarjan();
-		DGraph cg = this.sdg.getConcreteSCC(2);
+		for(SDGVertex v : this.sdg.getVertices()) {
+			System.out.println("Vertex " + v.getVertexIndex() + " is in scc no."+ v.getSccMark() + " lowlink: " + v.getLowLink());
+		}
+		DGraph cg = this.sdg.getConcreteSCC(1);
+		cg = this.sdg.getConcreteSCC(1);
+		//cg = this.sdg.getConcreteSCC(3);
 		System.out.println("vertices: ");
 		for(DGVertex v : cg.getVertices()) {
-			System.out.print(v.getIndex());
+			System.out.println(v.getIndex());
 		}
 		System.out.println("edges: ");
 		for(DGVertex v : cg.getVertices()) {
-			for(DGEdge e : cg.getEdges()) {
+			for(DGEdge e : v.getEdges()) {
 				System.out.println("from " + e.getFrom().getIndex() + " to " + e.getTo().getIndex());
 			}
 		}
