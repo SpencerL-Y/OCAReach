@@ -1,7 +1,10 @@
 package graph.directed;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
+import graph.directed.abs.LoopTag;
 import junit.framework.TestCase;
 import parser.OCDGenerator;
 
@@ -12,11 +15,23 @@ public class DGraphTest extends TestCase {
 	private Random r;
 	private OCDGenerator ocdg;
 	private DGraph dg;
+	private DGraph ddg;
 	
 	public void setUp() {
 		this.r = new Random();
 		this.ocdg = new OCDGenerator();
 		this.dg = ocdg.genRandomOca(10).toDGraph();
+		this.ddg = new DGraph();
+		this.ddg = new DGraph();
+		for(int i = 0; i < 4; i++) {
+			this.ddg.addVertex(i);
+		}
+		this.ddg.addEdge(0, 1, -1);
+		this.ddg.addEdge(1, 2, 1);
+		this.ddg.addEdge(2, 0, -1);
+		this.ddg.addEdge(2, 3, 1);
+		this.ddg.setStartVertexIndex(0);
+		this.ddg.setEndingVertexIndex(0);
 		
 	}
 	
@@ -50,15 +65,25 @@ public class DGraphTest extends TestCase {
 	}
 
 	public final void testComputeLoopTag() {
-		fail();
 		//TODO: test after the test of table
+		System.out.println("ComputeLoopTagTest:");
+		LoopTag t = this.ddg.computeLoopTag();
+		System.out.println("known looptag: " + t.toString());
+		System.out.println("stress testing: ");
+		for(int i = 0; i < 15; i++) {
+			this.dg = this.ocdg.genRandomOca(4).toDGraph();
+			t = this.dg.computeLoopTag();
+			System.out.println("tag " + i + ": " + t.toString());
+		}
 	}
 
 	public final void testGetAllPossibleSupport() {
-		//List<DGraph> list = this.dg.getAllPossibleSupport(0, 9);
-		//for(DGraph g : list) {
-		//	assert(g.isSubgraphOf(this.dg));
-		//}
+		System.out.println("GetAllPossibleSupportTest: ");
+		this.dg = this.ocdg.genRandomOca(5).toDGraph();
+		List<DGraph> list = this.dg.getAllPossibleSupport(0, 3);
+		for(DGraph g : list) {
+			assert(g.isSubgraphOf(this.dg));
+		}
 	}
 
 	public final void testGetSkewTranspose() {
@@ -81,11 +106,43 @@ public class DGraphTest extends TestCase {
 	}
 
 	public final void testEdgeListToGraph() {
-		fail("Not yet implemented"); // TODO
+		System.out.println("EdgeListToGraphTest:");
+		System.out.println("known: ");
+		List<DGEdge> list = new ArrayList<DGEdge>();
+		for(DGVertex v : this.ddg.getVertices()) {
+			for(DGEdge e : v.getEdges()) {
+				if(r.nextBoolean()) {
+					list.add(e);
+				}
+			}
+		}
+		DGraph newG = this.ddg.edgeListToGraph(list);
+		
+		for(int i = 0; i < 10; i++) {
+			list.clear();
+			this.dg = this.ocdg.genRandomOca(8).toDGraph();
+			for(DGVertex v : this.dg.getVertices()) {
+				for(DGEdge e : v.getEdges()) {
+					if(r.nextBoolean()) {
+						list.add(e);
+					}
+				}
+			}
+			this.dg.edgeListToGraph(list);
+		}
+		
 	}
 
 	public final void testIsConnected() {
-		fail("Not yet implemented"); // TODO
+		System.out.println("IsConnectedTest:");
+		
+		System.out.println("known: " + this.ddg.isConnected());
+		System.out.println("stress testing");
+		for(int i = 0; i < 15; i++) {
+			this.dg = this.ocdg.genRandomOca(4).toDGraph();
+			boolean t = this.dg.isConnected();
+			System.out.println("tag " + i + ": " + t);
+		}
 	}
 
 	public final void testIsSubgraphOf() {
@@ -125,7 +182,13 @@ public class DGraphTest extends TestCase {
 	}
 
 	public final void testContainsCycle() {
-		fail("Not yet implemented"); // TODO
+		System.out.println("ContainsCycleTest:");
+		System.out.println("known: " + this.ddg.containsCycle());
+		for(int i = 0; i < 15; i++) {
+			this.dg = this.ocdg.genRandomOca(6).toDGraph();
+			boolean t = this.dg.containsCycle();
+			System.out.println("tag " + i + ": " + t);
+		}
 	}
 
 	public final void testContainsVertex() {
@@ -139,7 +202,13 @@ public class DGraphTest extends TestCase {
 	}
 
 	public final void testIncreaseDWTLenLimit() {
-		fail("Not yet implemented"); // TODO
+		//TODO: problem, it takes to much time to increase the bound to 3n^2+1 
+		System.out.println("IncreaseDWTLenLimitTest:");
+		this.ddg.increaseDWTLenLimit();
+		for(int i = 0; i < 5; i++) {
+			this.dg = this.ocdg.genRandomOca(5).toDGraph();
+			this.dg.increaseDWTLenLimit();
+		}
 	}
 
 	public void tearDown() {

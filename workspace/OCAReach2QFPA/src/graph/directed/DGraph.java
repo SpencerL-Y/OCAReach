@@ -135,6 +135,9 @@ public class DGraph implements Graph{
 		boolean noCycle = true;
 		for(DGVertex v : this.getVertices()) {
 			DWTEntry entry = table.getEntry(v.getIndex(), v.getIndex());
+			if(entry == null) {
+				continue;
+			}
 			if(entry.getSetOfDWTuples().size() != 0) {
 				noCycle = false;
 			}
@@ -170,7 +173,7 @@ public class DGraph implements Graph{
 	public List<DGraph> getAllPossibleSupport(int startIndex, int endIndex){
 		// find the supports that contains startVertex and endVertex
 		// the support also needs to be a strong connect component
-		// TODO: debug
+		// TODO: find a better implementation 
 		List<DGraph> graphs = new ArrayList<DGraph>();
 		List<DGEdge> edges = new ArrayList<DGEdge>();
 		for(DGVertex v : this.getVertices()) {
@@ -210,17 +213,19 @@ public class DGraph implements Graph{
 		DGraph g = new DGraph();
 		if(list.size() == 0 && this.getVertices().size() == 1) {
 			// trivial case
-			g.addVertex(this.getVertices().get(0));
+			g.addVertex(this.getVertices().get(0).getIndex());
 		}
 		for(DGEdge e : list) {
-			if(this.containsVertex(e.getTo().getIndex())) {
+			if(this.containsVertex(e.getTo().getIndex()) && !g.containsVertex(e.getTo().getIndex())) {
 				g.addVertex(e.getTo().getIndex());
 			}
-			if(this.containsVertex(e.getFrom().getIndex())) {
+			if(this.containsVertex(e.getFrom().getIndex()) && !g.containsVertex(e.getFrom().getIndex())) {
 				g.addVertex(e.getFrom().getIndex());
 			}
 			g.addEdge(e.getFrom().getIndex(), e.getTo().getIndex(), e.getWeight());
 		}
+		g.setStartVertexIndex(this.getStartVertexIndex());
+		g.setEndingVertexIndex(this.getEndingVertexIndex());
 		return g;
 	}
 	
@@ -323,7 +328,10 @@ public class DGraph implements Graph{
 	}
 	
 	public void increaseDWTLenLimit() {
-		// increase the length limit to 3|V|^2 + 1 and 
+		// increase the length limit to 3|V|^2 + 1 and
+		if(this.getTable() == null) {
+			this.computeLoopTag();
+		}
 		for(int i = this.getTable().getMaxLength(); 
 				i < 3 * this.getVertices().size() * this.getVertices().size() + 1; 
 				i = this.getTable().getMaxLength()) {

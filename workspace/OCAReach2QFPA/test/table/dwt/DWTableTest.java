@@ -71,7 +71,13 @@ public class DWTableTest extends TestCase {
 	}
 
 	public final void testGetEntryList() {
-		//TODO: imple
+		System.out.println("GetEntryListTest:s");
+		for(int i = 0; i < 4; i++) {
+			this.table.increMaxLenUpdate();
+		}
+		for(int i = 0; i < 100; i++) {
+			this.table.getEntryList();
+		}
 	}
 
 	public final void testIncreMaxLenUpdate() {
