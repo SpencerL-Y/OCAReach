@@ -3,6 +3,7 @@ package graph.directed;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class SDGraph implements Graph{
 	private DGraph graph;
@@ -19,7 +20,7 @@ public class SDGraph implements Graph{
 			this.vertices.add(new SDGVertex(v, this));
 		}
 		this.startingVertex = this.getVertex(this.getGraph().getStartVertexIndex());
-		this.setEndingVertex(this.getVertex(this.getGraph().getEndingVertexIndex()));
+		this.endingVertex = this.getVertex(this.getGraph().getEndingVertexIndex());
 	}
 	
 	// basic operation
@@ -46,13 +47,15 @@ public class SDGraph implements Graph{
 			if(v.getSccMark() == sccIndex) {
 				// add all the scc vertices into the subgraph
 				graph.addVertex(v.getVertex().getIndex());
-				for(DGEdge e : v.getVertex().getEdges()) {
-					if(this.getEdgeTo(e).getSccMark() == sccIndex) {
-						// if the transition is in the scc, add it to the sub dgraph
-						graph.addEdge(e.getFrom().getIndex(), 
-									  e.getTo().getIndex(),
-									  e.getWeight());
-					}
+			}
+		}
+		for(SDGVertex v : this.getVertices()) {
+			for(DGEdge e : v.getVertex().getEdges()) {
+				if(this.getEdgeTo(e).getSccMark() == sccIndex) {
+					// if the transition is in the scc, add it to the sub dgraph
+					graph.addEdge(e.getFrom().getIndex(), 
+								  e.getTo().getIndex(),
+								  e.getWeight());
 				}
 			}
 		}
@@ -68,21 +71,20 @@ public class SDGraph implements Graph{
 	// algorithm tarjan
 	//TODO: debug
 	public void tarjan() {
-		Integer index = 0;
-		Integer sccIndex = 1;
+		AtomicInteger index = new AtomicInteger(0);
+		AtomicInteger sccIndex = new AtomicInteger(1);
 		Stack<SDGVertex> stack = new Stack<SDGVertex>();
 		for(SDGVertex v : this.getVertices()) {
 			if(v.getSccMark() == -1) {
 				v.strongConnected(stack, index, sccIndex);
 			}
 		}
-		this.setSccNum(sccIndex);
+		this.setSccNum(sccIndex.get() - 1);
 	}
 	
 	public SDGraph getSkewTranspose() {
 		//TODO: debug
 		// tarjan must be computed before computing skew transpose
-		assert(this.getSccNum() != -1);
 		DGraph sktG = this.getGraph().getSkewTranspose();
 		SDGraph sktSG = new SDGraph(sktG);
 		return sktSG;

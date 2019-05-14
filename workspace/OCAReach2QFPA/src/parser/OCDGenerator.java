@@ -64,7 +64,8 @@ public class OCDGenerator {
 		}
 		for(int i = 0; i < stateNum; i ++) {
 			for(int j = 0; j < stateNum; j ++) {
-				if(r.nextInt() % 3 == 0) {
+				//TODO: change here to control the number of edges
+				if(r.nextInt() % 5 == 0) {
 					int op = r.nextInt(2);
 					if(op == 0) {
 						this.getTempOca().addTransition(i, OCAOp.Add, j);

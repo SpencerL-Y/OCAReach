@@ -2,6 +2,7 @@ package graph.directed;
 
 import java.util.List;
 import java.util.Stack;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class SDGVertex implements Vertex{
@@ -22,10 +23,10 @@ public class SDGVertex implements Vertex{
 	
 	//algorithm 
 	//TODO: debug
-	public void strongConnected(Stack<SDGVertex> stack, Integer index, Integer sccIndex) {
-		this.setSccMark(index);
-		this.setLowLink(index);
-		index = index + 1;
+	public void strongConnected(Stack<SDGVertex> stack, AtomicInteger index, AtomicInteger sccIndex) {
+		this.setSccMark(index.get());
+		this.setLowLink(index.get());
+		index.set(index.get()+1);
 		stack.push(this);
 		this.setOnStack(true);
 		for(DGEdge e: this.getVertex().getEdges()) {
@@ -33,19 +34,20 @@ public class SDGVertex implements Vertex{
 			SDGVertex w  = this.getGraph().getVertex(e.getTo().getIndex());
 			if(w.getSccMark() == -1) {
 				w.strongConnected(stack, index, sccIndex);
+				this.setLowLink(Math.min(this.lowLink, w.getLowLink()));
 			} else if(w.getOnStack()) {
 				this.setLowLink(Math.min(this.lowLink, w.getSccMark()));
 			} 
 		}
 		
 		if(this.lowLink == this.getSccMark()) {
-			SDGVertex w;
+			SDGVertex w = null;
 			do {
 				w = stack.pop();
 				w.setOnStack(false);
-				w.setSccMark(sccIndex);
+				w.setSccMark(sccIndex.get());
 			} while(w != this);
-			sccIndex += 1;
+			sccIndex.set(sccIndex.get()+1);
 		}
 	}
 	
@@ -63,6 +65,7 @@ public class SDGVertex implements Vertex{
 	public void setLowLink(Integer lowLink) {
 		this.lowLink = lowLink;
 	}
+	
 	public DGVertex getVertex() {
 		return vertex;
 	}
