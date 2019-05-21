@@ -32,7 +32,7 @@ public class ASDGraph {
 			System.out.println("ERROR: SDG haven't run tarjan algorithm");
 			System.out.checkError();
 		}
-		System.out.println("scc Num :" + sdg.getSccNum());
+		//System.out.println("scc Num :" + sdg.getSccNum());
 		// after add all the border edges then we construct the vertices
 		for(int i = 1; i <= sdg.getSccNum(); i++) {
 			this.vertices.add(new ASDGVertex(this, i, this.borderEdges));
@@ -49,7 +49,7 @@ public class ASDGraph {
 				return v;
 			}
 		}
-		System.out.println("ERROR: ASDGVertex not found");
+		System.out.println("ERROR: ASDGVertex " + sccIndex + " not found");
 		System.out.checkError();
 		return null;
 	}
@@ -105,7 +105,9 @@ public class ASDGraph {
 	}
 	
 	public ASDGraph getSkewTranspose() {
-		ASDGraph sktASG = new ASDGraph(this.getSdg().getSkewTranspose());
+		SDGraph skewSdg = this.getSdg().getSkewTranspose();
+		skewSdg.tarjan();
+		ASDGraph sktASG = new ASDGraph(skewSdg);
 		return sktASG;
 	}
 	

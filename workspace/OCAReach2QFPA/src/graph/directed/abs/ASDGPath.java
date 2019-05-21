@@ -3,7 +3,6 @@ package graph.directed.abs;
 import java.util.ArrayList;
 import java.util.List;
 
-import graph.directed.DGVertex;
 import graph.directed.SDGVertex;
  
 public class ASDGPath {
@@ -279,6 +278,14 @@ public class ASDGPath {
 		return list;
 	}
 
+	public void print() {
+		System.out.println("SCCPath: ");
+		for(ASDGVertex v : this.getPath()) {
+			System.out.print(v.getSccIndex() + " ");
+		}
+		System.out.println();
+	}
+	
 	//getters and setters
 	public List<ASDGVertex> getPath() {
 		return path;

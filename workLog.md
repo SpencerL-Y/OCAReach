@@ -547,3 +547,45 @@ output 利用Z3的java api生成公式
 
 开始利用JUnit对工具的每个部分，特别是和算法有关的方法进行单元测试。
 目前已完成了 OCA， OCDGenerator和OCAParser的测试。
+
+# 五月 15日
+
+论文存在的问题：
+- Intro:
+  - why:
+  1. 理论上： 计数器自动机、可达性、工具 done
+  2. sl done
+  3. summary 程序分析 done
+  - 相关研究： Presburger 性质结论 done
+  - 结构贡献： 先贡献：1.2.再结构 -NP- done
+- Pre:
+  - [k] [1,k] Z+ done
+  - OCA 的语义 done
+  - 运行到路径的定义，迁移上加delta，直接定义语义。 done
+  - 可达关系 定义 N^k*N^k done
+  - zero test free amplify + 说明 done
+  - 可达性问题 先定义QFPA 可达关系计算问题: s t 下标 done
+  - existential PA done
+  - 图的大小 done
+  - 子图redundant done
+  - out(v) in(v) done
+  - v font done
+  - 图是连通的 不带权的图 done
+  - v_i v_i+1 done
+  - 定点 done
+  - i ne j done
+  - 顿号 done
+  - drop 的定义 done
+  - 权重的最小值 done
+  - lemma 2.2 证明 done
+  - 权降至少为-n done
+  - lemma 4.1.16 叙述 + 位置 done
+  - dwt def done
+  - f去掉，直接说路径 done
+  - type1 structural d#
+
+  # 
+  - counter value >= 0 构造
+  -1 +3 -2 
+       -1
+

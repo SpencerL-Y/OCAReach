@@ -130,7 +130,6 @@ public class DGraphTest extends TestCase {
 			}
 			this.dg.edgeListToGraph(list);
 		}
-		
 	}
 
 	public final void testIsConnected() {

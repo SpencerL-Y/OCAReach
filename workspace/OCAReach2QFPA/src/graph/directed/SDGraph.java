@@ -46,13 +46,13 @@ public class SDGraph implements Graph{
 		for(SDGVertex v : this.getVertices()) {
 			if(v.getSccMark() == sccIndex) {
 				// add all the scc vertices into the subgraph
-				System.out.println("vertex:" + v.getVertexIndex() + "scc:" + sccIndex);
+				//System.out.println("vertex:" + v.getVertexIndex() + "scc:" + sccIndex);
 				graph.addVertex(v.getVertexIndex());
 			}
 		}
 		for(SDGVertex v : this.getVertices()) {
 			for(DGEdge e : v.getVertex().getEdges()) {
-				if(this.getEdgeTo(e).getSccMark() == sccIndex) {
+				if(v.getSccMark() == sccIndex && this.getEdgeTo(e).getSccMark() == sccIndex) {
 					// if the transition is in the scc, add it to the sub dgraph
 					graph.addEdge(e.getFrom().getIndex(), 
 								  e.getTo().getIndex(),
