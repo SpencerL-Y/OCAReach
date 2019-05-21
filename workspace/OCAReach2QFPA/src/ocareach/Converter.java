@@ -46,7 +46,14 @@ public class Converter {
 	}
 	
 	
+	
+	
+	
 	// ALGORITHM
+	public String convert() {
+		return this.convert(this.oca.getInitState(), this.oca.getTargetState());
+	}
+	
 	public String convert(State startState, State endState) {
 		assert(this.getOca().containsState(startState) && this.getOca().containsState(endState));
 		//set starting and ending vertex in dg
@@ -101,7 +108,7 @@ public class Converter {
 		return result;
 	}
 	
-	private BoolExpr genTrivialFormula(ASDGPath p) {
+	public BoolExpr genTrivialFormula(ASDGPath p) {
 		//TODO debug
 		// convert abstract vertices to concrete vertices
 		DGPath cp = new DGPath(p.getVertex(0).getConcreteDGraph(false).getVertices().get(0));
@@ -127,7 +134,7 @@ public class Converter {
 	// Here we use the second one
 	// TODO: debug trivial case from abstract state to concreate graph
 	//TODO: debug
-	private BoolExpr genType1Formulae(ASDGPath p, int startIndex, int endIndex,
+	public BoolExpr genType1Formulae(ASDGPath p, int startIndex, int endIndex,
 									              IntExpr startVar, IntExpr endVar
 									              , boolean isSkew) {
 		//assertion
@@ -146,6 +153,11 @@ public class Converter {
 		}
 		BoolExpr type1FormBody = this.getQfpaGen().mkFalse();
 		for(List<SDGVertex> l : allPossibleInOut) {
+			System.out.println("All possible inout: " );
+			for(int i = 0; i < l.size(); i++) {
+				System.out.print(l.get(i).getVertexIndex());
+			}
+			System.out.println();
 			// for every possible sequence of inoutports
 			BoolExpr type1FormBodyItem = this.getQfpaGen().mkTrue();
 			for(int i = 0; i <= p.length(); i ++) {
@@ -192,7 +204,7 @@ public class Converter {
 	
 	//TODO: debug
 	//TODO: imple add variable positive requirement
-	private List<BoolExpr> genAbsStateNoPosCycle(ASDGVertex v, SDGVertex inport, SDGVertex outport, 
+	public List<BoolExpr> genAbsStateNoPosCycle(ASDGVertex v, SDGVertex inport, SDGVertex outport, 
 														   BorderEdge in, BorderEdge out, 
 														   IntExpr thisInVar,  IntExpr thisOutVar,
 														   IntExpr lastOutVar, IntExpr nextInVar, boolean isSkew) {
@@ -212,7 +224,7 @@ public class Converter {
 	}
 	
 	//TODO: debug
-	private BoolExpr borderEdgeWeightAndDropRequirements(BorderEdge in, BorderEdge out, 
+	public BoolExpr borderEdgeWeightAndDropRequirements(BorderEdge in, BorderEdge out, 
 													IntExpr thisInVar, IntExpr thisOutVar, 
 													IntExpr nextInVar, IntExpr lastOutVar) {
 		BoolExpr formula = this.getQfpaGen().mkAndBool(
@@ -229,7 +241,7 @@ public class Converter {
 		return formula;
 	}
 	//TODO: debug
-	private BoolExpr startVertexBorderEdgeWeigthAndDropRequirements(BorderEdge out, 
+	public BoolExpr startVertexBorderEdgeWeigthAndDropRequirements(BorderEdge out, 
 																	IntExpr thisInVar, IntExpr thisOutVar,
 																	IntExpr nextInVar) {
 		BoolExpr formula = this.getQfpaGen().mkEqBool(
@@ -247,7 +259,7 @@ public class Converter {
 		return formula;
 	}
 	//TODO: debug
-	private List<BoolExpr> type1ConcreteGraphPathFormula(ASDGVertex v, SDGVertex inport, SDGVertex outport, 
+	public List<BoolExpr> type1ConcreteGraphPathFormula(ASDGVertex v, SDGVertex inport, SDGVertex outport, 
 			   										 BorderEdge in, BorderEdge out, 
 			   										 IntExpr thisInVar,  IntExpr thisOutVar,
 			   										 IntExpr lastOutVar, IntExpr nextInVar, boolean isSkew) {
@@ -338,7 +350,7 @@ public class Converter {
 		return exprs;
 	}
 	
-	private BoolExpr genPathFlowFormula(DGraph g, int startIndex, int endIndex,
+	public BoolExpr genPathFlowFormula(DGraph g, int startIndex, int endIndex,
 													   IntExpr startVar, IntExpr endVar) {
 		//TODO debug
 		List<DGEdge> edgeList = g.getEdges();
@@ -392,7 +404,7 @@ public class Converter {
 		}
 	}
 	//TODO: debug
-	private List<IntExpr> getAllFlowInVars(DGVertex v, DGFlowTuple[] flowTuples){
+	public List<IntExpr> getAllFlowInVars(DGVertex v, DGFlowTuple[] flowTuples){
 		List<IntExpr> inVars = new ArrayList<IntExpr>();
 		for(DGFlowTuple t : flowTuples) {
 			if(t.getEdgeTo().getIndex() == v.getIndex()) {
@@ -402,7 +414,7 @@ public class Converter {
 		return inVars;
 	}
 	//TODO: debug
-	private List<IntExpr> getAllFlowOutVars(DGVertex v, DGFlowTuple[] flowTuples){
+	public List<IntExpr> getAllFlowOutVars(DGVertex v, DGFlowTuple[] flowTuples){
 		List<IntExpr> outVars = new ArrayList<IntExpr>();
 		for(DGFlowTuple t : flowTuples) {
 			if(t.getEdgeTo().getIndex() == v.getIndex()) {
@@ -413,7 +425,7 @@ public class Converter {
 	}	
 	
 	//TODO: debug
-	private BoolExpr genType12Formulae(ASDGPath p, int startIndex, int endIndex,
+	public BoolExpr genType12Formulae(ASDGPath p, int startIndex, int endIndex,
 												   IntExpr startVar, IntExpr endVar) {
 		// assert that there exists a postive tag absVertex
 		assert(p.containsPosTagVertex());
@@ -456,7 +468,7 @@ public class Converter {
 	
 	
 	
-	private BoolExpr genType132Formulae(ASDGPath p, int startIndex, int endIndex, 
+	public BoolExpr genType132Formulae(ASDGPath p, int startIndex, int endIndex, 
 												 IntExpr startVar, IntExpr endVar) {
 		//TODO: debug
 		// assert there is a condition for type132
@@ -504,7 +516,7 @@ public class Converter {
 		
 	}
 	
-	private BoolExpr genVarNonNegRequirement(IntExpr[] vars) {
+	public BoolExpr genVarNonNegRequirement(IntExpr[] vars) {
 		BoolExpr result = this.getQfpaGen().mkTrue();
 		for(IntExpr var : vars) {
 			this.getQfpaGen().mkAndBool(
@@ -516,7 +528,7 @@ public class Converter {
 	}
 	
 	//TODO: debug
-	private BoolExpr genType3Formula(ASDGPath p3, int startIndex, int endIndex,
+	public BoolExpr genType3Formula(ASDGPath p3, int startIndex, int endIndex,
 												  IntExpr startVar, IntExpr endVar) {
 		ASDGVertex startVertex = p3.getInit();
 		ASDGVertex endVertex   = p3.getLastVertex();
@@ -548,7 +560,7 @@ public class Converter {
 		return result;
 	}
 	
-	private DGraph genType3ConcreteGraph(ASDGPath p3) {
+	public DGraph genType3ConcreteGraph(ASDGPath p3) {
 		// generate the graph
 		List<DGEdge> concreteEdgeList = new ArrayList<DGEdge>();
 		for(int i = 0; i < p3.getPath().size() - 1; i++) {
@@ -568,7 +580,7 @@ public class Converter {
 	
 	//TODO: formula for postive cycle template
 	
-	private BoolExpr genPosCycleTemplateFormula(DGraph g, int startIndex, int guessIndex, IntExpr startVar, IntExpr guessVar) {
+	public BoolExpr genPosCycleTemplateFormula(DGraph g, int startIndex, int guessIndex, IntExpr startVar, IntExpr guessVar) {
 		//TODO: debug
 		// desciption: return the possible positive cycle template with the minimum drop, if none return null
 		assert(g.containsVertex(startIndex) && g.containsVertex(guessIndex));
@@ -593,7 +605,7 @@ public class Converter {
 		return form;
 	}
 	
-	private BoolExpr combineAllFormlae(BoolExpr type1, BoolExpr type12, BoolExpr type132) {
+	public BoolExpr combineAllFormlae(BoolExpr type1, BoolExpr type12, BoolExpr type132) {
 		BoolExpr result = this.getQfpaGen().mkOrBool(
 			type1, type12, type132
 		);

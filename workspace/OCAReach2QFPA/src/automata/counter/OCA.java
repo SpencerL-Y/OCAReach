@@ -46,6 +46,10 @@ public class OCA implements Automaton{
 		return this.getState(this.getInitIndex());
 	}
 	
+	public State getTargetState() {
+		return this.getStates().get(this.getTargetIndex());
+	}
+	
 	public void addTransition(int fromIndex, OCAOp op, int toIndex) {
 		OCATran tran = new OCATran(this.getState(fromIndex), this.getState(toIndex), op);
 		this.getState(fromIndex).addTransition(tran);

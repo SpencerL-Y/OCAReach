@@ -136,7 +136,7 @@ public class ASDGPath {
 	}
 	
 	//TODO: debug
-	public List<List<SDGVertex>>inportsOutportsCartesianProduct(SDGVertex start, SDGVertex end) {
+	public List<List<SDGVertex>> inportsOutportsCartesianProduct(SDGVertex start, SDGVertex end) {
 		List<List<SDGVertex>> list = new ArrayList<List<SDGVertex>>();
 		List<SDGVertex> startList = new ArrayList<SDGVertex>();
 		startList.add(start);
@@ -147,14 +147,17 @@ public class ASDGPath {
 			for(SDGVertex lastOut : this.getPath().get(i-1).getOutports()) {
 				for(SDGVertex nextIn : this.getPath().get(i).getInports()) {
 					if(g.containsBorderEdge(lastOut, nextIn)) {
+						System.out.println("here" + lastOut.getVertexIndex() + nextIn.getVertexIndex());
 						List<SDGVertex> newCon = new ArrayList<SDGVertex>();
 						newCon.add(lastOut);
 						newCon.add(nextIn);
+						connect.add(newCon);
 					}
 				}
 			}
-			this.connectIOSequence(list, connect);
+			list = this.connectIOSequence(list, connect);
 		}
+		
 		for(List<SDGVertex> l : list) {
 			l.add(end);
 		}
@@ -163,27 +166,27 @@ public class ASDGPath {
 	
 	
 	//TODO: debug
-	private void connectIOSequence(List<List<SDGVertex>> list, List<List<SDGVertex>> connect){
+	private List<List<SDGVertex>> connectIOSequence(List<List<SDGVertex>> list, List<List<SDGVertex>> connect){
 		if(list.size() == 0) {
-			for(List<SDGVertex> l : connect) {
-				list.add(l);
-			}
-			return;
+			return connect;
 		}
 		List<List<SDGVertex>> newList = new ArrayList<List<SDGVertex>>();
 		for(List<SDGVertex> l : connect) {
 			for(List<SDGVertex> pre : list) {
 				List<SDGVertex> newSeq = new ArrayList<SDGVertex>();
 				for(SDGVertex p : pre) {
+					System.out.print(p.getVertexIndex());
 					newSeq.add(p);
+					
 				}
 				for(SDGVertex v : l) {
+					System.out.print(v.getVertexIndex());
 					newSeq.add(v);
 				}
 				newList.add(newSeq);
 			}
 		}
-		list = newList;
+		return newList;
 	}
 	
 	

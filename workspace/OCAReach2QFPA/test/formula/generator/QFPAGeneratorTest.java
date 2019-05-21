@@ -37,6 +37,7 @@ public class QFPAGeneratorTest extends TestCase {
 
 
 	public final void testMkRequireNonNeg() {
+		System.out.println("RequireNonNegTest:");
 		IntExpr var = this.gen.mkVariableInt("x");
 		BoolExpr result  = this.gen.mkRequireNonNeg(var);
 		System.out.println(result.toString());
