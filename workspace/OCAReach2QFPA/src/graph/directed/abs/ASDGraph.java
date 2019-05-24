@@ -97,7 +97,7 @@ public class ASDGraph {
 	public BorderEdge getBorderEdgeByInportOutport(SDGVertex inport, SDGVertex outport) {
 		List<BorderEdge> list = this.getBorderEdgesByAbsEdge(inport.getSccMark(), outport.getSccMark());
 		for(BorderEdge e : list) {
-			if(e.getFromVertex() == inport && e.getToVertex() == outport) {
+			if(e.getFromVertex().getVertexIndex() == inport.getVertexIndex() && e.getToVertex().getVertexIndex() == outport.getVertexIndex()) {
 				return e;
 			}
 		}

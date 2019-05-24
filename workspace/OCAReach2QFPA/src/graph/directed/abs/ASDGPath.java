@@ -142,12 +142,11 @@ public class ASDGPath {
 		startList.add(start);
 		list.add(startList);
 		ASDGraph g = this.getPath().get(0).getGraph();
-		for(int i = 1; i < this.length(); i++) {
+		for(int i = 1; i <= this.length(); i++) {
 			List<List<SDGVertex>> connect = new ArrayList<List<SDGVertex>>();
 			for(SDGVertex lastOut : this.getPath().get(i-1).getOutports()) {
 				for(SDGVertex nextIn : this.getPath().get(i).getInports()) {
 					if(g.containsBorderEdge(lastOut, nextIn)) {
-						System.out.println("here" + lastOut.getVertexIndex() + nextIn.getVertexIndex());
 						List<SDGVertex> newCon = new ArrayList<SDGVertex>();
 						newCon.add(lastOut);
 						newCon.add(nextIn);
@@ -175,12 +174,10 @@ public class ASDGPath {
 			for(List<SDGVertex> pre : list) {
 				List<SDGVertex> newSeq = new ArrayList<SDGVertex>();
 				for(SDGVertex p : pre) {
-					System.out.print(p.getVertexIndex());
 					newSeq.add(p);
 					
 				}
 				for(SDGVertex v : l) {
-					System.out.print(v.getVertexIndex());
 					newSeq.add(v);
 				}
 				newList.add(newSeq);

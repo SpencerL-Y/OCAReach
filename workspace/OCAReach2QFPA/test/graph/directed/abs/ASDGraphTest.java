@@ -99,7 +99,6 @@ public class ASDGraphTest extends TestCase {
 
 	public final void testGetBorderEdgeByInportOutport() {
 		System.out.println("GetBorderEdgeByInportOutport:");
-		//TODO: test later
 	}
 
 	public final void testGetSkewTranspose() {

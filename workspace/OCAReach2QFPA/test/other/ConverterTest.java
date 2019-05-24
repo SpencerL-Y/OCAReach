@@ -19,6 +19,8 @@ public class ConverterTest {
 		oca.setInitIndex(0);
 		oca.setTargetIndex(3);
 		Converter con = new Converter(oca);
-		con.convert();
+		String result = con.convert();
+		System.out.println(result);
+		
 	}
 }

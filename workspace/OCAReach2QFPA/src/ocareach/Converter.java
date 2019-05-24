@@ -3,7 +3,9 @@ package ocareach;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.microsoft.z3.*;
+import com.microsoft.z3.BoolExpr;
+import com.microsoft.z3.Expr;
+import com.microsoft.z3.IntExpr;
 
 import automata.State;
 import automata.counter.OCA;
@@ -105,6 +107,7 @@ public class Converter {
 		for(BoolExpr formula : formulae) {
 			resultExpr = this.getQfpaGen().mkOrBool(resultExpr, formula);
 		}
+		result = resultExpr.toString();
 		return result;
 	}
 	
@@ -164,21 +167,24 @@ public class Converter {
 				BoolExpr currentAbsVertexForm = this.getQfpaGen().mkFalse();
 				List<BoolExpr> sccExprs;
 				if(i == 0) {
+					//TODO: DEBUG arguments bugs!!
 					sccExprs = this.genAbsStateNoPosCycle(p.getVertex(i), 
-						p.getG().getSdg().getVertex(startIndex), l.get(2*i),
-						null, p.getG().getBorderEdgeByInportOutport(l.get(2*i), l.get(2*i + 1)),
+						l.get(0), l.get(2*i + 1),
+						null, p.getG().getBorderEdgeByInportOutport(l.get(2*i + 1), l.get(2*i + 2)),
 						sVar, absPathVars[2*i], 
 						null, absPathVars[2*i + 1], isSkew);
 				} else if(i == p.length()) {
+					System.out.println(l.get(2*i - 1).getVertexIndex() + " TO " + l.get(2*i).getVertexIndex());
 					sccExprs = this.genAbsStateNoPosCycle(p.getVertex(i), 
 						l.get(2*i-1), p.getG().getSdg().getVertex(endIndex),
-						p.getG().getBorderEdgeByInportOutport(l.get(2*i - 2), l.get(2*i - 1)), null,
+						p.getG().getBorderEdgeByInportOutport(l.get(2*i - 1), l.get(2*i)), null,
 						absPathVars[2*i - 1], tVar, 
 						absPathVars[2*i - 2], null, isSkew);
 				} else {
+					//System.out.println("IN: " + p.getG().getBorderEdgeByInportOutport(l.get(2*i - 1), l.get(2*i)).getFromScc() + " TO " + p.getG().getBorderEdgeByInportOutport(l.get(2*i - 1), l.get(2*i)).getToScc());
 					sccExprs = this.genAbsStateNoPosCycle(p.getVertex(i),
-						l.get(2*i - 1), l.get(2*i), 
-						p.getG().getBorderEdgeByInportOutport(l.get(2*i - 2), l.get(2*i - 1)), p.getG().getBorderEdgeByInportOutport(l.get(2*i), l.get(2*i + 1)),
+						l.get(2*i), l.get(2*i+1), 
+						p.getG().getBorderEdgeByInportOutport(l.get(2*i - 1), l.get(2*i)), p.getG().getBorderEdgeByInportOutport(l.get(2*i+1), l.get(2*i + 2)),
 						absPathVars[2*i - 1], absPathVars[2*i],
 						absPathVars[2*i - 2], absPathVars[2*i + 1], isSkew);
 				}
@@ -214,32 +220,49 @@ public class Converter {
 		if(in == null && out != null && lastOutVar == null && nextInVar != null) {
 			// start absVertex
 			return this.type1ConcreteGraphPathFormula(v, inport, outport, in, out, thisInVar, thisOutVar, lastOutVar, nextInVar, isSkew);
-		} else if(out == null && nextInVar == null) {
+		} else if(in != null && out == null && nextInVar == null && lastOutVar != null) {
 			// end absVertex
+			System.out.println("edge:" + in.getFromVertex().getVertexIndex() + " to " + in.getToVertex().getVertexIndex());
+			System.out.println("thisInVar: " + thisInVar.toString() + " thisOutVar: " + thisOutVar.toString() );
+			//System.out.println("lastOutVar: " + lastOutVar.toString() + " nextInVar: " + nextInVar.toString() );
 			return this.type1ConcreteGraphPathFormula(v, inport, outport, in, out, thisInVar, thisOutVar, lastOutVar, nextInVar, isSkew);
 		} else {
+			assert(in != null && out != null && nextInVar != null && lastOutVar != null);
+			System.out.println("in is null:" + (in == null));
+			System.out.println("out is null:" + (out == null));
+			System.out.println("nextIn is null:" + (nextInVar == null));
+			System.out.println("lastOut is null:" + (lastOutVar == null));
 			// other absVertex
+			System.out.println("edge:" + in.getFromVertex().getVertexIndex() + " to " + in.getToVertex().getVertexIndex());
+			System.out.println("thisInVar: " + thisInVar.toString() + " thisOutVar: " + thisOutVar.toString() );
+			System.out.println("lastOutVar: " + lastOutVar.toString() + " nextInVar: " + nextInVar.toString() );
 			return this.type1ConcreteGraphPathFormula(v, inport, outport, in, out, thisInVar, thisOutVar, lastOutVar, nextInVar, isSkew);
 		}
 	}
 	
+	
+	
+	
 	//TODO: debug
-	public BoolExpr borderEdgeWeightAndDropRequirements(BorderEdge in, BorderEdge out, 
-													IntExpr thisInVar, IntExpr thisOutVar, 
-													IntExpr nextInVar, IntExpr lastOutVar) {
-		BoolExpr formula = this.getQfpaGen().mkAndBool(
-				// border edge weight add correctly
-				this.getQfpaGen().mkEqBool(
-					this.getQfpaGen().mkSubInt(thisInVar, lastOutVar), 
-					this.getQfpaGen().mkConstantInt(in.getWeight())),
-				// border edge weight add correctly
-				//TODO: the formula can be redundant here
-				this.getQfpaGen().mkEqBool(
-					this.getQfpaGen().mkSubInt(nextInVar, thisOutVar), 
-					this.getQfpaGen().mkConstantInt(out.getWeight()))
-		);
-		return formula;
+	
+	public BoolExpr vertexBorderEdgeWeightAndDropRequirements(BorderEdge in, BorderEdge out, IntExpr thisInVar, IntExpr thisOutVar,
+																							 IntExpr lastOutVar, IntExpr nextInVar) {
+		//System.out.println("vertexBorderFunc: ");
+		//System.out.println(" in is null: " + (in == null) + " out is null: " + (out == null )+ "\n thisInVar is null: " + (thisInVar == null) 
+		//	 + " thisOutVar is null: " + (thisOutVar == null) + " lastOutVar is null: " + (lastOutVar == null)
+		//	 + "\n nextInVar is null: " + (nextInVar == null));
+		
+		if(in == null && lastOutVar == null) {
+			return this.startVertexBorderEdgeWeigthAndDropRequirements(out, thisInVar, thisOutVar, nextInVar);
+		} else if(out == null && nextInVar == null) {
+			return this.endVertexBorderEdgeWeightAndDropRequirements(in, thisInVar, thisOutVar, lastOutVar);
+		} else {
+			assert(in != null && out != null && thisInVar != null && thisOutVar == null && nextInVar == null && lastOutVar == null);
+			return this.midBorderEdgeWeightAndDropRequirements(in, out, thisInVar, thisOutVar, lastOutVar, nextInVar);
+		}
 	}
+	
+	
 	//TODO: debug
 	public BoolExpr startVertexBorderEdgeWeigthAndDropRequirements(BorderEdge out, 
 																	IntExpr thisInVar, IntExpr thisOutVar,
@@ -250,7 +273,7 @@ public class Converter {
 		return formula;
 	}
 	//TODO: debug
-	private BoolExpr endVertexBorderEdgeWeightAndDropRequirements(BorderEdge in,
+	public BoolExpr endVertexBorderEdgeWeightAndDropRequirements(BorderEdge in,
 																  IntExpr thisInVar, IntExpr thisOutVar,
 																  IntExpr lastOutVar) {
 		BoolExpr formula = this.getQfpaGen().mkEqBool(
@@ -258,6 +281,25 @@ public class Converter {
 					this.getQfpaGen().mkConstantInt(in.getWeight()));
 		return formula;
 	}
+	
+	//TODO: debug
+		public BoolExpr midBorderEdgeWeightAndDropRequirements(BorderEdge in, BorderEdge out, 
+														IntExpr thisInVar, IntExpr thisOutVar, 
+														IntExpr lastOutVar, IntExpr nextInVar) {
+			BoolExpr formula = this.getQfpaGen().mkAndBool(
+					// border edge weight add correctly
+					this.getQfpaGen().mkEqBool(
+						this.getQfpaGen().mkSubInt(thisInVar, lastOutVar), 
+						this.getQfpaGen().mkConstantInt(in.getWeight())),
+					// border edge weight add correctly
+					//TODO: the formula can be redundant here
+					this.getQfpaGen().mkEqBool(
+						this.getQfpaGen().mkSubInt(nextInVar, thisOutVar), 
+						this.getQfpaGen().mkConstantInt(out.getWeight()))
+			);
+			return formula;
+		}
+	
 	//TODO: debug
 	public List<BoolExpr> type1ConcreteGraphPathFormula(ASDGVertex v, SDGVertex inport, SDGVertex outport, 
 			   										 BorderEdge in, BorderEdge out, 
@@ -269,17 +311,16 @@ public class Converter {
 		if(conGraph.getVertices().size() == 1) {
 			// if the scc is trivial
 			BoolExpr formula = this.getQfpaGen().mkAndBool(
-				this.startVertexBorderEdgeWeigthAndDropRequirements(out, thisInVar, thisOutVar, nextInVar),
+				this.vertexBorderEdgeWeightAndDropRequirements(in, out, thisInVar, thisOutVar, lastOutVar, nextInVar),
 				this.getQfpaGen().mkEqBool(thisOutVar, thisInVar)
-				
 			);
 			exprs.add(formula);
 			return exprs;
 		} 
 		List<DGraph> supports = conGraph.getAllPossibleSupport(inport.getVertexIndex(), outport.getVertexIndex());
 		for(DGraph support : supports) {
-			// if there is positive cycle in the support ignore it
-			if(support.computeLoopTag() != LoopTag.Pos && support.computeLoopTag() != LoopTag.PosNeg) {
+			// if there is a positive cycle in the support ignore it
+			if(support.computeLoopTag() == LoopTag.Pos || support.computeLoopTag() == LoopTag.PosNeg) {
 				continue;
 			}
 			if(support.containsCycle()) {
@@ -296,13 +337,20 @@ public class Converter {
 						formGe, 
 						this.getQfpaGen().mkAndBool(
 							this.genPathFlowFormula(support, inport.getVertexIndex(), ve.getIndex(), thisInVar, midVar),
-							// z > |V|, this gurantee the counter value to be positive
+							// z > |V|, this guarantee the counter value to be positive
 							this.getQfpaGen().mkGeBool(midVar, this.getQfpaGen().mkConstantInt(support.getVertices().size()))
 						)
 					);
 				}
 				// length < 3n^2 + 1
 				BoolExpr formLt = this.getQfpaGen().mkFalse();
+				System.out.println("in " + inport.getVertexIndex() + " out " + outport.getVertexIndex());
+				//TODO: DEBUG entry might not exists..
+				if(support.getTable().getEntry(inport.getVertexIndex(), outport.getVertexIndex()) == null) {
+					// if the entry does not exists, ignore the support
+					continue;
+				}
+				System.out.println("table entry null:" + (support.getTable().getEntry(inport.getVertexIndex(), outport.getVertexIndex()) == null) + " table len:" +  support.getTable().getMaxLength());
 				for(DWTuple t : support.getTable().getEntry(inport.getVertexIndex(), outport.getVertexIndex()).getSetOfDWTuples()) {
 					BoolExpr temp = this.getQfpaGen().mkAndBool(
 						// weight sum correctly in the concreteScc
@@ -317,7 +365,7 @@ public class Converter {
 					formLt = this.getQfpaGen().mkOrBool(formLt, temp);
 				} 
 				formLt = this.getQfpaGen().mkAndBool(formLt, 
-						this.borderEdgeWeightAndDropRequirements(in, out, thisInVar, thisOutVar, nextInVar, lastOutVar));
+						this.vertexBorderEdgeWeightAndDropRequirements(in, out, thisInVar, thisOutVar, lastOutVar, nextInVar));
 				BoolExpr formula = this.getQfpaGen().mkOrBool(formLt, formGe);
 				exprs.add(formula);
 			} else {
@@ -340,7 +388,7 @@ public class Converter {
 				}
 				// guess it is a simple path
 				BoolExpr formula = this.getQfpaGen().mkAndBool(
-					this.borderEdgeWeightAndDropRequirements(in, out, thisInVar, thisOutVar, nextInVar, lastOutVar),
+					this.vertexBorderEdgeWeightAndDropRequirements(in, out, thisInVar, thisOutVar, lastOutVar, nextInVar),
 					// there is a concrete path from inport to outport in concreteScc
 					concretePathFormula
 				);

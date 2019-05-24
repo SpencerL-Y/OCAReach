@@ -183,6 +183,7 @@ public class DGraph implements Graph{
 		for(List<DGEdge> list : edgePow) {
 			DGraph temp = this.edgeListToGraph(list);
 			if(temp.containsVertex(startIndex) && temp.containsVertex(endIndex)) {
+				temp.computeLoopTag();
 				graphs.add(temp);
 			}
 		}
