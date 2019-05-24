@@ -60,7 +60,7 @@ public class DGraph implements Graph{
 				return v;
 			}
 		}
-		System.out.println("ERROR: Vertex not found");
+		System.out.println("ERROR: Vertex " +  index + " not found");
 		return null;
 	}
 	
@@ -181,7 +181,7 @@ public class DGraph implements Graph{
 		}
 		List<List<DGEdge>> edgePow = DGraphUtil.getPowerSet(edges);
 		for(List<DGEdge> list : edgePow) {
-			DGraph temp = this.edgeListToGraph(list);
+			DGraph temp = this.edgeListToGraph(list, startIndex, endIndex);
 			if(temp.containsVertex(startIndex) && temp.containsVertex(endIndex)) {
 				temp.computeLoopTag();
 				graphs.add(temp);
@@ -201,18 +201,23 @@ public class DGraph implements Graph{
 				g.addEdge(e.getTo().getIndex(), e.getFrom().getIndex(), -e.getWeight());
 			}
 		}
+		int oldStart = g.getStartVertexIndex();
+		System.out.println("oldStart:" + oldStart);
 		g.setStartVertexIndex(this.getEndingVertexIndex());
-		g.setEndingVertexIndex(this.getStartVertexIndex());
+		g.setEndingVertexIndex(oldStart);
+		System.out.println("newStart:" + g.startVertexIndex + " newEnd:" + g.endingVertexIndex);
 		return g;
 	}
 	
 	
 	//TODO: debug
-	public DGraph edgeListToGraph(List<DGEdge> list) {
+	public DGraph edgeListToGraph(List<DGEdge> list, int startIndex, int endIndex) {
 		DGraph g = new DGraph();
 		if(list.size() == 0 && this.getVertices().size() == 1) {
 			// trivial case
-			g.addVertex(this.getVertices().get(0).getIndex());
+			for(DGVertex v : this.getVertices()) {
+				g.addVertex(v.getIndex());
+			}
 		}
 		for(DGEdge e : list) {
 			if(this.containsVertex(e.getTo().getIndex()) && !g.containsVertex(e.getTo().getIndex())) {
@@ -223,8 +228,8 @@ public class DGraph implements Graph{
 			}
 			g.addEdge(e.getFrom().getIndex(), e.getTo().getIndex(), e.getWeight());
 		}
-		g.setStartVertexIndex(this.getStartVertexIndex());
-		g.setEndingVertexIndex(this.getEndingVertexIndex());
+		g.setStartVertexIndex(startIndex);
+		g.setEndingVertexIndex(endIndex);
 		return g;
 	}
 	
@@ -234,7 +239,6 @@ public class DGraph implements Graph{
 		// here we only need the integrity of the graph
 		// if there is a vertex not appear in the visited list
 		// the graph is not connected
-		
 		DGVertex startVertex = this.getVertex(this.getStartVertexIndex());
 		Queue<DGVertex> list = new LinkedList<DGVertex>();
 		List<DGVertex> visited = new ArrayList<DGVertex>();

@@ -140,6 +140,7 @@ public class Converter {
 	public BoolExpr genType1Formulae(ASDGPath p, int startIndex, int endIndex,
 									              IntExpr startVar, IntExpr endVar
 									              , boolean isSkew) {
+		System.out.println("p len: " + p.length());
 		//assertion
 		IntExpr sVar = startVar;
 		IntExpr tVar = endVar;
@@ -163,37 +164,49 @@ public class Converter {
 			System.out.println();
 			// for every possible sequence of inoutports
 			BoolExpr type1FormBodyItem = this.getQfpaGen().mkTrue();
-			for(int i = 0; i <= p.length(); i ++) {
-				BoolExpr currentAbsVertexForm = this.getQfpaGen().mkFalse();
-				List<BoolExpr> sccExprs;
-				if(i == 0) {
-					//TODO: DEBUG arguments bugs!!
-					sccExprs = this.genAbsStateNoPosCycle(p.getVertex(i), 
-						l.get(0), l.get(2*i + 1),
-						null, p.getG().getBorderEdgeByInportOutport(l.get(2*i + 1), l.get(2*i + 2)),
-						sVar, absPathVars[2*i], 
-						null, absPathVars[2*i + 1], isSkew);
-				} else if(i == p.length()) {
-					System.out.println(l.get(2*i - 1).getVertexIndex() + " TO " + l.get(2*i).getVertexIndex());
-					sccExprs = this.genAbsStateNoPosCycle(p.getVertex(i), 
-						l.get(2*i-1), p.getG().getSdg().getVertex(endIndex),
-						p.getG().getBorderEdgeByInportOutport(l.get(2*i - 1), l.get(2*i)), null,
-						absPathVars[2*i - 1], tVar, 
-						absPathVars[2*i - 2], null, isSkew);
-				} else {
-					//System.out.println("IN: " + p.getG().getBorderEdgeByInportOutport(l.get(2*i - 1), l.get(2*i)).getFromScc() + " TO " + p.getG().getBorderEdgeByInportOutport(l.get(2*i - 1), l.get(2*i)).getToScc());
-					sccExprs = this.genAbsStateNoPosCycle(p.getVertex(i),
-						l.get(2*i), l.get(2*i+1), 
-						p.getG().getBorderEdgeByInportOutport(l.get(2*i - 1), l.get(2*i)), p.getG().getBorderEdgeByInportOutport(l.get(2*i+1), l.get(2*i + 2)),
-						absPathVars[2*i - 1], absPathVars[2*i],
-						absPathVars[2*i - 2], absPathVars[2*i + 1], isSkew);
+			if(p.length() > 0) {
+
+				System.out.println("AbsPath length: " + p.length());
+				for(int i = 0; i <= p.length(); i ++) {
+					BoolExpr currentAbsVertexForm = this.getQfpaGen().mkFalse();
+					List<BoolExpr> sccExprs;
+					if(i == 0) {
+						//TODO: DEBUG arguments bugs!!
+						sccExprs = this.genAbsStateNoPosCycle(p.getVertex(i), 
+							l.get(0), l.get(2*i + 1),
+							null, p.getG().getBorderEdgeByInportOutport(l.get(2*i + 1), l.get(2*i + 2)),
+							sVar, absPathVars[2*i], 
+							null, absPathVars[2*i + 1], isSkew);
+					} else if(i == p.length()) {
+						System.out.println(l.get(2*i - 1).getVertexIndex() + " TO " + l.get(2*i).getVertexIndex());
+						sccExprs = this.genAbsStateNoPosCycle(p.getVertex(i), 
+							l.get(2*i-1), p.getG().getSdg().getVertex(endIndex),
+							p.getG().getBorderEdgeByInportOutport(l.get(2*i - 1), l.get(2*i)), null,
+							absPathVars[2*i - 1], tVar, 
+							absPathVars[2*i - 2], null, isSkew);
+					} else {
+						//System.out.println("IN: " + p.getG().getBorderEdgeByInportOutport(l.get(2*i - 1), l.get(2*i)).getFromScc() + " TO " + p.getG().getBorderEdgeByInportOutport(l.get(2*i - 1), l.get(2*i)).getToScc());
+						sccExprs = this.genAbsStateNoPosCycle(p.getVertex(i),
+							l.get(2*i), l.get(2*i+1), 
+							p.getG().getBorderEdgeByInportOutport(l.get(2*i - 1), l.get(2*i)), p.getG().getBorderEdgeByInportOutport(l.get(2*i+1), l.get(2*i + 2)),
+							absPathVars[2*i - 1], absPathVars[2*i],
+							absPathVars[2*i - 2], absPathVars[2*i + 1], isSkew);
+					}
+					for(BoolExpr e : sccExprs) {
+						currentAbsVertexForm = this.getQfpaGen().mkOrBool(e, currentAbsVertexForm);
+					}
+					type1FormBodyItem = this.getQfpaGen().mkAndBool(type1FormBodyItem, currentAbsVertexForm);
 				}
-				for(BoolExpr e : sccExprs) {
-					currentAbsVertexForm = this.getQfpaGen().mkOrBool(e, currentAbsVertexForm);
+				type1FormBody = this.getQfpaGen().mkOrBool(type1FormBody, type1FormBodyItem);
+			} else {
+				//TODO: DEBUG
+				// if the length of abspath is 0
+				System.out.println("AbsPath length: " + p.length());
+				List<BoolExpr> listExprs = this.type1ConcreteGraphPathFormula(p.getInit(), l.get(0), l.get(1), null, null, sVar, tVar, null, null, isSkew);
+				for(BoolExpr e : listExprs) {
+					type1FormBody = this.getQfpaGen().mkOrBool(type1FormBody, e);
 				}
-				type1FormBodyItem = this.getQfpaGen().mkAndBool(type1FormBodyItem, currentAbsVertexForm);
 			}
-			type1FormBody = this.getQfpaGen().mkOrBool(type1FormBody, type1FormBodyItem);
 		}
 		// add ge 0 requirement
 		BoolExpr posRequires = this.getQfpaGen().mkTrue();
@@ -204,7 +217,12 @@ public class Converter {
 			);
 		}
 		type1FormBody = this.getQfpaGen().mkAndBool(type1FormBody, posRequires);
-		Expr type1Form = this.getQfpaGen().mkExistsQuantifier(absPathVars, type1FormBody);
+		Expr type1Form = null;
+		if(absPathVars.length == 0) {
+			type1Form = type1FormBody;
+		} else {
+			type1Form = this.getQfpaGen().mkExistsQuantifier(absPathVars, type1FormBody);
+		}
 		return (BoolExpr) type1Form;
 	}
 	
@@ -251,8 +269,9 @@ public class Converter {
 		//System.out.println(" in is null: " + (in == null) + " out is null: " + (out == null )+ "\n thisInVar is null: " + (thisInVar == null) 
 		//	 + " thisOutVar is null: " + (thisOutVar == null) + " lastOutVar is null: " + (lastOutVar == null)
 		//	 + "\n nextInVar is null: " + (nextInVar == null));
-		
-		if(in == null && lastOutVar == null) {
+		if(in == null && out == null && lastOutVar == null && nextInVar == null) {
+			return this.singleAbsStateBorderEdgeWeightAndDropRequirements();
+		} else if(in == null && lastOutVar == null) {
 			return this.startVertexBorderEdgeWeigthAndDropRequirements(out, thisInVar, thisOutVar, nextInVar);
 		} else if(out == null && nextInVar == null) {
 			return this.endVertexBorderEdgeWeightAndDropRequirements(in, thisInVar, thisOutVar, lastOutVar);
@@ -262,6 +281,11 @@ public class Converter {
 		}
 	}
 	
+	
+	public BoolExpr singleAbsStateBorderEdgeWeightAndDropRequirements() {
+		BoolExpr result = this.getQfpaGen().mkTrue();
+		return result;
+	}
 	
 	//TODO: debug
 	public BoolExpr startVertexBorderEdgeWeigthAndDropRequirements(BorderEdge out, 
@@ -581,7 +605,7 @@ public class Converter {
 		ASDGVertex startVertex = p3.getInit();
 		ASDGVertex endVertex   = p3.getLastVertex();
 		assert(startVertex.containIndex(startIndex) && endVertex.containIndex(endIndex));
-		DGraph p3Graph = this.genType3ConcreteGraph(p3);
+		DGraph p3Graph = this.genType3ConcreteGraph(p3, startIndex, endIndex);
 		DGraph p3SkewGraph = p3Graph.getSkewTranspose();
 		assert(p3Graph.containsVertex(startIndex) && p3Graph.containsVertex(endIndex));
 		IntExpr startMidVar = this.getQfpaGen().mkVariableInt("vm_3_s");
@@ -608,7 +632,7 @@ public class Converter {
 		return result;
 	}
 	
-	public DGraph genType3ConcreteGraph(ASDGPath p3) {
+	public DGraph genType3ConcreteGraph(ASDGPath p3, int startIndex, int endIndex) {
 		// generate the graph
 		List<DGEdge> concreteEdgeList = new ArrayList<DGEdge>();
 		for(int i = 0; i < p3.getPath().size() - 1; i++) {
@@ -622,7 +646,7 @@ public class Converter {
 				concreteEdgeList.add(e);
 			}
 		}
-		DGraph type3Graph = p3.getVertex(0).getGraph().getSdg().getGraph().edgeListToGraph(concreteEdgeList);
+		DGraph type3Graph = p3.getVertex(0).getGraph().getSdg().getGraph().edgeListToGraph(concreteEdgeList, startIndex, endIndex);
 		return type3Graph;
 	}
 	

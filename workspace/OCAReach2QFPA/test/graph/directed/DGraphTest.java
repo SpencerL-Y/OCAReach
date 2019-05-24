@@ -116,7 +116,7 @@ public class DGraphTest extends TestCase {
 				}
 			}
 		}
-		DGraph newG = this.ddg.edgeListToGraph(list);
+		DGraph newG = this.ddg.edgeListToGraph(list, 0, 3);
 		
 		for(int i = 0; i < 10; i++) {
 			list.clear();
@@ -128,7 +128,7 @@ public class DGraphTest extends TestCase {
 					}
 				}
 			}
-			this.dg.edgeListToGraph(list);
+			this.dg.edgeListToGraph(list, r.nextInt(10), r.nextInt(10));
 		}
 	}
 
