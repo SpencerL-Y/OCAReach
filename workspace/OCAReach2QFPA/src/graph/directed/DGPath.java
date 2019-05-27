@@ -1,5 +1,7 @@
 package graph.directed;
 
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +42,7 @@ public class DGPath {
 			}
 		}
 		assert(false);
-		System.out.println("ERROR: Path Concat Not Valid");
+		System.out.println("ERROR: Path Concat Not Valid: " + last.getIndex() + " to " + v.getIndex());
 	}
 	
 	public void concatPath(DGPath path) {

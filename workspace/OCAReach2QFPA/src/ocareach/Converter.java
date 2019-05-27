@@ -332,7 +332,7 @@ public class Converter {
 		
 		List<BoolExpr> exprs = new ArrayList<BoolExpr>();
 		DGraph conGraph = v.getConcreteDGraph(isSkew);
-		if(conGraph.getVertices().size() == 1) {
+		/*if(conGraph.getVertices().size() == 1) {
 			// if the scc is trivial
 			BoolExpr formula = this.getQfpaGen().mkAndBool(
 				this.vertexBorderEdgeWeightAndDropRequirements(in, out, thisInVar, thisOutVar, lastOutVar, nextInVar),
@@ -340,7 +340,7 @@ public class Converter {
 			);
 			exprs.add(formula);
 			return exprs;
-		} 
+		} */
 		List<DGraph> supports = conGraph.getAllPossibleSupport(inport.getVertexIndex(), outport.getVertexIndex());
 		for(DGraph support : supports) {
 			// if there is a positive cycle in the support ignore it
@@ -425,6 +425,7 @@ public class Converter {
 	public BoolExpr genPathFlowFormula(DGraph g, int startIndex, int endIndex,
 													   IntExpr startVar, IntExpr endVar) {
 		//TODO debug
+		System.out.println("genPathFlow: " + startIndex + " to " + endIndex);
 		List<DGEdge> edgeList = g.getEdges();
 		IntExpr[] flowVars = new IntExpr[edgeList.size()];
 		DGFlowTuple[] flowTuples = new DGFlowTuple[edgeList.size()];
@@ -468,8 +469,13 @@ public class Converter {
 			}
 			BoolExpr weightSumCorrect = this.getQfpaGen().mkEqBool(sum, this.getQfpaGen().mkSubInt(endVar, startVar));
 			body = this.getQfpaGen().mkAndBool(body, weightSumCorrect);
-			//TODO: debug BoolExpr type
-			BoolExpr result = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(flowVars, body);
+			
+			BoolExpr result = null;
+			if(flowVars.length > 0) {
+				result = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(flowVars, body);
+			} else {
+				result = body;
+			}
 			return result;
 		} else {
 			return this.getQfpaGen().mkFalse();

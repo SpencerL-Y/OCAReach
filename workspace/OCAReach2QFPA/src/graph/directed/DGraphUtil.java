@@ -37,6 +37,12 @@ public class DGraphUtil {
 	}
 	
 	private static <T> List<List<T>> powerSet(List<T> set){
+		if(set.size() == 0) {
+			List<List<T>> arrayList = new ArrayList<List<T>>();
+			arrayList.add(new ArrayList<T>());
+			arrayList.add(set);
+			return arrayList;
+		}
 		if(set.size() == 1) {
 			List<List<T>> arrayList = new ArrayList<List<T>>();
 			arrayList.add(new ArrayList<T>());

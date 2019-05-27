@@ -588,4 +588,14 @@ output 利用Z3的java api生成公式
   - counter value >= 0 构造
   -1 +3 -2 
        -1
+  - type 3 的例子的构造， 体现两个环的作用
+  - type 1 例子的构造
 
+
+
+# 5 月 27日
+随机测出的可能的bug
+
+1. type132的抽象路径的concat的错误，可能存在13型32型没有考虑
+2. trivial情况的具体路径concat的错误，需要设计样例测试
+3. getAllPossibleSupport需要修改
