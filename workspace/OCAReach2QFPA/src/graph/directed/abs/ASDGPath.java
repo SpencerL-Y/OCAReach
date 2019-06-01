@@ -23,7 +23,7 @@ public class ASDGPath {
 			this.getPath().add(vertex);
 			return;
 		}
-		System.out.println("ERROR: append not valid, abstract edge not exists");
+		System.out.println("ERROR: append not valid, abstract edge not exists scc: " + this.getLastVertex().getSccIndex() + " --> " + vertex.getSccIndex());
 	}
 	
 	public ASDGVertex getLastVertex() {
@@ -230,36 +230,112 @@ public class ASDGPath {
 	//TODO: debug 
 	public ASDGPath[] getAllType132SplitPaths(ASDGVertex[] splitVertices){
 		assert(this.containsVertex(splitVertices[0]) && this.containsVertex(splitVertices[1]));
+
+		System.out.println("SPLIT begin");
 		ASDGPath[] splittedPaths = new ASDGPath[3];
 		if(splitVertices[0] != this.getInit() && splitVertices[1] != this.getLastVertex()) {
+			System.out.println("subType 132");
 			//132
 			ASDGPath p1 = new ASDGPath(this.getInit());
-			int i = 0;
-			System.out.println("first abs concat");
-			for(i = 0; i < this.getPath().size() && this.getVertex(i).getSccIndex() != splitVertices[0].getSccIndex(); i ++) {
+			int i = 1;
+
+			System.out.println("AbsConcat p1");
+			for(i = 1; i < this.getPath().size() && this.getVertex(i).getSccIndex() != splitVertices[0].getSccIndex(); i ++) {
 				p1.concatVertex(this.getVertex(i));
 			}
 
-			System.out.println("second abs concat");
+			System.out.println("AbsConcat p3");
 			ASDGPath p3 = new ASDGPath(splitVertices[0]);
+			i = i + 1;
 			for(     ; i < this.getPath().size() && this.getVertex(i).getSccIndex() != splitVertices[1].getSccIndex(); i++) {
 				p3.concatVertex(this.getVertex(i));
 			}
 
-			System.out.println("third abs concat");
 			p3.concatVertex(this.getVertex(i));
 			i = i + 1;
 			ASDGPath p2 = new ASDGPath(this.getVertex(i));
 
-			System.out.println("forth abs concat");
+
+			System.out.println("AbsConcat p2");
 			for(     ; i < this.getPath().size(); i++) {
 				p2.concatVertex(this.getVertex(i));
 			}
 			splittedPaths[0] = p1;
 			splittedPaths[1] = p3;
 			splittedPaths[2] = p2;
-		} 
+		} else if(splitVertices[0] != this.getInit() && splitVertices[1] == this.getLastVertex()) {
+			//13
+
+			System.out.println("subType 13");
+			ASDGPath p1 = new ASDGPath(this.getInit());
+			int i = 1;
+
+			System.out.println("AbsConcat p1");
+			for(i = 1; i < this.getPath().size() && this.getVertex(i).getSccIndex() != splitVertices[0].getSccIndex(); i ++) {
+				p1.concatVertex(this.getVertex(i));
+			}
+
+			System.out.println("AbsConcat p3");
+			ASDGPath p3 = new ASDGPath(splitVertices[0]);
+			i = i + 1;
+			for(     ; i < this.getPath().size() && this.getVertex(i).getSccIndex() != splitVertices[1].getSccIndex(); i++) {
+				p3.concatVertex(this.getVertex(i));
+			}
+
+			p3.concatVertex(this.getVertex(i));
+			assert(i == this.length());
+			ASDGPath p2 = null;
+			
+			splittedPaths[0] = p1;
+			splittedPaths[1] = p3;
+			splittedPaths[2] = p2;
+		} else if(splitVertices[0] == this.getInit() && splitVertices[1] != this.getLastVertex()) {
+			//32
+
+			System.out.println("subType 32");
+			ASDGPath p1 = null;
+			int i = 1;
+
+			System.out.println("AbsConcat p3");
+			ASDGPath p3 = new ASDGPath(splitVertices[0]);
+			for(     ; i < this.getPath().size() && this.getVertex(i).getSccIndex() != splitVertices[1].getSccIndex(); i++) {
+				p3.concatVertex(this.getVertex(i));
+			}
+
+			p3.concatVertex(this.getVertex(i));
+			i = i + 1;
+			ASDGPath p2 = new ASDGPath(this.getVertex(i));
+
+
+			System.out.println("AbsConcat p2");
+			for(     ; i < this.getPath().size(); i++) {
+				p2.concatVertex(this.getVertex(i));
+			}
+			splittedPaths[0] = p1;
+			splittedPaths[1] = p3;
+			splittedPaths[2] = p2;
+		} else {
+			//3
+
+			System.out.println("subType 3");
+			ASDGPath p1 = null;
+			int i = 1;
+
+			System.out.println("AbsConcat p3");
+			ASDGPath p3 = new ASDGPath(splitVertices[0]);
+			for(     ; i < this.getPath().size() && this.getVertex(i).getSccIndex() != splitVertices[1].getSccIndex(); i++) {
+				p3.concatVertex(this.getVertex(i));
+			}
+
+			p3.concatVertex(this.getVertex(i));
+			assert(i == this.length());
+			ASDGPath p2 = null;
+			splittedPaths[0] = p1;
+			splittedPaths[1] = p3;
+			splittedPaths[2] = p2;
+		}
 		
+		System.out.println("SPLIT over");
 		return splittedPaths;
 	}
 	
@@ -288,7 +364,7 @@ public class ASDGPath {
 								inouts[0] = vo1;
 								inouts[1] = vi1;
 								inouts[2] = vo2;
-								inouts[2] = vi2;
+								inouts[3] = vi2;
 								list.add(inouts);
 							}
 						}

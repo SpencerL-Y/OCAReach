@@ -86,19 +86,19 @@ public class Converter {
 			IntExpr sVar = this.getQfpaGen().mkVariableInt("xs");
 			IntExpr tVar = this.getQfpaGen().mkVariableInt("xt");
 			if(trivial) {
-				System.out.println("type trivial");
+				System.out.println("TYPE TRIVIAL");
 				trivialForm = this.genTrivialFormula(p);
 			}
 			if(type1) {
-				System.out.println("type1");
+				System.out.println("TYPE 1");
 				type1Form = this.genType1Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar, false);
 			}
 			if(type12) {
-				System.out.println("type12");
+				System.out.println("TYPE 12");
 				type12Form = this.genType12Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar);
 			}
 			if(type132) {
-				System.out.println("type132");
+				System.out.println("TYPE 132");
 				type132Form = this.genType132Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar);
 			}
 			BoolExpr temp = (trivial)? trivialForm : this.combineAllFormlae(type1Form, type12Form, type132Form);
@@ -583,31 +583,43 @@ public class Converter {
 		splitVars[3] = this.getQfpaGen().mkVariableInt("vs_2");
 		BoolExpr type132Form = this.getQfpaGen().mkFalse();
 		for(ASDGVertex[] s : splitVertices) {
+			//TODO DEBUG different situations here
 			ASDGPath[] paths = p.getAllType132SplitPaths(s);
 			BoolExpr portForm = this.getQfpaGen().mkTrue();
-			for(SDGVertex[] inouts : p.getType132LinkInportOutport(s)) {
-				portForm = this.getQfpaGen().mkAndBool(
-						this.genType1Formulae(paths[0], startIndex, inouts[0].getVertexIndex(), startVar, splitVars[0], false),
-						this.genType3Formula(paths[1], inouts[1].getVertexIndex(), inouts[2].getVertexIndex(), splitVars[1], splitVars[2]),
-						this.genType1Formulae(paths[2], inouts[3].getVertexIndex(), endIndex, splitVars[3], endVar, true),
-						this.getQfpaGen().mkEqBool(
-								splitVars[1], 
-								this.getQfpaGen().mkAddInt(
-										splitVars[0], 
-										this.getQfpaGen().mkConstantInt(p.getG().getBorderEdgeByInportOutport(inouts[0], inouts[1]).getWeight())
-								)
-						),
-						this.getQfpaGen().mkEqBool(
-								splitVars[3], 
-								this.getQfpaGen().mkAddInt(
-										splitVars[3], 
-										this.getQfpaGen().mkConstantInt(p.getG().getBorderEdgeByInportOutport(inouts[2], inouts[3]).getWeight())
-								)
-						)
-						
-				);
+			assert(paths[1] != null);
+			if(paths[0] != null && paths[1] != null && paths[2] != null) {
+				//132
+				for(SDGVertex[] inouts : p.getType132LinkInportOutport(s)) {
+					portForm = this.getQfpaGen().mkAndBool(
+							this.genType1Formulae(paths[0], startIndex, inouts[0].getVertexIndex(), startVar, splitVars[0], false),
+							this.genType3Formula(paths[1], inouts[1].getVertexIndex(), inouts[2].getVertexIndex(), splitVars[1], splitVars[2]),
+							this.genType1Formulae(paths[2], inouts[3].getVertexIndex(), endIndex, splitVars[3], endVar, true),
+							this.getQfpaGen().mkEqBool(
+									splitVars[1], 
+									this.getQfpaGen().mkAddInt(
+											splitVars[0], 
+											this.getQfpaGen().mkConstantInt(p.getG().getBorderEdgeByInportOutport(inouts[0], inouts[1]).getWeight())
+									)
+							),
+							this.getQfpaGen().mkEqBool(
+									splitVars[3], 
+									this.getQfpaGen().mkAddInt(
+											splitVars[3], 
+											this.getQfpaGen().mkConstantInt(p.getG().getBorderEdgeByInportOutport(inouts[2], inouts[3]).getWeight())
+									)
+							)
+							
+					);
+				}
+				type132Form = this.getQfpaGen().mkOrBool(portForm, type132Form);
+			} else if(paths[0] != null && paths[2] == null) {
+				//13
+			} else if(paths[0] == null && paths[2] != null) {
+				//32
+			} else {
+				assert(paths[0] == null && paths[2] == null);
+				//3
 			}
-			type132Form = this.getQfpaGen().mkOrBool(portForm, type132Form);
 		}
 		type132Form = this.getQfpaGen().mkAndBool(
 				type132Form,
