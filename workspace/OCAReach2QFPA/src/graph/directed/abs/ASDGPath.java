@@ -124,13 +124,22 @@ public class ASDGPath {
 				breakPoint = i;
 			}
 		}
-		paths[0] = new ASDGPath(this.getVertex(0));
-		for(int i = 1; i < breakPoint; i ++) {
-			paths[0].concatVertex(this.getVertex(i));
-		}
-		paths[1] = new ASDGPath(this.getVertex(breakPoint));
-		for(int i = breakPoint+1; i < this.getPath().size(); i ++) {
-			paths[1].concatVertex(this.getVertex(i));
+		 
+		if(breakPoint == 0) {
+			paths[0] = null;
+			paths[1] = new ASDGPath(this.getVertex(breakPoint));
+			for(int i = breakPoint+1; i < this.getPath().size(); i ++) {
+				paths[1].concatVertex(this.getVertex(i));
+			}
+		} else {
+			paths[0] = new ASDGPath(this.getVertex(0));
+			for(int i = 1; i < breakPoint; i ++) {
+				paths[0].concatVertex(this.getVertex(i));
+			}
+			paths[1] = new ASDGPath(this.getVertex(breakPoint));
+			for(int i = breakPoint+1; i < this.getPath().size(); i ++) {
+				paths[1].concatVertex(this.getVertex(i));
+			}
 		}
 		return paths;
 	}
@@ -221,32 +230,36 @@ public class ASDGPath {
 	//TODO: debug 
 	public ASDGPath[] getAllType132SplitPaths(ASDGVertex[] splitVertices){
 		assert(this.containsVertex(splitVertices[0]) && this.containsVertex(splitVertices[1]));
-		ASDGPath p1 = new ASDGPath(this.getInit());
-		int i = 0;
-		System.out.println("first abs concat");
-		for(i = 0; i < this.getPath().size() && this.getVertex(i).getSccIndex() != splitVertices[0].getSccIndex(); i ++) {
-			p1.concatVertex(this.getVertex(i));
-		}
-
-		System.out.println("second abs concat");
-		ASDGPath p3 = new ASDGPath(splitVertices[0]);
-		for(     ; i < this.getPath().size() && this.getVertex(i).getSccIndex() != splitVertices[1].getSccIndex(); i++) {
-			p3.concatVertex(this.getVertex(i));
-		}
-
-		System.out.println("third abs concat");
-		p3.concatVertex(this.getVertex(i));
-		i = i + 1;
-		ASDGPath p2 = new ASDGPath(this.getVertex(i));
-
-		System.out.println("forth abs concat");
-		for(     ; i < this.getPath().size(); i++) {
-			p2.concatVertex(this.getVertex(i));
-		}
 		ASDGPath[] splittedPaths = new ASDGPath[3];
-		splittedPaths[0] = p1;
-		splittedPaths[1] = p3;
-		splittedPaths[2] = p2;
+		if(splitVertices[0] != this.getInit() && splitVertices[1] != this.getLastVertex()) {
+			//132
+			ASDGPath p1 = new ASDGPath(this.getInit());
+			int i = 0;
+			System.out.println("first abs concat");
+			for(i = 0; i < this.getPath().size() && this.getVertex(i).getSccIndex() != splitVertices[0].getSccIndex(); i ++) {
+				p1.concatVertex(this.getVertex(i));
+			}
+
+			System.out.println("second abs concat");
+			ASDGPath p3 = new ASDGPath(splitVertices[0]);
+			for(     ; i < this.getPath().size() && this.getVertex(i).getSccIndex() != splitVertices[1].getSccIndex(); i++) {
+				p3.concatVertex(this.getVertex(i));
+			}
+
+			System.out.println("third abs concat");
+			p3.concatVertex(this.getVertex(i));
+			i = i + 1;
+			ASDGPath p2 = new ASDGPath(this.getVertex(i));
+
+			System.out.println("forth abs concat");
+			for(     ; i < this.getPath().size(); i++) {
+				p2.concatVertex(this.getVertex(i));
+			}
+			splittedPaths[0] = p1;
+			splittedPaths[1] = p3;
+			splittedPaths[2] = p2;
+		} 
+		
 		return splittedPaths;
 	}
 	
