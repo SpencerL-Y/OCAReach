@@ -340,38 +340,97 @@ public class ASDGPath {
 	}
 	
 	public List<SDGVertex[]> getType132LinkInportOutport(ASDGVertex[] splitVertices){
-		ASDGVertex last = null;
-		ASDGVertex now = this.getInit();
+		// TODO DEBUG change link ports output 
+		boolean subType132 = false, subType13 = false, subType32 = false, subType3 = false;
+		if(splitVertices[0] == this.getInit() && splitVertices[1] == this.getLastVertex()) {
+			subType3 = true;
+		} else if(splitVertices[0] == this.getInit()) {
+			subType32 = true;
+		} else if(splitVertices[1] == this.getLastVertex()) {
+			subType13 = true;
+		} else {
+			subType132 = true;
+		}
 		List<SDGVertex[]> list = new ArrayList<SDGVertex[]>();
-		int i = 0;
-		for(i = 0; i < this.getPath().size() && now != splitVertices[0]; i++) {
-			last = now;
-			now = this.getVertex(i+1);
-		}
-		ASDGVertex last2 = last;
-		ASDGVertex now2 = now;
-		for(     ; i < this.getPath().size() && last2 != splitVertices[1]; i++) {
-			last2 = now2;
-			now2 = this.getVertex(i+1);
-		}
-		for(SDGVertex vo1 : last.getOutports()) {
-			for(SDGVertex vi1 : now.getInports()) {
-				if(this.getG().containsBorderEdge(vo1, vi1)) {
-					for(SDGVertex vo2 : last2.getOutports()) {
-						for(SDGVertex vi2 : now2.getInports()) {
-							if(this.getG().containsBorderEdge(vo2, vi2)) {
-								SDGVertex[] inouts = new SDGVertex[4];
-								inouts[0] = vo1;
-								inouts[1] = vi1;
-								inouts[2] = vo2;
-								inouts[3] = vi2;
-								list.add(inouts);
+		if(subType132) {
+			ASDGVertex last = null;
+			ASDGVertex now = this.getInit();
+			
+			int i = 0;
+			for(i = 0; i < this.getPath().size() && now != splitVertices[0]; i++) {
+				last = now;
+				now = this.getVertex(i+1);
+			}
+			ASDGVertex last2 = last;
+			ASDGVertex now2 = now;
+			for(     ; i < this.getPath().size() && last2 != splitVertices[1]; i++) {
+				last2 = now2;
+				now2 = this.getVertex(i+1);
+			}
+			for(SDGVertex vo1 : last.getOutports()) {
+				for(SDGVertex vi1 : now.getInports()) {
+					if(this.getG().containsBorderEdge(vo1, vi1)) {
+						for(SDGVertex vo2 : last2.getOutports()) {
+							for(SDGVertex vi2 : now2.getInports()) {
+								if(this.getG().containsBorderEdge(vo2, vi2)) {
+									SDGVertex[] inouts = new SDGVertex[4];
+									inouts[0] = vo1;
+									inouts[1] = vi1;
+									inouts[2] = vo2;
+									inouts[3] = vi2;
+									list.add(inouts);
+								}
 							}
 						}
 					}
 				}
 			}
 		}
+		
+		if(subType13) {
+			ASDGVertex last = null;
+			ASDGVertex now = this.getInit();
+			
+			int i = 0;
+			for(i = 0; i < this.getPath().size() && now != splitVertices[0]; i++) {
+				last = now;
+				now = this.getVertex(i+1);
+			}
+			for(SDGVertex vo1 : last.getOutports()) {
+				for(SDGVertex vi1 : now.getInports()) {
+					if(this.getG().containsBorderEdge(vo1, vi1)) {
+						SDGVertex[] inouts = new SDGVertex[2];
+						inouts[0] = vo1;
+						inouts[1] = vi1;
+					}
+				}
+			}
+		}
+		
+		if(subType32) {
+			ASDGVertex last = null;
+			ASDGVertex now = this.getInit();
+			
+			int i = 0;
+			for(i = 0; i < this.getPath().size() && now != splitVertices[1]; i++) {
+				last = now;
+				now = this.getVertex(i+1);
+			}
+			for(SDGVertex vo2 : last.getOutports()) {
+				for(SDGVertex vi2 : now.getInports()) {
+					if(this.getG().containsBorderEdge(vo2, vi2)) {
+						SDGVertex[] inouts = new SDGVertex[2];
+						inouts[0] = vo2;
+						inouts[1] = vi2;
+					}
+				}
+			}
+		}
+		
+		if(subType3) {
+			// nothing todo
+		}
+		
 		return list;
 	}
 
