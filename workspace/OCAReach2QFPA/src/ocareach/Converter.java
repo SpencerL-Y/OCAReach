@@ -751,20 +751,27 @@ public class Converter {
 			g.computeLoopTag();
 		}
 		BoolExpr form = this.getQfpaGen().mkFalse();
-		for(DWTuple t : g.getTable().getEntry(startIndex, guessIndex).getSetOfDWTuples()) {
-			for(DWTuple tg : g.getTable().getEntry(guessIndex, guessIndex).getSetOfDWTuples()) {
-				if(tg.getWeight() > 0) {
-					int drop = Math.min(t.getDrop(), tg.getDrop() + t.getWeight());
-					form = this.getQfpaGen().mkOrBool(
-						form,
-						this.getQfpaGen().mkAndBool(
-							this.getQfpaGen().mkGeBool(this.getQfpaGen().mkAddInt(startVar, this.getQfpaGen().mkConstantInt(drop)), this.getQfpaGen().mkConstantInt(0)),
-							this.getQfpaGen().mkEqBool(this.getQfpaGen().mkAddInt(startVar, this.getQfpaGen().mkConstantInt(t.getWeight())), guessVar)
-						)
-					);
-				} 
+		DWTEntry startToGuessEntry = g.getTable().getEntry(startIndex, guessIndex);
+		if(startToGuessEntry != null) {
+			for(DWTuple t : startToGuessEntry.getSetOfDWTuples()) {
+				DWTEntry guessLoopEntry = g.getTable().getEntry(guessIndex, guessIndex);
+				if(guessLoopEntry != null) {
+					for(DWTuple tg : guessLoopEntry.getSetOfDWTuples()) {
+						if(tg.getWeight() > 0) {
+							int drop = Math.min(t.getDrop(), tg.getDrop() + t.getWeight());
+							form = this.getQfpaGen().mkOrBool(
+								form,
+								this.getQfpaGen().mkAndBool(
+									this.getQfpaGen().mkGeBool(this.getQfpaGen().mkAddInt(startVar, this.getQfpaGen().mkConstantInt(drop)), this.getQfpaGen().mkConstantInt(0)),
+									this.getQfpaGen().mkEqBool(this.getQfpaGen().mkAddInt(startVar, this.getQfpaGen().mkConstantInt(t.getWeight())), guessVar)
+								)
+							);
+						} 
+					}
+				}
 			}
 		}
+		
 		return form;
 	}
 	

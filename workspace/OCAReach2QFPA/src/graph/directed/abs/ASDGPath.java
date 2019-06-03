@@ -227,7 +227,7 @@ public class ASDGPath {
 		return list;
 	}
 	
-	//TODO: debug 
+	//TODO: DEBUG
 	public ASDGPath[] getAllType132SplitPaths(ASDGVertex[] splitVertices){
 		assert(this.containsVertex(splitVertices[0]) && this.containsVertex(splitVertices[1]));
 
@@ -236,6 +236,7 @@ public class ASDGPath {
 		if(splitVertices[0] != this.getInit() && splitVertices[1] != this.getLastVertex()) {
 			System.out.println("subType 132");
 			//132
+			// construct type 1 abs path
 			ASDGPath p1 = new ASDGPath(this.getInit());
 			int i = 1;
 
@@ -245,21 +246,29 @@ public class ASDGPath {
 			}
 
 			System.out.println("AbsConcat p3");
+			// construct type 3  abs path
 			ASDGPath p3 = new ASDGPath(splitVertices[0]);
-			i = i + 1;
 			for(     ; i < this.getPath().size() && this.getVertex(i).getSccIndex() != splitVertices[1].getSccIndex(); i++) {
-				p3.concatVertex(this.getVertex(i));
+				if(this.getPath().get(i).getSccIndex() != splitVertices[0].getSccIndex()) {
+					p3.concatVertex(this.getVertex(i));
+				}
 			}
-
-			p3.concatVertex(this.getVertex(i));
+			if(i < this.getPath().size()) {
+				if(this.getVertex(i).getSccIndex() != splitVertices[0].getSccIndex()) {
+					// if not the case that the split vertices are the same one
+					p3.concatVertex(this.getVertex(i));
+				}
+			}
+			
+			// construct type2 abs path
 			i = i + 1;
+			// TODO : DEBUG range error
 			ASDGPath p2 = new ASDGPath(this.getVertex(i));
-
-
 			System.out.println("AbsConcat p2");
 			for(     ; i < this.getPath().size(); i++) {
 				p2.concatVertex(this.getVertex(i));
 			}
+			
 			splittedPaths[0] = p1;
 			splittedPaths[1] = p3;
 			splittedPaths[2] = p2;
@@ -277,12 +286,18 @@ public class ASDGPath {
 
 			System.out.println("AbsConcat p3");
 			ASDGPath p3 = new ASDGPath(splitVertices[0]);
-			i = i + 1;
+			//TODO DEBUG
 			for(     ; i < this.getPath().size() && this.getVertex(i).getSccIndex() != splitVertices[1].getSccIndex(); i++) {
+				if(this.getVertex(i).getSccIndex() != splitVertices[0].getSccIndex()) {
+					p3.concatVertex(this.getVertex(i));
+				}
+			}
+			
+			if(i < this.getPath().size()) {
+				// if the last vertex is not added to type 3 path
 				p3.concatVertex(this.getVertex(i));
 			}
-
-			p3.concatVertex(this.getVertex(i));
+			
 			assert(i == this.length());
 			ASDGPath p2 = null;
 			
@@ -294,21 +309,24 @@ public class ASDGPath {
 
 			System.out.println("subType 32");
 			ASDGPath p1 = null;
-			int i = 1;
+			int i = 0;
 
 			System.out.println("AbsConcat p3");
 			ASDGPath p3 = new ASDGPath(splitVertices[0]);
 			for(     ; i < this.getPath().size() && this.getVertex(i).getSccIndex() != splitVertices[1].getSccIndex(); i++) {
+				if(i != 0) {
+					p3.concatVertex(this.getVertex(i));
+				}
+			}
+			if(i != 0) {
 				p3.concatVertex(this.getVertex(i));
 			}
-
-			p3.concatVertex(this.getVertex(i));
 			i = i + 1;
 			ASDGPath p2 = new ASDGPath(this.getVertex(i));
 
 
 			System.out.println("AbsConcat p2");
-			for(     ; i < this.getPath().size(); i++) {
+			for(i = i + 1; i < this.getPath().size(); i++) {
 				p2.concatVertex(this.getVertex(i));
 			}
 			splittedPaths[0] = p1;
@@ -326,8 +344,10 @@ public class ASDGPath {
 			for(     ; i < this.getPath().size() && this.getVertex(i).getSccIndex() != splitVertices[1].getSccIndex(); i++) {
 				p3.concatVertex(this.getVertex(i));
 			}
-
-			p3.concatVertex(this.getVertex(i));
+			if(i < this.getPath().size()) {
+				assert(this.getVertex(i).getLoopTag() == LoopTag.Neg || this.getVertex(i).getLoopTag() == LoopTag.PosNeg);
+				p3.concatVertex(this.getVertex(i));
+			}
 			assert(i == this.length());
 			ASDGPath p2 = null;
 			splittedPaths[0] = p1;
@@ -340,7 +360,7 @@ public class ASDGPath {
 	}
 	
 	public List<SDGVertex[]> getType132LinkInportOutport(ASDGVertex[] splitVertices){
-		// TODO DEBUG change link ports output 
+		// TODO DEBUG CHECK AGAIN
 		boolean subType132 = false, subType13 = false, subType32 = false, subType3 = false;
 		if(splitVertices[0] == this.getInit() && splitVertices[1] == this.getLastVertex()) {
 			subType3 = true;
@@ -412,7 +432,7 @@ public class ASDGPath {
 			ASDGVertex now = this.getInit();
 			
 			int i = 0;
-			for(i = 0; i < this.getPath().size() && now != splitVertices[1]; i++) {
+			for(i = 0; i < this.getPath().size() && last != splitVertices[1]; i++) {
 				last = now;
 				now = this.getVertex(i+1);
 			}
