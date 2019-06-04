@@ -74,7 +74,8 @@ public class Converter {
 			// there is no cycles in the SCCs (trivial case: every scc is a concrete vertex)
 			boolean trivial = !p.containsCycledVertex();
 			// there might be type-1 certificate
-			boolean type1 = p.containsNegTagVertex();
+			// TODO: DEBUG CHECK AGAIN
+			boolean type1 = true;
 			// there might be type-1 . type-2 certificate
 			boolean type12 = p.containsPosTagVertex();
 			// there might be type-1 . type-3 . type-2 certificate
@@ -89,7 +90,7 @@ public class Converter {
 				System.out.println("TYPE TRIVIAL");
 				trivialForm = this.genTrivialFormula(p);
 			}
-			if(type1) {
+			if(type1 && !trivial) {
 				System.out.println("TYPE 1");
 				type1Form = this.genType1Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar, false);
 			}
@@ -215,7 +216,6 @@ public class Converter {
 				}
 				type1FormBody = this.getQfpaGen().mkOrBool(type1FormBody, type1FormBodyItem);
 			} else {
-				//TODO: DEBUG
 				// if the length of abspath is 0
 				System.out.println("AbsPath length: " + p.length());
 				List<BoolExpr> listExprs = this.type1ConcreteGraphPathFormula(p.getInit(), l.get(0), l.get(1), null, null, sVar, tVar, null, null, isSkew);
@@ -385,7 +385,6 @@ public class Converter {
 				// length < 3n^2 + 1
 				BoolExpr formLt = this.getQfpaGen().mkFalse();
 				System.out.println("in " + inport.getVertexIndex() + " out " + outport.getVertexIndex());
-				//TODO: DEBUG entry might not exists..
 				if(support.getTable().getEntry(inport.getVertexIndex(), outport.getVertexIndex()) == null) {
 					// if the entry does not exists, ignore the support
 					continue;
@@ -593,7 +592,6 @@ public class Converter {
 		splitVars32[1] = fullSplitVars[3];
 		
 		for(ASDGVertex[] s : splitVertices) {
-			//TODO DEBUG different situations here
 			ASDGPath[] paths = p.getAllType132SplitPaths(s);
 			BoolExpr portForm = this.getQfpaGen().mkTrue();
 			assert(paths[1] != null);

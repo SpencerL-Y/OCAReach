@@ -106,7 +106,8 @@ public class ASDGPath {
 	//TODO: debug
 	public ASDGPath getSkewPath() {
 		ASDGPath skewP = new ASDGPath(this.getLastVertex());
-		for(int i = this.getPath().size()-2; i >= 1; i++) {
+		skewP.setG(skewP.getG().getSkewTranspose());
+		for(int i = this.getPath().size()-2; i >= 1; i--) {
 			skewP.concatVertex(this.getVertex(i));
 		}
 		return skewP;
@@ -227,7 +228,7 @@ public class ASDGPath {
 		return list;
 	}
 	
-	//TODO: DEBUG
+
 	public ASDGPath[] getAllType132SplitPaths(ASDGVertex[] splitVertices){
 		assert(this.containsVertex(splitVertices[0]) && this.containsVertex(splitVertices[1]));
 
@@ -262,7 +263,7 @@ public class ASDGPath {
 			
 			// construct type2 abs path
 			i = i + 1;
-			// TODO : DEBUG range error
+			// TODO : DEBUG RANGE ERROR
 			ASDGPath p2 = new ASDGPath(this.getVertex(i));
 			System.out.println("AbsConcat p2");
 			for(     ; i < this.getPath().size(); i++) {
@@ -286,7 +287,6 @@ public class ASDGPath {
 
 			System.out.println("AbsConcat p3");
 			ASDGPath p3 = new ASDGPath(splitVertices[0]);
-			//TODO DEBUG
 			for(     ; i < this.getPath().size() && this.getVertex(i).getSccIndex() != splitVertices[1].getSccIndex(); i++) {
 				if(this.getVertex(i).getSccIndex() != splitVertices[0].getSccIndex()) {
 					p3.concatVertex(this.getVertex(i));
