@@ -24,9 +24,8 @@ public class ConverterTest {
 		//random example
 		
 		OCDGenerator ocdg = new OCDGenerator();
-		for(int i = 0; i < 500; i++) {
+		//for(int i = 0; i < 500; i++) {
 		oca = ocdg.genRandomOca(5);
-		oca.print();
 		
 		// type12 example //DONE
 		/*
@@ -240,15 +239,31 @@ public class ConverterTest {
 		oca.addTransition(1, OCAOp.Sub, 1);
 		oca.addTransition(1, OCAOp.Add, 2);
 		oca.addTransition(4, OCAOp.Add, 2);
+		oca.addTransition(2, OCAOp.Sub, 3);
 		oca.setInitIndex(0);
 		oca.setTargetIndex(3);
+		oca = new OCA();
+		for(int i = 0; i < 1; i++) {
+			oca.addState(i);
+		}
+		oca.addTransition(0, OCAOp.Add, 0);
+		oca.setInitIndex(0);
+		oca.setTargetIndex(0);
 		*/
-		Converter con = new Converter(oca); 
-		String result = con.convert();
 		
-		System.out.println("--------------------------OUTPUT FORMULA--------------------------");
+		
+		
+		Converter con = new Converter(oca); 
+		
+		String result = con.convertTest();
+		
+
+		System.out.println("----------------------------OCA  INPUT----------------------------");
+		oca.print();
+		System.out.println("------------------------------------------------------------------");
+		System.out.println("--------------------------FORMULA OUTPUT--------------------------");
 		System.out.println(result);
 		System.out.println("------------------------------------------------------------------");
-		}
+		//}
 	}
 }

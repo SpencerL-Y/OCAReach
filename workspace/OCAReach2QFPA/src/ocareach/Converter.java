@@ -56,6 +56,10 @@ public class Converter {
 		return this.convert(this.oca.getInitState(), this.oca.getTargetState());
 	}
 	
+	public String convertTest() {
+		return this.convertTest(this.oca.getInitState(), this.oca.getTargetState());
+	}
+	
 	public String convert(State startState, State endState) {
 		assert(this.getOca().containsState(startState) && this.getOca().containsState(endState));
 		//set starting and ending vertex in dg
@@ -115,6 +119,72 @@ public class Converter {
 		result = resultExpr.toString();
 		return result;
 	}
+	
+	public String convertTest(State startState, State endState) {
+		assert(this.getOca().containsState(startState) && this.getOca().containsState(endState));
+		//set starting and ending vertex in dg
+		this.getDgraph().setStartVertexIndex(startState.getIndex());
+		this.getDgraph().setEndingVertexIndex(endState.getIndex());
+		// mark sccIndex in SDG
+		this.getSdg().tarjan();
+		// construct abstract sdg
+		this.asdg = new ASDGraph(this.getSdg());
+		ASDGVertex absStart = this.getAsdg().getVertex(this.getSdg().getStartingVertex().getSccMark());
+		ASDGVertex absEnd = this.getAsdg().getVertex(this.getSdg().getEndingVertex().getSccMark());
+		// get all the possible abstract path
+		List<ASDGPath> paths = this.getAsdg().DFSFindAbsPaths(absStart.getSccIndex(), absEnd.getSccIndex());
+		List<BoolExpr> formulae = new ArrayList<BoolExpr>();
+
+		IntExpr sVar = this.getQfpaGen().mkVariableInt("xs");
+		IntExpr tVar = this.getQfpaGen().mkVariableInt("xt");
+		for(ASDGPath p : paths) {
+			// there is no cycles in the SCCs (trivial case: every scc is a concrete vertex)
+			boolean trivial = !p.containsCycledVertex();
+			// there might be type-1 certificate
+			// TODO: DEBUG CHECK AGAIN
+			boolean type1 = true;
+			// there might be type-1 . type-2 certificate
+			boolean type12 = p.containsPosTagVertex();
+			// there might be type-1 . type-3 . type-2 certificate
+			boolean type132 = p.containsNegTagVertex() && p.containsPosTagVertex();
+			BoolExpr trivialForm = this.getQfpaGen().mkFalse();
+			BoolExpr type1Form = this.getQfpaGen().mkFalse();
+			BoolExpr type12Form = this.getQfpaGen().mkFalse();
+			BoolExpr type132Form = this.getQfpaGen().mkFalse();
+			if(trivial) {
+				System.out.println("TYPE TRIVIAL");
+				trivialForm = this.genTrivialFormula(p);
+			}
+			if(type1 && !trivial) {
+				System.out.println("TYPE 1");
+				type1Form = this.genType1Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar, false);
+			}
+			if(type12) {
+				System.out.println("TYPE 12");
+				type12Form = this.genType12Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar);
+			}
+			if(type132) {
+				System.out.println("TYPE 132");
+				type132Form = this.genType132Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar);
+			}
+			BoolExpr temp = (trivial)? trivialForm : this.combineAllFormlae(type1Form, type12Form, type132Form);
+			formulae.add(temp);
+		}
+		
+		
+		String result = null;
+		BoolExpr resultExpr = this.getQfpaGen().mkFalse();
+		for(BoolExpr formula : formulae) {
+			resultExpr = this.getQfpaGen().mkOrBool(resultExpr, formula);
+		}
+		resultExpr = this.getQfpaGen().mkOrBool(
+				this.getQfpaGen().mkAndBool(resultExpr, this.getQfpaGen().mkOrBool(this.getQfpaGen().mkLtBool(tVar, this.getQfpaGen().mkConstantInt(0)), this.getQfpaGen().mkLtBool(sVar, this.getQfpaGen().mkConstantInt(0)))),
+				this.getQfpaGen().mkAndBool(this.getQfpaGen().mkNotBool(resultExpr), this.getQfpaGen().mkGeBool(tVar, this.getQfpaGen().mkConstantInt(0)), this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(0)))
+				);
+		result = resultExpr.toString();
+		return result;
+	}
+	
 	
 	public BoolExpr genTrivialFormula(ASDGPath p) {
 		//TODO debug
@@ -373,38 +443,49 @@ public class Converter {
 				// guess the mid vertex and init a int variable for it
 				for(DGVertex ve : support.getVertices()) {
 					IntExpr midVar = this.getQfpaGen().mkVariableInt("z"+ ve.getIndex());
+					// latter dynamic pater
+					BoolExpr formGeDynamic = this.type1DynamicPartFormula(support, this.getSdg().getVertex(ve.getIndex()), outport, midVar, thisOutVar);
+					if(formGeDynamic == null) {
+						continue;
+					}
+					// former flow part
 					formGe = this.getQfpaGen().mkOrBool(
 						formGe, 
 						this.getQfpaGen().mkAndBool(
+							// path flow
 							this.genPathFlowFormula(support, inport.getVertexIndex(), ve.getIndex(), thisInVar, midVar),
 							// z > |V|, this guarantee the counter value to be positive
-							this.getQfpaGen().mkGeBool(midVar, this.getQfpaGen().mkConstantInt(support.getVertices().size()))
+							this.getQfpaGen().mkGeBool(midVar, this.getQfpaGen().mkConstantInt(support.getVertices().size())),
+							formGeDynamic
 						)
 					);
+					
+					
+					// add border edge requirements
+					
+					formGe = this.getQfpaGen().mkAndBool(formGe,
+							this.vertexBorderEdgeWeightAndDropRequirements(in, out, thisInVar, thisOutVar, lastOutVar, nextInVar));
+					
+					// add positive requirement
+					
+					formGe = this.getQfpaGen().mkAndBool(this.getQfpaGen().mkRequireNonNeg(midVar), formGe);
+					
+					// add existential 
+					IntExpr[] midVarQuant = new IntExpr[1];
+					midVarQuant[0] = midVar;
+					formGe = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(midVarQuant, formGe);
 				}
 				// length < 3n^2 + 1
-				BoolExpr formLt = this.getQfpaGen().mkFalse();
-				System.out.println("in " + inport.getVertexIndex() + " out " + outport.getVertexIndex());
-				if(support.getTable().getEntry(inport.getVertexIndex(), outport.getVertexIndex()) == null) {
-					// if the entry does not exists, ignore the support
+				BoolExpr formLt = this.type1DynamicPartFormula(support, inport, outport, thisInVar, thisOutVar);
+				
+				if(formLt == null) {
 					continue;
 				}
-				System.out.println("table entry null:" + (support.getTable().getEntry(inport.getVertexIndex(), outport.getVertexIndex()) == null) + " table len:" +  support.getTable().getMaxLength());
-				for(DWTuple t : support.getTable().getEntry(inport.getVertexIndex(), outport.getVertexIndex()).getSetOfDWTuples()) {
-					BoolExpr temp = this.getQfpaGen().mkAndBool(
-						// weight sum correctly in the concreteScc
-						this.getQfpaGen().mkEqBool(
-							thisOutVar, 
-							this.getQfpaGen().mkAddInt(thisInVar, this.getQfpaGen().mkConstantInt(t.getWeight()))),
-							// the minimum counter value >= 0
-						this.getQfpaGen().mkGeBool(
-								this.getQfpaGen().mkAddInt(thisInVar, this.getQfpaGen().mkConstantInt(t.getDrop())), 
-								this.getQfpaGen().mkConstantInt(0))
-					);
-					formLt = this.getQfpaGen().mkOrBool(formLt, temp);
-				} 
+				
+				// add border edge requirements
 				formLt = this.getQfpaGen().mkAndBool(formLt, 
 						this.vertexBorderEdgeWeightAndDropRequirements(in, out, thisInVar, thisOutVar, lastOutVar, nextInVar));
+				
 				BoolExpr formula = this.getQfpaGen().mkOrBool(formLt, formGe);
 				exprs.add(formula);
 			} else {
@@ -436,6 +517,32 @@ public class Converter {
 		}
 		return exprs;
 	}
+	
+	public BoolExpr type1DynamicPartFormula(DGraph support, SDGVertex inport, SDGVertex outport, 
+															IntExpr thisInVar, IntExpr thisOutVar) {
+		BoolExpr formDynamic = this.getQfpaGen().mkFalse();
+		System.out.println("in " + inport.getVertexIndex() + " out " + outport.getVertexIndex());
+		if(support.getTable().getEntry(inport.getVertexIndex(), outport.getVertexIndex()) == null) {
+			// if the entry does not exists, ignore the support
+			return null;
+		}
+		System.out.println("table entry null:" + (support.getTable().getEntry(inport.getVertexIndex(), outport.getVertexIndex()) == null) + " table len:" +  support.getTable().getMaxLength());
+		for(DWTuple t : support.getTable().getEntry(inport.getVertexIndex(), outport.getVertexIndex()).getSetOfDWTuples()) {
+			BoolExpr temp = this.getQfpaGen().mkAndBool(
+				// weight sum correctly in the concreteScc
+				this.getQfpaGen().mkEqBool(
+					thisOutVar, 
+					this.getQfpaGen().mkAddInt(thisInVar, this.getQfpaGen().mkConstantInt(t.getWeight()))),
+					// the minimum counter value >= 0
+				this.getQfpaGen().mkGeBool(
+						this.getQfpaGen().mkAddInt(thisInVar, this.getQfpaGen().mkConstantInt(t.getDrop())), 
+						this.getQfpaGen().mkConstantInt(0))
+			);
+			formDynamic = this.getQfpaGen().mkOrBool(formDynamic, temp);
+		} 
+		return formDynamic;
+	}
+	
 	
 	public BoolExpr genPathFlowFormula(DGraph g, int startIndex, int endIndex,
 													   IntExpr startVar, IntExpr endVar) {
