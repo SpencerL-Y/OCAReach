@@ -23,13 +23,9 @@ public class DGraphTest extends TestCase {
 		this.dg = ocdg.genRandomOca(10).toDGraph();
 		this.ddg = new DGraph();
 		this.ddg = new DGraph();
-		for(int i = 0; i < 4; i++) {
+		for(int i = 0; i < 1; i++) {
 			this.ddg.addVertex(i);
 		}
-		this.ddg.addEdge(0, 1, -1);
-		this.ddg.addEdge(1, 2, 1);
-		this.ddg.addEdge(2, 0, -1);
-		this.ddg.addEdge(2, 3, 1);
 		this.ddg.setStartVertexIndex(0);
 		this.ddg.setEndingVertexIndex(0);
 		

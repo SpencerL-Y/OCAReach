@@ -214,19 +214,27 @@ public class ConverterTest {
 		oca.setTargetIndex(2);
 		
 		
-		
+		*/
 		oca = new OCA();
-		for(int i = 0; i < 5; i++) {
+		for(int i = 0; i < 3; i++) {
 			oca.addState(i);
 		}
 		oca.addTransition(0, OCAOp.Add, 1);
-		oca.addTransition(1, OCAOp.Add, 1);
-		oca.addTransition(0, OCAOp.Add, 4);
-		oca.addTransition(1, OCAOp.Add, 4);
-		oca.addTransition(4, OCAOp.Sub, 3);
+		oca.addTransition(1, OCAOp.Sub, 2);
+		oca.addTransition(1, OCAOp.Sub, 1); 
+		//oca.addTransition(1, OCAOp.Add, 4);
+		//oca.addTransition(4, OCAOp.Sub, 3);
 		oca.setInitIndex(0);
-		oca.setTargetIndex(3);
-		
+		oca.setTargetIndex(1);
+		/*
+	
+		oca = new OCA();
+		for(int i = 0; i < 1; i++) {
+			oca.addState(i);
+		}
+		oca.addTransition(0, OCAOp.Sub, 0);
+		oca.setInitIndex(0);
+		oca.setTargetIndex(0);
 		
 		oca = new OCA();
 		for(int i = 0; i < 5; i++) {
@@ -242,20 +250,13 @@ public class ConverterTest {
 		oca.addTransition(2, OCAOp.Sub, 3);
 		oca.setInitIndex(0);
 		oca.setTargetIndex(3);
-		oca = new OCA();
-		for(int i = 0; i < 1; i++) {
-			oca.addState(i);
-		}
-		oca.addTransition(0, OCAOp.Add, 0);
-		oca.setInitIndex(0);
-		oca.setTargetIndex(0);
-		*/
 		
+			*/
 		
 		
 		Converter con = new Converter(oca); 
 		
-		String result = con.convertTest();
+		String result = con.convert();
 		
 
 		System.out.println("----------------------------OCA  INPUT----------------------------");

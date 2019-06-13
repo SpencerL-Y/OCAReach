@@ -21,6 +21,7 @@ public class DGraph implements Graph{
 		this.setStartVertexIndex(0);
 		this.setEndingVertexIndex(0);
 		this.table = null;
+		this.tag = null;
 	}
 	
 	
@@ -123,6 +124,7 @@ public class DGraph implements Graph{
 		if(this.table != null) {
 			return this.getTag();
 		}
+		System.out.println("compute loop tag");
 		DWTable table = new DWTableImpl(this);
 		this.table = table;
 		for(int i = 0; i <= this.getVertices().size(); i ++) {
@@ -137,6 +139,10 @@ public class DGraph implements Graph{
 				continue;
 			}
 			if(entry.getSetOfDWTuples().size() != 0) {
+				System.out.println("tuple print:");
+				for(DWTuple t : entry.getSetOfDWTuples()) {
+					t.printTuple();
+				}
 				noCycle = false;
 			}
 			for(DWTuple t : entry.getSetOfDWTuples()) {
@@ -150,6 +156,7 @@ public class DGraph implements Graph{
 			}
 		}
 		if(noCycle) {
+			this.setTag(LoopTag.None);
 			return LoopTag.None;
 		} else {
 			if(hasPos && hasNeg) {
@@ -184,6 +191,7 @@ public class DGraph implements Graph{
 			DGraph temp = this.edgeListToGraph(list, startIndex, endIndex);
 			if(temp.containsVertex(startIndex) && temp.containsVertex(endIndex)) {
 				temp.computeLoopTag();
+				System.out.println("cycled: " + temp.getTag());
 				graphs.add(temp);
 			}
 		}
@@ -210,16 +218,17 @@ public class DGraph implements Graph{
 	}
 	
 	
-	//TODO: debug
+	//TODO: DEBUG SPECIAL CASE
 	public DGraph edgeListToGraph(List<DGEdge> list, int startIndex, int endIndex) {
 		DGraph g = new DGraph();
-		if(list.size() == 0 && this.getVertices().size() == 1) {
+		if(list.size() == 0 && this.getVertices().size() != 0) {
 			// trivial case
-			for(DGVertex v : this.getVertices()) {
-				g.addVertex(v.getIndex());
-			}
+			if(startIndex == endIndex) {
+				g.addVertex(startIndex);
+			} 
 		}
 		for(DGEdge e : list) {
+			System.out.println("Support add edge");
 			if(this.containsVertex(e.getTo().getIndex()) && !g.containsVertex(e.getTo().getIndex())) {
 				g.addVertex(e.getTo().getIndex());
 			}
@@ -314,9 +323,10 @@ public class DGraph implements Graph{
 		if(this.table == null) {
 			this.computeLoopTag();
 		}
-		if(this.getTag() == LoopTag.None){
+		if(this.getTag().equals(LoopTag.None)){
 			return false;
 		} else {
+			System.out.println("edge : " + this.getEdges().size());
 			return true;
 		}
 	}
@@ -331,12 +341,12 @@ public class DGraph implements Graph{
 	}
 	
 	public void increaseDWTLenLimit() {
-		// increase the length limit to 3|V|^2 + 1 and
+		// increase the length limit to 2|V|^2 + 1 and
 		if(this.getTable() == null) {
 			this.computeLoopTag();
 		}
 		for(int i = this.getTable().getMaxLength(); 
-				i < 3 * this.getVertices().size() * this.getVertices().size() + 1; 
+				i <= 2 * this.getVertices().size() * this.getVertices().size() + 1; 
 				i = this.getTable().getMaxLength()) {
 			this.getTable().increMaxLenUpdate();
 		}
