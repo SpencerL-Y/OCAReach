@@ -16,12 +16,15 @@ public class ASDGVertex {
 	private List<ASDGEdge> absEdges;
 	private LoopTag loopTag;
 	
-	public ASDGVertex(ASDGraph g, int sccIndex, List<BorderEdge> borderEdges) {
+	public ASDGVertex(ASDGraph g, int sccIndex) {
 		this.setGraph(g);
 		this.sccIndex = sccIndex;
 		this.inports = new ArrayList<SDGVertex>();
 		this.outports = new ArrayList<SDGVertex>();
-		this.absEdges = new ArrayList<ASDGEdge>();
+		this.absEdges = new ArrayList<ASDGEdge>();	
+	}
+	
+	public void constructAbsEdgesByBorderEdges(List<BorderEdge> borderEdges) {
 		for(BorderEdge e : borderEdges) {
 			if(e.getToScc() == this.getSccIndex()) {
 				this.inports.add(e.getToVertex());
@@ -32,15 +35,9 @@ public class ASDGVertex {
 		}
 	}
 	
-	// map to concrete subgraph
-	//TODO: debug
-	public DGraph getConcreteDGraph(boolean isSkew) {
-		if(!isSkew) {
-			//System.out.println("get scc index " + this.getSccIndex());
-			return this.getGraph().getSdg().getConcreteSCC(this.getSccIndex());
-		} else {
-			return this.getGraph().getSdg().getConcreteSCC(this.getSccIndex()).getSkewTranspose();
-		}
+	//TODO: DEBUG CAREFUL WHETHER ADD skew or not
+	public DGraph getConcreteDGraph() {
+		return this.getGraph().getSdg().getConcreteSCC(this.getSccIndex());
 	}
 	
 	//basic operations
@@ -79,7 +76,7 @@ public class ASDGVertex {
 	public void computeLoopTag() {
 		//TODO debug
 		// compute loop information using DWT
-		DGraph concreteG = this.getConcreteDGraph(false);
+		DGraph concreteG = this.getConcreteDGraph();
 		this.setLoopTag(concreteG.computeLoopTag());
 	}
 	

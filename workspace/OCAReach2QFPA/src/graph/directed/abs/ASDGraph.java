@@ -35,26 +35,13 @@ public class ASDGraph {
 		//System.out.println("scc Num :" + sdg.getSccNum());
 		// after add all the border edges then we construct the vertices
 		for(int i = 1; i <= sdg.getSccNum(); i++) {
-			this.vertices.add(new ASDGVertex(this, i, this.borderEdges));
+			this.vertices.add(new ASDGVertex(this, i));
+		}
+		for(int i = 1; i <= sdg.getSccNum(); i++) {
+			this.getVertex(i).constructAbsEdgesByBorderEdges(this.getBorderEdges());
 		}
 		// after constructing the graph, compute the tags
 		this.computeAllLoopTag();
-	}
-	
-	public ASDGraph(SDGraph skewSDG, ASDGraph original) {
-		// this is used to get the skew transpose
-		this.setSdg(skewSDG);
-		this.vertices = new ArrayList<ASDGVertex>();
-		
-		this.borderEdges = new ArrayList<BorderEdge>();
-		for(BorderEdge e : original.getBorderEdges()) {
-			BorderEdge newE = new BorderEdge(e.getToVertex(), e.getFromVertex());
-			this.borderEdges.add(newE);
-		}
-		for(ASDGVertex av : original.getVertices()) {
-			ASDGVertex nv = new ASDGVertex(this, av.getSccIndex(), this.getBorderEdges());
-			this.vertices.add(nv);
-		}
 	}
 	
 	//basic operations

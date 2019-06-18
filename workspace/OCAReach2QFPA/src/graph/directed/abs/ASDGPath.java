@@ -169,8 +169,8 @@ public class ASDGPath {
 				}
 			} else {
 				// inports and outports are exchanged here
-				for(SDGVertex lastOut : this.getPath().get(i-1).getInports()) {
-					for(SDGVertex nextIn : this.getPath().get(i).getOutports()) {
+				for(SDGVertex lastOut : this.getPath().get(i-1).getOutports()) {
+					for(SDGVertex nextIn : this.getPath().get(i).getInports()) {
 						if(g.containsBorderEdge(lastOut, nextIn)) {
 							List<SDGVertex> newCon = new ArrayList<SDGVertex>();
 							newCon.add(lastOut);
