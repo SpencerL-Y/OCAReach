@@ -124,7 +124,7 @@ public class DGraph implements Graph{
 		if(this.table != null) {
 			return this.getTag();
 		}
-		System.out.println("compute loop tag");
+		//System.out.println("compute loop tag");
 		DWTable table = new DWTableImpl(this);
 		this.table = table;
 		for(int i = 0; i <= this.getVertices().size(); i ++) {
@@ -139,10 +139,10 @@ public class DGraph implements Graph{
 				continue;
 			}
 			if(entry.getSetOfDWTuples().size() != 0) {
-				System.out.println("tuple print:");
+				/*System.out.println("tuple print:");
 				for(DWTuple t : entry.getSetOfDWTuples()) {
 					t.printTuple();
-				}
+				}*/
 				noCycle = false;
 			}
 			for(DWTuple t : entry.getSetOfDWTuples()) {
@@ -209,8 +209,9 @@ public class DGraph implements Graph{
 				g.addEdge(e.getTo().getIndex(), e.getFrom().getIndex(), -e.getWeight());
 			}
 		}
-		int oldStart = g.getStartVertexIndex();
-		System.out.println("oldStart:" + oldStart);
+		int oldStart = this.getStartVertexIndex();
+		int oldEnd = this.getEndingVertexIndex();
+		System.out.println("oldStart:" + oldStart + " oldEnd: " + oldEnd);
 		g.setStartVertexIndex(this.getEndingVertexIndex());
 		g.setEndingVertexIndex(oldStart);
 		System.out.println("newStart:" + g.startVertexIndex + " newEnd:" + g.endingVertexIndex);
@@ -228,7 +229,7 @@ public class DGraph implements Graph{
 			} 
 		}
 		for(DGEdge e : list) {
-			System.out.println("Support add edge");
+			//System.out.println("Support add edge");
 			if(this.containsVertex(e.getTo().getIndex()) && !g.containsVertex(e.getTo().getIndex())) {
 				g.addVertex(e.getTo().getIndex());
 			}

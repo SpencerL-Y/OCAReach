@@ -103,12 +103,14 @@ public class ASDGPath {
 	}
 	
 	// algorithm
-	//TODO: debug
 	public ASDGPath getSkewPath() {
-		ASDGPath skewP = new ASDGPath(this.getLastVertex());
-		skewP.setG(skewP.getG().getSkewTranspose());
-		for(int i = this.getPath().size()-2; i >= 1; i--) {
-			skewP.concatVertex(this.getVertex(i));
+		ASDGraph skewASDG = this.getG().getSkewTranspose();
+		ASDGPath skewP = new ASDGPath(skewASDG.getVertex(this.getLastVertex().getSccIndex()));
+		skewASDG.getVertex(2);
+		skewP.setG(skewASDG);
+		
+		for(int i = this.getPath().size()-2; i >= 0; i--) {
+			skewP.concatVertex(skewASDG.getVertex(this.getVertex(i).getSccIndex()));
 		}
 		return skewP;
 	}
@@ -146,7 +148,7 @@ public class ASDGPath {
 	}
 	
 	//TODO: debug
-	public List<List<SDGVertex>> inportsOutportsCartesianProduct(SDGVertex start, SDGVertex end) {
+	public List<List<SDGVertex>> inportsOutportsCartesianProduct(SDGVertex start, SDGVertex end, boolean isSkew) {
 		List<List<SDGVertex>> list = new ArrayList<List<SDGVertex>>();
 		List<SDGVertex> startList = new ArrayList<SDGVertex>();
 		startList.add(start);
@@ -154,13 +156,27 @@ public class ASDGPath {
 		ASDGraph g = this.getPath().get(0).getGraph();
 		for(int i = 1; i <= this.length(); i++) {
 			List<List<SDGVertex>> connect = new ArrayList<List<SDGVertex>>();
-			for(SDGVertex lastOut : this.getPath().get(i-1).getOutports()) {
-				for(SDGVertex nextIn : this.getPath().get(i).getInports()) {
-					if(g.containsBorderEdge(lastOut, nextIn)) {
-						List<SDGVertex> newCon = new ArrayList<SDGVertex>();
-						newCon.add(lastOut);
-						newCon.add(nextIn);
-						connect.add(newCon);
+			if(!isSkew) {
+				for(SDGVertex lastOut : this.getPath().get(i-1).getOutports()) {
+					for(SDGVertex nextIn : this.getPath().get(i).getInports()) {
+						if(g.containsBorderEdge(lastOut, nextIn)) {
+							List<SDGVertex> newCon = new ArrayList<SDGVertex>();
+							newCon.add(lastOut);
+							newCon.add(nextIn);
+							connect.add(newCon);
+						}
+					}
+				}
+			} else {
+				// inports and outports are exchanged here
+				for(SDGVertex lastOut : this.getPath().get(i-1).getInports()) {
+					for(SDGVertex nextIn : this.getPath().get(i).getOutports()) {
+						if(g.containsBorderEdge(lastOut, nextIn)) {
+							List<SDGVertex> newCon = new ArrayList<SDGVertex>();
+							newCon.add(lastOut);
+							newCon.add(nextIn);
+							connect.add(newCon);
+						}
 					}
 				}
 			}
@@ -263,7 +279,6 @@ public class ASDGPath {
 			
 			// construct type2 abs path
 			i = i + 1;
-			// TODO : DEBUG RANGE ERROR
 			ASDGPath p2 = new ASDGPath(this.getVertex(i));
 			System.out.println("AbsConcat p2");
 			for(     ; i < this.getPath().size(); i++) {

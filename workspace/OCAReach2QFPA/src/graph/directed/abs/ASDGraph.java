@@ -41,6 +41,22 @@ public class ASDGraph {
 		this.computeAllLoopTag();
 	}
 	
+	public ASDGraph(SDGraph skewSDG, ASDGraph original) {
+		// this is used to get the skew transpose
+		this.setSdg(skewSDG);
+		this.vertices = new ArrayList<ASDGVertex>();
+		
+		this.borderEdges = new ArrayList<BorderEdge>();
+		for(BorderEdge e : original.getBorderEdges()) {
+			BorderEdge newE = new BorderEdge(e.getToVertex(), e.getFromVertex());
+			this.borderEdges.add(newE);
+		}
+		for(ASDGVertex av : original.getVertices()) {
+			ASDGVertex nv = new ASDGVertex(this, av.getSccIndex(), this.getBorderEdges());
+			this.vertices.add(nv);
+		}
+	}
+	
 	//basic operations
 	
 	public ASDGVertex getVertex(int sccIndex) {
@@ -50,13 +66,14 @@ public class ASDGraph {
 			}
 		}
 		System.out.println("ERROR: ASDGVertex " + sccIndex + " not found");
-		System.out.checkError();
+		ASDGVertex vv = null;
+		vv.computeLoopTag();
 		return null;
 	}
 	
 	public Boolean containsBorderEdge(SDGVertex from, SDGVertex to) {
 		for(BorderEdge e : this.getBorderEdges()) {
-			if(e.getFromVertex() == from && e.getToVertex() == to) {
+			if(e.getFromVertex().getVertexIndex() == from.getVertexIndex() && e.getToVertex().getVertexIndex() == to.getVertexIndex()) {
 				return true;
 			}
 		}
@@ -105,10 +122,20 @@ public class ASDGraph {
 	}
 	
 	public ASDGraph getSkewTranspose() {
+		//TODO: MAYBE EASIER?
+		
 		SDGraph skewSdg = this.getSdg().getSkewTranspose();
-		skewSdg.tarjan();
-		ASDGraph sktASG = new ASDGraph(skewSdg);
+		for(SDGVertex v : this.getSdg().getVertices()) {
+			skewSdg.getVertex(v.getVertexIndex()).setSccMark(v.getSccMark());
+		}
+		skewSdg.setSccNum(this.getSdg().getSccNum());
+		/*ASDGraph sktASG = new ASDGraph(skewSdg);
 		return sktASG;
+		*/
+		ASDGraph sktASG = new ASDGraph(skewSdg);
+		//sktASG.getVertex(2);
+		return sktASG;
+		
 	}
 	
 	//TODO: debug
