@@ -134,11 +134,32 @@ public class Converter {
 		// simplification 
 		//resultExpr = (BoolExpr) resultExpr.simplify();
 		// debug:
-		/*BoolExpr equiv = this.getQfpaGen().mkAndBool(
+		/*
+		IntExpr iVar = this.getQfpaGen().mkVariableInt("i");
+		IntExpr jVar = this.getQfpaGen().mkVariableInt("j");
+		List<IntExpr> sum = new ArrayList<IntExpr>(3);
+		sum.add(null);
+		sum.add(null);
+		sum.add(null);
+		sum.set(0, this.getQfpaGen().mkScalarTimes(this.getQfpaGen().mkConstantInt(-2), iVar));
+		sum.set(1, this.getQfpaGen().mkScalarTimes(this.getQfpaGen().mkConstantInt(-1), jVar));
+		sum.set(2, sVar);
+		BoolExpr equiv = this.getQfpaGen().mkAndBool(
+					this.getQfpaGen().mkEqBool(tVar, this.getQfpaGen().sumUpVars(sum)),
+					this.getQfpaGen().mkRequireNonNeg(jVar),
+					this.getQfpaGen().mkRequireNonNeg(iVar),
+					this.getQfpaGen().mkRequireNonNeg(tVar),
+					this.getQfpaGen().mkRequireNonNeg(sVar)
+				);
+		*/
+		BoolExpr equiv = this.getQfpaGen().mkAndBool(
+				this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(0)),
+				this.getQfpaGen().mkRequireNonNeg(tVar),
+				this.getQfpaGen().mkGtBool(tVar, sVar)
 				);
 		resultExpr = this.getQfpaGen().mkAndBool(this.getQfpaGen().getCtx().mkImplies(resultExpr, equiv), this.getQfpaGen().getCtx().mkImplies(equiv, resultExpr));
 		resultExpr = this.getQfpaGen().mkNotBool(resultExpr);
-		*/
+		
 		result = resultExpr.toString();
 		
 		return result;
@@ -671,7 +692,7 @@ public class Converter {
 				for(BorderEdge e : p.getG().getBorderEdgesByAbsEdge(paths[0].getLastVertex().getSccIndex(), 
 																	paths[1].getInit().getSccIndex())) {
 					BoolExpr expr1 = this.genType1Formulae(paths[0], startIndex, e.getFromVertex().getVertexIndex(), startVar, splitVars[0], false);
-					BoolExpr expr2 = this.genType1Formulae(paths[1].getSkewPath(), endIndex, e.getToVertex().getVertexIndex(), endVar, splitVars[1], true);
+					BoolExpr expr2 = this.genType1Formulae(paths[1], e.getToVertex().getVertexIndex(), endIndex, splitVars[1], endVar, true);
 					System.out.println("type1 of type12: " + expr1.toString());
 					System.out.println("type2 of type12: " + expr2.toString());
 					
