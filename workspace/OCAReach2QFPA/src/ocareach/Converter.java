@@ -133,7 +133,14 @@ public class Converter {
 		resultExpr = this.getQfpaGen().mkAndBool(resultExpr, xsXtPosRequirements);
 		// simplification 
 		//resultExpr = (BoolExpr) resultExpr.simplify();
+		// debug:
+		/*BoolExpr equiv = this.getQfpaGen().mkAndBool(
+				);
+		resultExpr = this.getQfpaGen().mkAndBool(this.getQfpaGen().getCtx().mkImplies(resultExpr, equiv), this.getQfpaGen().getCtx().mkImplies(equiv, resultExpr));
+		resultExpr = this.getQfpaGen().mkNotBool(resultExpr);
+		*/
 		result = resultExpr.toString();
+		
 		return result;
 	}
 	
@@ -632,7 +639,7 @@ public class Converter {
 	public List<IntExpr> getAllFlowOutVars(DGVertex v, DGFlowTuple[] flowTuples){
 		List<IntExpr> outVars = new ArrayList<IntExpr>();
 		for(DGFlowTuple t : flowTuples) {
-			if(t.getEdgeTo().getIndex() == v.getIndex()) {
+			if(t.getEdgeFrom().getIndex() == v.getIndex()) {
 				outVars.add(t.getEdgeVar());
 			}
 		}
