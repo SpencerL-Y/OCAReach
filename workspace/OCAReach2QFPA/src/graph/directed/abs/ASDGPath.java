@@ -296,23 +296,30 @@ public class ASDGPath {
 			int i = 1;
 
 			System.out.println("AbsConcat p1");
+			System.out.print(p1.getInit().getSccIndex());
 			for(i = 1; i < this.getPath().size() && this.getVertex(i).getSccIndex() != splitVertices[0].getSccIndex(); i ++) {
 				p1.concatVertex(this.getVertex(i));
+				System.out.print(this.getVertex(i).getSccIndex());
 			}
-
-			System.out.println("AbsConcat p3");
+			
+			System.out.println();
 			ASDGPath p3 = new ASDGPath(splitVertices[0]);
+			System.out.println("AbsConcat p3");
+			System.out.print(p3.getInit().getSccIndex());
 			for(     ; i < this.getPath().size() && this.getVertex(i).getSccIndex() != splitVertices[1].getSccIndex(); i++) {
 				if(this.getVertex(i).getSccIndex() != splitVertices[0].getSccIndex()) {
 					p3.concatVertex(this.getVertex(i));
+
+					
 				}
 			}
 			
 			if(i < this.getPath().size()) {
 				// if the last vertex is not added to type 3 path
 				p3.concatVertex(this.getVertex(i));
+				System.out.print(this.getVertex(i).getSccIndex());
 			}
-			
+			System.out.println();
 			assert(i == this.length());
 			ASDGPath p2 = null;
 			
@@ -434,9 +441,11 @@ public class ASDGPath {
 			for(SDGVertex vo1 : last.getOutports()) {
 				for(SDGVertex vi1 : now.getInports()) {
 					if(this.getG().containsBorderEdge(vo1, vi1)) {
+						System.out.println("LINKLINKLINK");
 						SDGVertex[] inouts = new SDGVertex[2];
 						inouts[0] = vo1;
 						inouts[1] = vi1;
+						list.add(inouts);
 					}
 				}
 			}
@@ -457,6 +466,7 @@ public class ASDGPath {
 						SDGVertex[] inouts = new SDGVertex[2];
 						inouts[0] = vo2;
 						inouts[1] = vi2;
+						list.add(inouts);
 					}
 				}
 			}

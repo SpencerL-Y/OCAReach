@@ -134,29 +134,33 @@ public class Converter {
 		// simplification 
 		//resultExpr = (BoolExpr) resultExpr.simplify();
 		// debug:
-		/*
+		
 		IntExpr iVar = this.getQfpaGen().mkVariableInt("i");
 		IntExpr jVar = this.getQfpaGen().mkVariableInt("j");
 		List<IntExpr> sum = new ArrayList<IntExpr>(3);
 		sum.add(null);
 		sum.add(null);
 		sum.add(null);
-		sum.set(0, this.getQfpaGen().mkScalarTimes(this.getQfpaGen().mkConstantInt(-2), iVar));
+		sum.set(0, this.getQfpaGen().mkScalarTimes(this.getQfpaGen().mkConstantInt(2), iVar));
 		sum.set(1, this.getQfpaGen().mkScalarTimes(this.getQfpaGen().mkConstantInt(-1), jVar));
 		sum.set(2, sVar);
-		BoolExpr equiv = this.getQfpaGen().mkAndBool(
-					this.getQfpaGen().mkEqBool(tVar, this.getQfpaGen().sumUpVars(sum)),
-					this.getQfpaGen().mkRequireNonNeg(jVar),
+		IntExpr[] bounds = new IntExpr[2];
+		bounds[0] = iVar;
+		bounds[1] = jVar;
+		BoolExpr equiv = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(bounds,
+					this.getQfpaGen().mkAndBool(
+							this.getQfpaGen().mkEqBool(tVar, this.getQfpaGen().sumUpVars(sum)),
+							this.getQfpaGen().mkRequireNonNeg(jVar),
 					this.getQfpaGen().mkRequireNonNeg(iVar),
 					this.getQfpaGen().mkRequireNonNeg(tVar),
 					this.getQfpaGen().mkRequireNonNeg(sVar)
-				);
-		*/
-		BoolExpr equiv = this.getQfpaGen().mkAndBool(
+				));
+		
+		/*BoolExpr equiv = this.getQfpaGen().mkAndBool(
 				this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(0)),
 				this.getQfpaGen().mkRequireNonNeg(tVar),
 				this.getQfpaGen().mkGtBool(tVar, sVar)
-				);
+				);*/
 		resultExpr = this.getQfpaGen().mkAndBool(this.getQfpaGen().getCtx().mkImplies(resultExpr, equiv), this.getQfpaGen().getCtx().mkImplies(equiv, resultExpr));
 		resultExpr = this.getQfpaGen().mkNotBool(resultExpr);
 		
@@ -230,7 +234,7 @@ public class Converter {
 		}
 		
 		BoolExpr type1FormBody = this.getQfpaGen().mkFalse();
-		for(List<SDGVertex> l : allPossibleInOut) {System.out.println("HERERERERE " );
+		for(List<SDGVertex> l : allPossibleInOut) {
 			System.out.println("ALL INOUTS layer 2: " );
 			for(int i = 0; i < l.size(); i++) {
 				System.out.print(l.get(i).getVertexIndex());
@@ -679,7 +683,6 @@ public class Converter {
 		splitVars[1] = this.getQfpaGen().mkVariableInt("vs_2");
 		boolean hasBorder = false;
 		BoolExpr type12Form = this.getQfpaGen().mkFalse();
-		System.out.println("HERERERERERERERERERER" + posVertices.get(0).getSccIndex());
 		for(ASDGVertex v : posVertices) {
 			ASDGPath[] paths = p.splitPathAt(v);
 
@@ -716,7 +719,7 @@ public class Converter {
 			} else {
 				// if there is no type1 path
 				type12Form = this.genType1Formulae(paths[1], startIndex, endIndex, startVar, endVar, true);
-				System.out.println("HERERERERERERERERERER" + " path 0 is null: " + (paths[0] == null));
+				System.out.println(" path 0 is null: " + (paths[0] == null));
 				System.out.println("type2 of type12 : " + type12Form.toString());
 			}
 		}
@@ -749,11 +752,14 @@ public class Converter {
 		splitVars32[1] = fullSplitVars[3];
 		
 		for(ASDGVertex[] s : splitVertices) {
+			System.out.println("HERERERERE " );
+			System.out.println("split Vertices form gen: " + s[0].getSccIndex() + " & " + s[1].getSccIndex());
 			ASDGPath[] paths = p.getAllType132SplitPaths(s);
 			BoolExpr portForm = this.getQfpaGen().mkTrue();
 			assert(paths[1] != null);
 			if(paths[0] != null && paths[1] != null && paths[2] != null) {
 				//132
+				System.out.println("subtype 132 gen");
 				for(SDGVertex[] inouts : p.getType132LinkInportOutport(s)) {
 					portForm = this.getQfpaGen().mkAndBool(
 							this.genType1Formulae(paths[0], startIndex, inouts[0].getVertexIndex(), startVar, fullSplitVars[0], false),
@@ -775,8 +781,8 @@ public class Converter {
 							)
 							
 					);
+					type132Form = this.getQfpaGen().mkOrBool(portForm, type132Form);
 				}
-				type132Form = this.getQfpaGen().mkOrBool(portForm, type132Form);
 				type132Form = this.getQfpaGen().mkAndBool(
 						type132Form,
 						this.genVarNonNegRequirement(fullSplitVars)
@@ -784,7 +790,10 @@ public class Converter {
 				type132Form = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(fullSplitVars, type132Form);
 			} else if(paths[0] != null && paths[2] == null) {
 				//13
+				System.out.println("subtype 13 gen");System.out.println("HERERERERE 13 " + p.getType132LinkInportOutport(s).size());
 				for(SDGVertex[] inouts : p.getType132LinkInportOutport(s)) {
+
+					System.out.println("HERERERERE 13" );
 					portForm = this.getQfpaGen().mkAndBool(
 							this.genType1Formulae(paths[0], startIndex, inouts[0].getVertexIndex(), startVar, splitVars13[0], false),
 							this.genType3Formula(paths[1], inouts[1].getVertexIndex(), endIndex, splitVars13[1], endVar),
@@ -796,8 +805,8 @@ public class Converter {
 									)
 							)
 					);
+					type132Form = this.getQfpaGen().mkOrBool(portForm, type132Form);
 				}
-				type132Form = this.getQfpaGen().mkOrBool(portForm, type132Form);
 				type132Form = this.getQfpaGen().mkAndBool(
 						type132Form,
 						this.genVarNonNegRequirement(splitVars13)
@@ -805,6 +814,7 @@ public class Converter {
 				type132Form = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(splitVars13, type132Form);
 			} else if(paths[0] == null && paths[2] != null) {
 				//32
+				System.out.println("subtype 32 gen");
 				for(SDGVertex[] inouts : p.getType132LinkInportOutport(s)) {
 					portForm = this.getQfpaGen().mkAndBool(
 							this.genType3Formula(paths[1], startIndex, inouts[0].getVertexIndex(), startVar, splitVars32[0]),
@@ -817,8 +827,8 @@ public class Converter {
 									)
 							)
 					);
+					type132Form = this.getQfpaGen().mkOrBool(portForm, type132Form);
 				}
-				type132Form = this.getQfpaGen().mkOrBool(portForm, type132Form);
 				type132Form = this.getQfpaGen().mkAndBool(
 						type132Form,
 						this.genVarNonNegRequirement(splitVars32)
@@ -827,6 +837,7 @@ public class Converter {
 			} else {
 				assert(paths[0] == null && paths[2] == null);
 				//3
+				System.out.println("subtype 3 gen");
 				portForm = this.genType3Formula(paths[1], startIndex, endIndex, startVar, endVar);
 				type132Form = (BoolExpr) portForm;
 			}
