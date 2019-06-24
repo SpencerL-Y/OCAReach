@@ -134,7 +134,7 @@ public class Converter {
 		// simplification 
 		//resultExpr = (BoolExpr) resultExpr.simplify();
 		// debug:
-		
+		/*
 		IntExpr iVar = this.getQfpaGen().mkVariableInt("i");
 		IntExpr jVar = this.getQfpaGen().mkVariableInt("j");
 		List<IntExpr> sum = new ArrayList<IntExpr>(3);
@@ -156,13 +156,13 @@ public class Converter {
 					this.getQfpaGen().mkRequireNonNeg(sVar)
 				));
 		
-		/*BoolExpr equiv = this.getQfpaGen().mkAndBool(
+		BoolExpr equiv = this.getQfpaGen().mkAndBool(
 				this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(0)),
 				this.getQfpaGen().mkRequireNonNeg(tVar),
 				this.getQfpaGen().mkGtBool(tVar, sVar)
-				);*/
+				);
 		resultExpr = this.getQfpaGen().mkAndBool(this.getQfpaGen().getCtx().mkImplies(resultExpr, equiv), this.getQfpaGen().getCtx().mkImplies(equiv, resultExpr));
-		resultExpr = this.getQfpaGen().mkNotBool(resultExpr);
+		resultExpr = this.getQfpaGen().mkNotBool(resultExpr);*/
 		
 		result = resultExpr.toString();
 		
@@ -848,7 +848,7 @@ public class Converter {
 	public BoolExpr genVarNonNegRequirement(IntExpr[] vars) {
 		BoolExpr result = this.getQfpaGen().mkTrue();
 		for(IntExpr var : vars) {
-			this.getQfpaGen().mkAndBool(
+			result = this.getQfpaGen().mkAndBool(
 					result,
 					this.getQfpaGen().mkGeBool(var, this.getQfpaGen().mkConstantInt(0))
 			);
@@ -873,14 +873,18 @@ public class Converter {
 		BoolExpr startPosTemp = this.getQfpaGen().mkFalse();
 		BoolExpr endPosTemp = this.getQfpaGen().mkFalse();
 		for(DGVertex vms : p3Graph.getVertices()) {
+			System.out.println("vms");
 			startPosTemp = this.getQfpaGen().mkOrBool(startPosTemp, this.genPosCycleTemplateFormula(p3Graph, startIndex, vms.getIndex(), startVar, startMidVar));
 		}
 		for(DGVertex vme : p3SkewGraph.getVertices()) {
+			System.out.println("vme");
 			endPosTemp = this.getQfpaGen().mkOrBool(endPosTemp, this.genPosCycleTemplateFormula(p3SkewGraph, endIndex, vme.getIndex(), endVar, endMidVar));
 		}
 		BoolExpr posTemp = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(boundVars, this.getQfpaGen().mkAndBool(
-																											startPosTemp, endPosTemp,
-																											this.genVarNonNegRequirement(boundVars)));
+																											startPosTemp, 
+																											endPosTemp,
+																											this.genVarNonNegRequirement(boundVars))
+																										);
 		BoolExpr pathFlow = this.genPathFlowFormula(p3Graph, startIndex, endIndex, startVar, endVar);
 		BoolExpr result = this.getQfpaGen().mkAndBool(
 				posTemp, 
@@ -910,7 +914,7 @@ public class Converter {
 	//TODO: formula for postive cycle template
 	
 	public BoolExpr genPosCycleTemplateFormula(DGraph g, int startIndex, int guessIndex, IntExpr startVar, IntExpr guessVar) {
-		//TODO: debug
+		//TODO: DEBUG REDUNDANT 
 		// desciption: return the possible positive cycle template with the minimum drop, if none return null
 		assert(g.containsVertex(startIndex) && g.containsVertex(guessIndex));
 		if(g.getTag() == null) {
@@ -937,7 +941,6 @@ public class Converter {
 				}
 			}
 		}
-		
 		return form;
 	}
 	

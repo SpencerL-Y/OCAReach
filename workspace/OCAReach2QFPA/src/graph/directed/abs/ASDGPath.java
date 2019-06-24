@@ -441,7 +441,6 @@ public class ASDGPath {
 			for(SDGVertex vo1 : last.getOutports()) {
 				for(SDGVertex vi1 : now.getInports()) {
 					if(this.getG().containsBorderEdge(vo1, vi1)) {
-						System.out.println("LINKLINKLINK");
 						SDGVertex[] inouts = new SDGVertex[2];
 						inouts[0] = vo1;
 						inouts[1] = vi1;
