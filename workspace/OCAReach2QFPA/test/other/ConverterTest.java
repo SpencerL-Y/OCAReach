@@ -223,6 +223,7 @@ public class ConverterTest {
 		oca.addTransition(1, OCAOp.Sub, 2);
 		oca.addTransition(1, OCAOp.Add, 3);
 		oca.addTransition(3, OCAOp.Add, 1);
+		oca.addTransition(2, OCAOp.Sub, 2);
 		oca.setInitIndex(0);
 		oca.setTargetIndex(2);
 		/*

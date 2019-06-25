@@ -136,29 +136,30 @@ public class Converter {
 		// debug:
 		
 		IntExpr iVar = this.getQfpaGen().mkVariableInt("i");
-		//IntExpr jVar = this.getQfpaGen().mkVariableInt("j");
-		List<IntExpr> sum = new ArrayList<IntExpr>(2);
+		IntExpr jVar = this.getQfpaGen().mkVariableInt("j");
+		List<IntExpr> sum = new ArrayList<IntExpr>(3);
 		sum.add(null);
 		sum.add(null);
-		//sum.add(null);
-		sum.set(0, this.getQfpaGen().mkScalarTimes(this.getQfpaGen().mkConstantInt(4), iVar));
-		//sum.set(1, this.getQfpaGen().mkScalarTimes(this.getQfpaGen().mkConstantInt(-2), jVar));
-		sum.set(1, sVar);
-		IntExpr[] bounds = new IntExpr[1];
+		sum.add(null);
+		sum.set(0, this.getQfpaGen().mkScalarTimes(this.getQfpaGen().mkConstantInt(2), iVar));
+		sum.set(1, this.getQfpaGen().mkScalarTimes(this.getQfpaGen().mkConstantInt(-1), jVar));
+		sum.set(2, sVar);
+		IntExpr[] bounds = new IntExpr[2];
 		bounds[0] = iVar;
-		//bounds[1] = jVar;
+		bounds[1] = jVar;
 		BoolExpr equiv = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(bounds,
 					this.getQfpaGen().mkAndBool(
 							this.getQfpaGen().mkEqBool(tVar, this.getQfpaGen().mkSubInt(this.getQfpaGen().sumUpVars(sum), this.getQfpaGen().mkConstantInt(2))),
 					this.getQfpaGen().mkRequireNonNeg(iVar),
 					this.getQfpaGen().mkRequireNonNeg(tVar),
-					this.getQfpaGen().mkRequireNonNeg(sVar)
+					this.getQfpaGen().mkRequireNonNeg(sVar),
+					this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(1))
 				));
-		
-		/*BoolExpr equiv = this.getQfpaGen().mkAndBool(
-				this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(0)),
+		/*
+		BoolExpr equiv = this.getQfpaGen().mkAndBool(
+				this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(1)),
 				this.getQfpaGen().mkRequireNonNeg(tVar),
-				this.getQfpaGen().mkGtBool(tVar, sVar)
+				this.getQfpaGen().mkGeBool(tVar, this.getQfpaGen().mkSubInt(sVar, this.getQfpaGen().mkConstantInt(2)))
 				);*/
 		resultExpr = this.getQfpaGen().mkAndBool(this.getQfpaGen().getCtx().mkImplies(resultExpr, equiv), this.getQfpaGen().getCtx().mkImplies(equiv, resultExpr));
 		resultExpr = this.getQfpaGen().mkNotBool(resultExpr);
@@ -789,10 +790,8 @@ public class Converter {
 				type132Form = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(fullSplitVars, type132Form);
 			} else if(paths[0] != null && paths[2] == null) {
 				//13
-				System.out.println("subtype 13 gen");System.out.println("HERERERERE 13 " + p.getType132LinkInportOutport(s).size());
+				System.out.println("subtype 13 gen");
 				for(SDGVertex[] inouts : p.getType132LinkInportOutport(s)) {
-
-					System.out.println("HERERERERE 13" );
 					portForm = this.getQfpaGen().mkAndBool(
 							this.genType1Formulae(paths[0], startIndex, inouts[0].getVertexIndex(), startVar, splitVars13[0], false),
 							this.genType3Formula(paths[1], inouts[1].getVertexIndex(), endIndex, splitVars13[1], endVar),
