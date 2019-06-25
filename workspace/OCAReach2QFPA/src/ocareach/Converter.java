@@ -111,7 +111,7 @@ public class Converter {
 				System.out.println(type12Form.toString());
 			}
 			if(type132) {
-				System.out.println("TYPE 132 layer1:");
+				System.out.println("TYPE 132 layer 1:");
 				type132Form = this.genType132Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar);
 				System.out.println("TYPE 132 Formula: ");
 				System.out.println(type132Form.toString());
@@ -134,35 +134,34 @@ public class Converter {
 		// simplification 
 		//resultExpr = (BoolExpr) resultExpr.simplify();
 		// debug:
-		/*
+		
 		IntExpr iVar = this.getQfpaGen().mkVariableInt("i");
-		IntExpr jVar = this.getQfpaGen().mkVariableInt("j");
-		List<IntExpr> sum = new ArrayList<IntExpr>(3);
+		//IntExpr jVar = this.getQfpaGen().mkVariableInt("j");
+		List<IntExpr> sum = new ArrayList<IntExpr>(2);
 		sum.add(null);
 		sum.add(null);
-		sum.add(null);
-		sum.set(0, this.getQfpaGen().mkScalarTimes(this.getQfpaGen().mkConstantInt(2), iVar));
-		sum.set(1, this.getQfpaGen().mkScalarTimes(this.getQfpaGen().mkConstantInt(-1), jVar));
-		sum.set(2, sVar);
-		IntExpr[] bounds = new IntExpr[2];
+		//sum.add(null);
+		sum.set(0, this.getQfpaGen().mkScalarTimes(this.getQfpaGen().mkConstantInt(4), iVar));
+		//sum.set(1, this.getQfpaGen().mkScalarTimes(this.getQfpaGen().mkConstantInt(-2), jVar));
+		sum.set(1, sVar);
+		IntExpr[] bounds = new IntExpr[1];
 		bounds[0] = iVar;
-		bounds[1] = jVar;
+		//bounds[1] = jVar;
 		BoolExpr equiv = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(bounds,
 					this.getQfpaGen().mkAndBool(
-							this.getQfpaGen().mkEqBool(tVar, this.getQfpaGen().sumUpVars(sum)),
-							this.getQfpaGen().mkRequireNonNeg(jVar),
+							this.getQfpaGen().mkEqBool(tVar, this.getQfpaGen().mkSubInt(this.getQfpaGen().sumUpVars(sum), this.getQfpaGen().mkConstantInt(2))),
 					this.getQfpaGen().mkRequireNonNeg(iVar),
 					this.getQfpaGen().mkRequireNonNeg(tVar),
 					this.getQfpaGen().mkRequireNonNeg(sVar)
 				));
 		
-		BoolExpr equiv = this.getQfpaGen().mkAndBool(
+		/*BoolExpr equiv = this.getQfpaGen().mkAndBool(
 				this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(0)),
 				this.getQfpaGen().mkRequireNonNeg(tVar),
 				this.getQfpaGen().mkGtBool(tVar, sVar)
-				);
+				);*/
 		resultExpr = this.getQfpaGen().mkAndBool(this.getQfpaGen().getCtx().mkImplies(resultExpr, equiv), this.getQfpaGen().getCtx().mkImplies(equiv, resultExpr));
-		resultExpr = this.getQfpaGen().mkNotBool(resultExpr);*/
+		resultExpr = this.getQfpaGen().mkNotBool(resultExpr);
 		
 		result = resultExpr.toString();
 		
