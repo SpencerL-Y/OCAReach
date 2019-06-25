@@ -922,26 +922,32 @@ public class Converter {
 		}
 		BoolExpr form = this.getQfpaGen().mkFalse();
 		DWTEntry startToGuessEntry = g.getTable().getEntry(startIndex, guessIndex);
+		int maxDrop = -2*g.getVertices().size() - 1;
+		BoolExpr maxForm = this.getQfpaGen().mkFalse();
 		if(startToGuessEntry != null) {
+			System.out.println("Start entry size: " + startToGuessEntry.getSetOfDWTuples().size());
 			for(DWTuple t : startToGuessEntry.getSetOfDWTuples()) {
 				DWTEntry guessLoopEntry = g.getTable().getEntry(guessIndex, guessIndex);
 				if(guessLoopEntry != null) {
+					System.out.println("Guess loop entry size: " + guessLoopEntry.getSetOfDWTuples().size());
+					List<Integer> weightMem = new ArrayList<Integer>();
 					for(DWTuple tg : guessLoopEntry.getSetOfDWTuples()) {
 						if(tg.getWeight() > 0) {
 							int drop = Math.min(t.getDrop(), tg.getDrop() + t.getWeight());
-							form = this.getQfpaGen().mkOrBool(
-								form,
-								this.getQfpaGen().mkAndBool(
+							form = this.getQfpaGen().mkAndBool(
 									this.getQfpaGen().mkGeBool(this.getQfpaGen().mkAddInt(startVar, this.getQfpaGen().mkConstantInt(drop)), this.getQfpaGen().mkConstantInt(0)),
 									this.getQfpaGen().mkEqBool(this.getQfpaGen().mkAddInt(startVar, this.getQfpaGen().mkConstantInt(t.getWeight())), guessVar)
-								)
 							);
+							if(drop > maxDrop) {
+								maxDrop = drop;
+								maxForm = form;
+							}
 						} 
 					}
 				}
 			}
 		}
-		return form;
+		return maxForm;
 	}
 	
 	public BoolExpr combineAllFormlae(BoolExpr type1, BoolExpr type12, BoolExpr type132) {
