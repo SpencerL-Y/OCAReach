@@ -6,6 +6,8 @@ import java.util.List;
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.IntExpr;
+import com.microsoft.z3.Solver;
+import com.microsoft.z3.Status;
 
 import automata.State;
 import automata.counter.OCA;
@@ -95,26 +97,26 @@ public class Converter {
 			if(trivial) {
 				System.out.println("TYPE TRIVIAL layer1:");
 				trivialForm = this.genTrivialFormula(p);
-				System.out.println("TRIVIAL Formula: ");
-				System.out.println(trivialForm.toString());
+				//System.out.println("TRIVIAL Formula: ");
+				//System.out.println(trivialForm.toString());
 			}
 			if(type1 && !trivial) {
 				System.out.println("TYPE 1 layer 1:");
 				type1Form = this.genType1Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar, false);
-				System.out.println("TYPE1 Formula: ");
-				System.out.println(type1Form.toString());
+				//System.out.println("TYPE1 Formula: ");
+				//System.out.println(type1Form.toString());
 			}
 			if(type12) {
 				System.out.println("TYPE 12 layer 1:");
 				type12Form = this.genType12Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar);
-				System.out.println("TYPE 12 Formula: ");
-				System.out.println(type12Form.toString());
+				//System.out.println("TYPE 12 Formula: ");
+				//System.out.println(type12Form.toString());
 			}
 			if(type132) {
 				System.out.println("TYPE 132 layer 1:");
 				type132Form = this.genType132Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar);
-				System.out.println("TYPE 132 Formula: ");
-				System.out.println(type132Form.toString());
+				//System.out.println("TYPE 132 Formula: ");
+				//System.out.println(type132Form.toString());
 			}
 			BoolExpr temp = (trivial)? trivialForm : this.combineAllFormlae(type1Form, type12Form, type132Form);
 			formulae.add(temp);
@@ -130,47 +132,60 @@ public class Converter {
 					this.getQfpaGen().mkRequireNonNeg(sVar),
 					this.getQfpaGen().mkRequireNonNeg(tVar)
 		);
-		resultExpr = this.getQfpaGen().mkAndBool(resultExpr, xsXtPosRequirements);
-		// simplification 
-		//resultExpr = (BoolExpr) resultExpr.simplify();
-		// debug:
+		resultExpr = this.getQfpaGen().mkAndBool(resultExpr, xsXtPosRequirements);	
+		// /*----------------------EQUIV DEBUG-----------------------
+		resultExpr = this.equivDebug(sVar, tVar, resultExpr);
 		
-		IntExpr iVar = this.getQfpaGen().mkVariableInt("i");
-		IntExpr jVar = this.getQfpaGen().mkVariableInt("j");
-		List<IntExpr> sum = new ArrayList<IntExpr>(3);
-		sum.add(null);
-		sum.add(null);
-		sum.add(null);
-		sum.set(0, this.getQfpaGen().mkScalarTimes(this.getQfpaGen().mkConstantInt(2), iVar));
-		sum.set(1, this.getQfpaGen().mkScalarTimes(this.getQfpaGen().mkConstantInt(-2), jVar));
-		sum.set(2, sVar);
-		IntExpr[] bounds = new IntExpr[2];
-		bounds[0] = iVar;
-		bounds[1] = jVar;
-		BoolExpr equiv = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(bounds,
-					this.getQfpaGen().mkAndBool(
-							this.getQfpaGen().mkEqBool(tVar, this.getQfpaGen().mkSubInt(this.getQfpaGen().sumUpVars(sum), this.getQfpaGen().mkConstantInt(2))),
-					this.getQfpaGen().mkRequireNonNeg(iVar),
-					this.getQfpaGen().mkRequireNonNeg(tVar),
-					this.getQfpaGen().mkRequireNonNeg(sVar)
-					//this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(1))
-				));
-		/*
-		BoolExpr equiv = this.getQfpaGen().mkAndBool(
-				this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(1)),
-				this.getQfpaGen().mkGeBool(tVar, this.getQfpaGen().mkConstantInt(1)),
-				this.getQfpaGen().mkRequireNonNeg(tVar)
-				//this.getQfpaGen().mkGeBool(tVar, this.getQfpaGen().mkSubInt(sVar, this.getQfpaGen().mkConstantInt(2)))
-				);*/
-		resultExpr = this.getQfpaGen().mkAndBool(this.getQfpaGen().getCtx().mkImplies(resultExpr, equiv), this.getQfpaGen().getCtx().mkImplies(equiv, resultExpr));
-		resultExpr = this.getQfpaGen().mkNotBool(resultExpr);
-		
-		result = resultExpr.toString();
-		
-		return result;
+		result = resultExpr.simplify().toString();
+		Solver solver = this.getQfpaGen().getCtx().mkSolver();
+		solver.add((BoolExpr)resultExpr.simplify());
+		String solveResult = null;
+		if(solver.check() == Status.UNSATISFIABLE) {
+			solveResult = "\n UNSAT";
+		} else {
+			solveResult = "\n SAT \n" + solver.getModel().toString();
+		}
+		// --------------------------------------------------------*/
+		return (solveResult == null) ? result : result + solveResult;
 	}
 	
-
+	public BoolExpr equivDebug(IntExpr sVar, IntExpr tVar, BoolExpr tempResult) {
+		// simplification 
+				//resultExpr = (BoolExpr) resultExpr.simplify();
+				// debug:
+				BoolExpr resultExpr = null;
+				IntExpr iVar = this.getQfpaGen().mkVariableInt("i");
+				IntExpr jVar = this.getQfpaGen().mkVariableInt("j");
+				List<IntExpr> sum = new ArrayList<IntExpr>(3);
+				sum.add(null);
+				sum.add(null);
+				sum.add(null);
+				sum.set(0, this.getQfpaGen().mkScalarTimes(this.getQfpaGen().mkConstantInt(2), iVar));
+				sum.set(1, this.getQfpaGen().mkScalarTimes(this.getQfpaGen().mkConstantInt(-4), jVar));
+				sum.set(2, sVar);
+				IntExpr[] bounds = new IntExpr[2];
+				bounds[0] = iVar;
+				bounds[1] = jVar;
+				/*BoolExpr equiv = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(bounds,
+							this.getQfpaGen().mkAndBool(
+									this.getQfpaGen().mkEqBool(tVar, this.getQfpaGen().mkSubInt(this.getQfpaGen().sumUpVars(sum), this.getQfpaGen().mkConstantInt(2))),
+							this.getQfpaGen().mkRequireNonNeg(iVar),
+							this.getQfpaGen().mkRequireNonNeg(tVar),
+							this.getQfpaGen().mkRequireNonNeg(sVar)
+							//this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(1))
+						));
+				*/
+				BoolExpr equiv = this.getQfpaGen().mkAndBool(
+						this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(2)),
+						this.getQfpaGen().mkGeBool(tVar, this.getQfpaGen().mkConstantInt(0)),
+						this.getQfpaGen().mkRequireNonNeg(tVar),
+						this.getQfpaGen().mkGeBool(this.getQfpaGen().mkSubInt(sVar, this.getQfpaGen().mkConstantInt(2)), tVar)
+						//this.getQfpaGen().mkGeBool(tVar, this.getQfpaGen().mkSubInt(sVar, this.getQfpaGen().mkConstantInt(2)))
+						);
+				resultExpr = this.getQfpaGen().mkAndBool(this.getQfpaGen().getCtx().mkImplies(tempResult, equiv), this.getQfpaGen().getCtx().mkImplies(equiv, tempResult));
+				resultExpr = this.getQfpaGen().mkNotBool(resultExpr);
+				return resultExpr;
+	}
 	
 	public BoolExpr genTrivialFormula(ASDGPath p) {
 		//TODO debug
@@ -304,51 +319,19 @@ public class Converter {
 		return (BoolExpr) type1Form;
 	}
 	
-	//TODO: debug
-	//TODO: imple add variable positive requirement
+
 	public List<BoolExpr> genAbsStateNoPosCycle(ASDGVertex v, SDGVertex inport, SDGVertex outport, 
 														   BorderEdge in, BorderEdge out, 
 														   IntExpr thisInVar,  IntExpr thisOutVar,
 														   IntExpr lastOutVar, IntExpr nextInVar, boolean isSkew) {
 		System.out.println("ABS STATE layer 2.5: " + v.getSccIndex());
-		//TODO: imple add special case the start vertex and the end vertex
 		assert(v.containIndex(inport.getVertexIndex()) && v.containIndex(outport.getVertexIndex()));
 		assert(thisInVar != null && thisOutVar != null && v != null);
 		return this.type1ConcreteGraphPathFormula(v, inport, outport, in, out, thisInVar, thisOutVar, lastOutVar, nextInVar, isSkew);
-		/*if(in == null && out != null && lastOutVar == null && nextInVar != null) {
-			// start absVertex
-			return this.type1ConcreteGraphPathFormula(v, inport, outport, in, out, thisInVar, thisOutVar, lastOutVar, nextInVar, isSkew);
-		} else if(in != null && out == null && nextInVar == null && lastOutVar != null) {
-			// end absVertex
-			//System.out.println("edge:" + in.getFromVertex().getVertexIndex() + " to " + in.getToVertex().getVertexIndex());
-			//System.out.println("thisInVar: " + thisInVar.toString() + " thisOutVar: " + thisOutVar.toString() );
-			//System.out.println("lastOutVar: " + lastOutVar.toString() + " nextInVar: " + nextInVar.toString() );
-			return this.type1ConcreteGraphPathFormula(v, inport, outport, in, out, thisInVar, thisOutVar, lastOutVar, nextInVar, isSkew);
-		} else {
-			assert(in != null && out != null && nextInVar != null && lastOutVar != null);
-			/*System.out.println("in is null:" + (in == null));
-			System.out.println("out is null:" + (out == null));
-			System.out.println("nextIn is null:" + (nextInVar == null));
-			System.out.println("lastOut is null:" + (lastOutVar == null));*/
-			// other absVertex
-			/*System.out.println("edge:" + in.getFromVertex().getVertexIndex() + " to " + in.getToVertex().getVertexIndex());
-			System.out.println("thisInVar: " + thisInVar.toString() + " thisOutVar: " + thisOutVar.toString() );
-			System.out.println("lastOutVar: " + lastOutVar.toString() + " nextInVar: " + nextInVar.toString() );
-			return this.type1ConcreteGraphPathFormula(v, inport, outport, in, out, thisInVar, thisOutVar, lastOutVar, nextInVar, isSkew);
-		}*/
 	}
-	
-	
-	
-	
-	//TODO: debug
-	
+
 	public BoolExpr vertexBorderEdgeWeightAndDropRequirements(BorderEdge in, BorderEdge out, IntExpr thisInVar, IntExpr thisOutVar,
 																							 IntExpr lastOutVar, IntExpr nextInVar) {
-		//System.out.println("vertexBorderFunc: ");
-		//System.out.println(" in is null: " + (in == null) + " out is null: " + (out == null )+ "\n thisInVar is null: " + (thisInVar == null) 
-		//	 + " thisOutVar is null: " + (thisOutVar == null) + " lastOutVar is null: " + (lastOutVar == null)
-		//	 + "\n nextInVar is null: " + (nextInVar == null));
 		if(in == null && out == null && lastOutVar == null && nextInVar == null) {
 			return this.singleAbsStateBorderEdgeWeightAndDropRequirements();
 		} else if(in == null && lastOutVar == null) {
@@ -366,8 +349,7 @@ public class Converter {
 		BoolExpr result = this.getQfpaGen().mkTrue();
 		return result;
 	}
-	
-	//TODO: debug
+
 	public BoolExpr startVertexBorderEdgeWeigthAndDropRequirements(BorderEdge out, 
 																	IntExpr thisInVar, IntExpr thisOutVar,
 																	IntExpr nextInVar) {
@@ -376,7 +358,7 @@ public class Converter {
 					this.getQfpaGen().mkConstantInt(out.getWeight()));
 		return formula;
 	}
-	//TODO: debug
+
 	public BoolExpr endVertexBorderEdgeWeightAndDropRequirements(BorderEdge in,
 																  IntExpr thisInVar, IntExpr thisOutVar,
 																  IntExpr lastOutVar) {
@@ -385,21 +367,20 @@ public class Converter {
 					this.getQfpaGen().mkConstantInt(in.getWeight()));
 		return formula;
 	}
-	
-	//TODO: debug
-		public BoolExpr midBorderEdgeWeightAndDropRequirements(BorderEdge in, BorderEdge out, 
+
+	public BoolExpr midBorderEdgeWeightAndDropRequirements(BorderEdge in, BorderEdge out, 
 														IntExpr thisInVar, IntExpr thisOutVar, 
 														IntExpr lastOutVar, IntExpr nextInVar) {
-			BoolExpr formula = this.getQfpaGen().mkAndBool(
-					// border edge weight add correctly
-					this.getQfpaGen().mkEqBool(
-						this.getQfpaGen().mkSubInt(thisInVar, lastOutVar), 
-						this.getQfpaGen().mkConstantInt(in.getWeight())),
-					// border edge weight add correctly
-					//TODO: the formula can be redundant here
-					this.getQfpaGen().mkEqBool(
-						this.getQfpaGen().mkSubInt(nextInVar, thisOutVar), 
-						this.getQfpaGen().mkConstantInt(out.getWeight()))
+		BoolExpr formula = this.getQfpaGen().mkAndBool(
+			// border edge weight add correctly
+			this.getQfpaGen().mkEqBool(
+					this.getQfpaGen().mkSubInt(thisInVar, lastOutVar), 
+					this.getQfpaGen().mkConstantInt(in.getWeight())
+			),
+			//TODO: the formula can be redundant here
+			this.getQfpaGen().mkEqBool(
+					this.getQfpaGen().mkSubInt(nextInVar, thisOutVar), 
+					this.getQfpaGen().mkConstantInt(out.getWeight()))
 			);
 			return formula;
 		}
