@@ -106,7 +106,6 @@ public class ASDGPath {
 	public ASDGPath getSkewPath() {
 		ASDGraph skewASDG = this.getG().getSkewTranspose();
 		ASDGPath skewP = new ASDGPath(skewASDG.getVertex(this.getLastVertex().getSccIndex()));
-		skewASDG.getVertex(2);
 		skewP.setG(skewASDG);
 		
 		for(int i = this.getPath().size()-2; i >= 0; i--) {

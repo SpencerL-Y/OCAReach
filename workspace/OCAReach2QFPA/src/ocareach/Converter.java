@@ -142,7 +142,7 @@ public class Converter {
 		sum.add(null);
 		sum.add(null);
 		sum.set(0, this.getQfpaGen().mkScalarTimes(this.getQfpaGen().mkConstantInt(2), iVar));
-		sum.set(1, this.getQfpaGen().mkScalarTimes(this.getQfpaGen().mkConstantInt(-1), jVar));
+		sum.set(1, this.getQfpaGen().mkScalarTimes(this.getQfpaGen().mkConstantInt(-2), jVar));
 		sum.set(2, sVar);
 		IntExpr[] bounds = new IntExpr[2];
 		bounds[0] = iVar;
@@ -152,14 +152,15 @@ public class Converter {
 							this.getQfpaGen().mkEqBool(tVar, this.getQfpaGen().mkSubInt(this.getQfpaGen().sumUpVars(sum), this.getQfpaGen().mkConstantInt(2))),
 					this.getQfpaGen().mkRequireNonNeg(iVar),
 					this.getQfpaGen().mkRequireNonNeg(tVar),
-					this.getQfpaGen().mkRequireNonNeg(sVar),
-					this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(1))
+					this.getQfpaGen().mkRequireNonNeg(sVar)
+					//this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(1))
 				));
 		/*
 		BoolExpr equiv = this.getQfpaGen().mkAndBool(
 				this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(1)),
-				this.getQfpaGen().mkRequireNonNeg(tVar),
-				this.getQfpaGen().mkGeBool(tVar, this.getQfpaGen().mkSubInt(sVar, this.getQfpaGen().mkConstantInt(2)))
+				this.getQfpaGen().mkGeBool(tVar, this.getQfpaGen().mkConstantInt(1)),
+				this.getQfpaGen().mkRequireNonNeg(tVar)
+				//this.getQfpaGen().mkGeBool(tVar, this.getQfpaGen().mkSubInt(sVar, this.getQfpaGen().mkConstantInt(2)))
 				);*/
 		resultExpr = this.getQfpaGen().mkAndBool(this.getQfpaGen().getCtx().mkImplies(resultExpr, equiv), this.getQfpaGen().getCtx().mkImplies(equiv, resultExpr));
 		resultExpr = this.getQfpaGen().mkNotBool(resultExpr);
