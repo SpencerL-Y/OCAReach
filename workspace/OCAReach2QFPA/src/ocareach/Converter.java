@@ -28,11 +28,10 @@ import table.dwt.DWTEntry;
 import table.dwt.DWTuple;
 
 public class Converter {
-	// TODO: debug
+	// Author: Xie Li
 	// input: A One-Counter Automaton and two states s, t of it
-	// output: A QFPA formula that is satisfiable if there is a 
-	// a possible run from (s,x) to (t,y) where x and y are integer
-	// variable
+	// output: A QFPA formula \phi(x, y) which is true iff
+	// there is a run from (s, x) --->* (t, y)
 	
 	private OCA oca;
 	private DGraph dgraph;
@@ -49,10 +48,6 @@ public class Converter {
 		this.qfpaGen = new QFPAGenerator();
 	}
 	
-	
-	
-	
-	
 	// ALGORITHM
 	public String convert() {
 		return this.convert(this.oca.getInitState(), this.oca.getTargetState());
@@ -60,12 +55,12 @@ public class Converter {
 	
 	public String convert(State startState, State endState) {
 		assert(this.getOca().containsState(startState) && this.getOca().containsState(endState));
-		//set starting and ending vertex in dg
+		// set starting and ending vertex in DG
 		this.getDgraph().setStartVertexIndex(startState.getIndex());
 		this.getDgraph().setEndingVertexIndex(endState.getIndex());
-		// mark sccIndex in SDG
+		// run tarjan and get SCC marks
 		this.getSdg().tarjan();
-		// construct abstract sdg
+		// construct abstract SDG
 		this.asdg = new ASDGraph(this.getSdg());
 		ASDGVertex absStart = this.getAsdg().getVertex(this.getSdg().getStartingVertex().getSccMark());
 		ASDGVertex absEnd = this.getAsdg().getVertex(this.getSdg().getEndingVertex().getSccMark());
@@ -81,42 +76,29 @@ public class Converter {
 			}
 			System.out.println();
 			
-			// there is no cycles in the SCCs (trivial case: every scc is a concrete vertex)
+			// there is no cycle in  SCCs (trivial case: every SCC is a concrete vertex)
 			boolean trivial = !p.containsCycledVertex();
 			// there might be type-1 certificate
-			// TODO: DEBUG CHECK AGAIN
 			boolean type1 = true;
-			// there might be type-1 . type-2 certificate
+			// there might be type-1 . type-2/ type-2 certificate
 			boolean type12 = p.containsPosTagVertex();
-			// there might be type-1 . type-3 . type-2 certificate
+			// there might be type-1 . type-3 . type-2/ type-1 . type-3/ type-3 . type-2/ type-3 certificate
 			boolean type132 = p.containsNegTagVertex() && p.containsPosTagVertex();
 			BoolExpr trivialForm = this.getQfpaGen().mkFalse();
 			BoolExpr type1Form = this.getQfpaGen().mkFalse();
 			BoolExpr type12Form = this.getQfpaGen().mkFalse();
 			BoolExpr type132Form = this.getQfpaGen().mkFalse();
 			if(trivial) {
-				System.out.println("TYPE TRIVIAL layer1:");
 				trivialForm = this.genTrivialFormula(p);
-				//System.out.println("TRIVIAL Formula: ");
-				//System.out.println(trivialForm.toString());
 			}
 			if(type1 && !trivial) {
-				System.out.println("TYPE 1 layer 1:");
 				type1Form = this.genType1Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar, false);
-				//System.out.println("TYPE1 Formula: ");
-				//System.out.println(type1Form.toString());
 			}
 			if(type12) {
-				System.out.println("TYPE 12 layer 1:");
 				type12Form = this.genType12Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar);
-				//System.out.println("TYPE 12 Formula: ");
-				//System.out.println(type12Form.toString());
 			}
 			if(type132) {
-				System.out.println("TYPE 132 layer 1:");
 				type132Form = this.genType132Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar);
-				//System.out.println("TYPE 132 Formula: ");
-				//System.out.println(type132Form.toString());
 			}
 			BoolExpr temp = (trivial)? trivialForm : this.combineAllFormlae(type1Form, type12Form, type132Form);
 			formulae.add(temp);
@@ -150,45 +132,41 @@ public class Converter {
 	}
 	
 	public BoolExpr equivDebug(IntExpr sVar, IntExpr tVar, BoolExpr tempResult) {
-		// simplification 
-				//resultExpr = (BoolExpr) resultExpr.simplify();
-				// debug:
-				BoolExpr resultExpr = null;
-				IntExpr iVar = this.getQfpaGen().mkVariableInt("i");
-				IntExpr jVar = this.getQfpaGen().mkVariableInt("j");
-				List<IntExpr> sum = new ArrayList<IntExpr>(3);
-				sum.add(null);
-				sum.add(null);
-				sum.add(null);
-				sum.set(0, this.getQfpaGen().mkScalarTimes(this.getQfpaGen().mkConstantInt(2), iVar));
-				sum.set(1, this.getQfpaGen().mkScalarTimes(this.getQfpaGen().mkConstantInt(-4), jVar));
-				sum.set(2, sVar);
-				IntExpr[] bounds = new IntExpr[2];
-				bounds[0] = iVar;
-				bounds[1] = jVar;
-				/*BoolExpr equiv = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(bounds,
-							this.getQfpaGen().mkAndBool(
-									this.getQfpaGen().mkEqBool(tVar, this.getQfpaGen().mkSubInt(this.getQfpaGen().sumUpVars(sum), this.getQfpaGen().mkConstantInt(2))),
-							this.getQfpaGen().mkRequireNonNeg(iVar),
-							this.getQfpaGen().mkRequireNonNeg(tVar),
-							this.getQfpaGen().mkRequireNonNeg(sVar)
-							//this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(1))
-						));
-				*/
-				BoolExpr equiv = this.getQfpaGen().mkAndBool(
-						this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(2)),
-						this.getQfpaGen().mkGeBool(tVar, this.getQfpaGen().mkConstantInt(0)),
-						this.getQfpaGen().mkRequireNonNeg(tVar),
-						this.getQfpaGen().mkGeBool(this.getQfpaGen().mkSubInt(sVar, this.getQfpaGen().mkConstantInt(2)), tVar)
-						//this.getQfpaGen().mkGeBool(tVar, this.getQfpaGen().mkSubInt(sVar, this.getQfpaGen().mkConstantInt(2)))
-						);
-				resultExpr = this.getQfpaGen().mkAndBool(this.getQfpaGen().getCtx().mkImplies(tempResult, equiv), this.getQfpaGen().getCtx().mkImplies(equiv, tempResult));
-				resultExpr = this.getQfpaGen().mkNotBool(resultExpr);
-				return resultExpr;
+		BoolExpr resultExpr = null;
+		IntExpr iVar = this.getQfpaGen().mkVariableInt("i");
+		IntExpr jVar = this.getQfpaGen().mkVariableInt("j");
+		List<IntExpr> sum = new ArrayList<IntExpr>(3);
+		sum.add(null);
+		sum.add(null);
+		sum.add(null);
+		sum.set(0, this.getQfpaGen().mkScalarTimes(this.getQfpaGen().mkConstantInt(2), iVar));
+		sum.set(1, this.getQfpaGen().mkScalarTimes(this.getQfpaGen().mkConstantInt(-4), jVar));
+		sum.set(2, sVar);
+		IntExpr[] bounds = new IntExpr[2];
+		bounds[0] = iVar;
+		bounds[1] = jVar;
+		/*BoolExpr equiv = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(bounds,
+					this.getQfpaGen().mkAndBool(
+							this.getQfpaGen().mkEqBool(tVar, this.getQfpaGen().mkSubInt(this.getQfpaGen().sumUpVars(sum), this.getQfpaGen().mkConstantInt(2))),
+					this.getQfpaGen().mkRequireNonNeg(iVar),
+					this.getQfpaGen().mkRequireNonNeg(tVar),
+					this.getQfpaGen().mkRequireNonNeg(sVar)
+					//this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(1))
+				));
+		*/
+		BoolExpr equiv = this.getQfpaGen().mkAndBool(
+			this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(2)),
+			this.getQfpaGen().mkGeBool(tVar, this.getQfpaGen().mkConstantInt(0)),
+			this.getQfpaGen().mkRequireNonNeg(tVar),
+			this.getQfpaGen().mkGeBool(this.getQfpaGen().mkSubInt(sVar, this.getQfpaGen().mkConstantInt(2)), tVar)
+				//this.getQfpaGen().mkGeBool(tVar, this.getQfpaGen().mkSubInt(sVar, this.getQfpaGen().mkConstantInt(2)))
+		);
+		resultExpr = this.getQfpaGen().mkAndBool(this.getQfpaGen().getCtx().mkImplies(tempResult, equiv), this.getQfpaGen().getCtx().mkImplies(equiv, tempResult));
+		resultExpr = this.getQfpaGen().mkNotBool(resultExpr);
+		return resultExpr;
 	}
 	
 	public BoolExpr genTrivialFormula(ASDGPath p) {
-		//TODO debug
 		// convert abstract vertices to concrete vertices
 		// we need the edge information so the path is constructed like this
 		DGVertex startV = this.getDgraph().getVertex(p.getVertex(0).getConcreteDGraph().getVertices().get(0).getIndex());
@@ -210,17 +188,9 @@ public class Converter {
 		return result;
 	}
 	
-	// two kinds of implementation :
-	// 1. guess support then determine which type certificate
-	// 2. check the possible types of certificates then guess the support with requirements
-	// Here we use the second one
-	// TODO: debug trivial case from abstract state to concreate graph
-	//TODO: debug
 	public BoolExpr genType1Formulae(ASDGPath inputP, int startIndex, int endIndex,
 									              IntExpr startVar, IntExpr endVar
-									              , boolean isSkew) {
-		System.out.println("p len: " + inputP.length());
-		//assertion
+									            , boolean isSkew) {
 		IntExpr sVar;
 		IntExpr tVar;
 		ASDGPath p = null;
@@ -239,7 +209,6 @@ public class Converter {
 				   	 											 p.getG().getSdg().getVertex(startIndex), true);
 			
 		}
-		//int inOutSeqSize = allPossibleInOut.get(0).size();
 		IntExpr[] absPathVars = new IntExpr[2*(p.length())];
 		for(int i = 0; i < 2*p.length(); i ++) {
 			if(i % 2 == 0) {
@@ -251,35 +220,29 @@ public class Converter {
 		
 		BoolExpr type1FormBody = this.getQfpaGen().mkFalse();
 		for(List<SDGVertex> l : allPossibleInOut) {
-			System.out.println("ALL INOUTS layer 2: " );
 			for(int i = 0; i < l.size(); i++) {
 				System.out.print(l.get(i).getVertexIndex());
 			}
 			System.out.println();
-			// for every possible sequence of inoutports
+			// for every possible inport-outport sequence
 			BoolExpr type1FormBodyItem = this.getQfpaGen().mkTrue();
 			if(p.length() > 0) {
-
-				System.out.println("AbsPath length > 0: " + p.length());
 				for(int i = 0; i <= p.length(); i ++) {
 					BoolExpr currentAbsVertexForm = this.getQfpaGen().mkFalse();
 					List<BoolExpr> sccExprs;
 					if(i == 0) {
-						System.out.println(l.get(2*i).getVertexIndex() + " TO " + l.get(2*i+1).getVertexIndex());
 						sccExprs = this.genAbsStateNoPosCycle(p.getVertex(i), 
 							l.get(2*i), l.get(2*i + 1),
 							null, p.getG().getBorderEdgeByInportOutport(l.get(2*i + 1), l.get(2*i + 2)),
 							sVar, absPathVars[2*i], 
 							null, absPathVars[2*i + 1], isSkew);
 					} else if(i == p.length()) {
-						System.out.println(l.get(2*i).getVertexIndex() + " TO " + l.get(2*i+1).getVertexIndex());
 						sccExprs = this.genAbsStateNoPosCycle(p.getVertex(i), 
 							l.get(2*i), l.get(2*i + 1),
 							p.getG().getBorderEdgeByInportOutport(l.get(2*i - 1), l.get(2*i)), null,
 							absPathVars[2*i - 1], tVar, 
 							absPathVars[2*i - 2], null, isSkew);
 					} else {
-						System.out.println(l.get(2*i).getVertexIndex() + " TO " + l.get(2*1 + 1).getVertexIndex());
 						sccExprs = this.genAbsStateNoPosCycle(p.getVertex(i),
 							l.get(2*i), l.get(2*i+1), 
 							p.getG().getBorderEdgeByInportOutport(l.get(2*i - 1), l.get(2*i)), p.getG().getBorderEdgeByInportOutport(l.get(2*i+1), l.get(2*i + 2)),
@@ -293,15 +256,14 @@ public class Converter {
 				}
 				type1FormBody = this.getQfpaGen().mkOrBool(type1FormBody, type1FormBodyItem);
 			} else {
-				// if the length of abspath is 0
-				System.out.println("AbsPath length = " + p.length());
+				// if the length of abstract path is 0
 				List<BoolExpr> listExprs = this.type1ConcreteGraphPathFormula(p.getInit(), l.get(0), l.get(1), null, null, sVar, tVar, null, null, isSkew);
 				for(BoolExpr e : listExprs) {
 					type1FormBody = this.getQfpaGen().mkOrBool(type1FormBody, e);
 				}
 			}
 		}
-		// add ge 0 requirement
+		// add non-negative requirements
 		BoolExpr posRequires = this.getQfpaGen().mkTrue();
 		for(int i = 0; i < absPathVars.length; i++) {
 			posRequires = this.getQfpaGen().mkAndBool(
@@ -324,7 +286,6 @@ public class Converter {
 														   BorderEdge in, BorderEdge out, 
 														   IntExpr thisInVar,  IntExpr thisOutVar,
 														   IntExpr lastOutVar, IntExpr nextInVar, boolean isSkew) {
-		System.out.println("ABS STATE layer 2.5: " + v.getSccIndex());
 		assert(v.containIndex(inport.getVertexIndex()) && v.containIndex(outport.getVertexIndex()));
 		assert(thisInVar != null && thisOutVar != null && v != null);
 		return this.type1ConcreteGraphPathFormula(v, inport, outport, in, out, thisInVar, thisOutVar, lastOutVar, nextInVar, isSkew);
@@ -377,7 +338,6 @@ public class Converter {
 					this.getQfpaGen().mkSubInt(thisInVar, lastOutVar), 
 					this.getQfpaGen().mkConstantInt(in.getWeight())
 			),
-			//TODO: the formula can be redundant here
 			this.getQfpaGen().mkEqBool(
 					this.getQfpaGen().mkSubInt(nextInVar, thisOutVar), 
 					this.getQfpaGen().mkConstantInt(out.getWeight()))
@@ -387,8 +347,8 @@ public class Converter {
 	
 	/* Cases:
 	 * 1. when ASDGVertex v to dgraph is a single vertex
-	 * 2. when ASDGVertex v to dgraph is scc with the same inport and outport
-	 * 3. when ASDGVertex v to dgraph is scc with different inport and outport 
+	 * 2. when ASDGVertex v to dgraph is SCC with the same inport and outport
+	 * 3. when ASDGVertex v to dgraph is SCC with different inport and outport 
 	 */
 	public List<BoolExpr> type1ConcreteGraphPathFormula(ASDGVertex v, SDGVertex inport, SDGVertex outport, 
 			   										 BorderEdge in, BorderEdge out, 
@@ -397,9 +357,9 @@ public class Converter {
 		
 		List<BoolExpr> exprs = new ArrayList<BoolExpr>();
 		DGraph conGraph = v.getConcreteDGraph();
-		// special case 1
+		// case 1
 		if(conGraph.getVertices().size() == 1 && conGraph.getVertices().get(0).getEdges().size() == 0) {
-			// if the scc a plain vertex
+			// if the SCC is a plain vertex
 			BoolExpr formula = this.getQfpaGen().mkAndBool(
 				this.vertexBorderEdgeWeightAndDropRequirements(in, out, thisInVar, thisOutVar, lastOutVar, nextInVar),
 				this.getQfpaGen().mkEqBool(thisOutVar, thisInVar)
@@ -409,24 +369,19 @@ public class Converter {
 		} 
 		
 		// case 2 and 3
-		System.out.println("NOT PLAIN " + inport.getVertexIndex() + " " + outport.getVertexIndex());
 		List<DGraph> supports = conGraph.getAllPossibleSupport(inport.getVertexIndex(), outport.getVertexIndex());
-		System.out.println("Support size: " + supports.size());
 		for(DGraph support : supports) {
-			System.out.println("SUPPORTS ENUM layer 3: ");
 			// if there is a positive cycle in the support ignore it
 			if(support.computeLoopTag() == LoopTag.Pos || support.computeLoopTag() == LoopTag.PosNeg) {
-				System.out.println("contain pos cycle return null");
 				continue;
 			}
 			if(support.containsCycle()) {
-				//TODO: debug
 				// increase the max length to 2n^2 + 1
 				support.increaseDWTLenLimit();
 				// guess that there is a cycle and apply the lemma
 				// length > 2n^2
 				BoolExpr formGe = this.getQfpaGen().mkFalse();
-				// guess the mid vertex and init a int variable for it
+				// guess the mid vertex and initialize an Int type variable for it
 				for(DGVertex ve : support.getVertices()) {
 					IntExpr midVar = this.getQfpaGen().mkVariableInt("z"+ ve.getIndex());
 					// latter dynamic part
@@ -440,38 +395,30 @@ public class Converter {
 						this.getQfpaGen().mkAndBool(
 							// path flow
 							this.genPathFlowFormula(support, inport.getVertexIndex(), ve.getIndex(), thisInVar, midVar),
-							// z > |V|, this guarantee the counter value to be positive
+							// z > |V|, this guarantee the counter value along the path to be positive
 							this.getQfpaGen().mkGeBool(midVar, this.getQfpaGen().mkConstantInt(support.getVertices().size())),
 							formGeDynamic
 						)
 					);
-					
-					
 					// add border edge requirements
-					
 					formGe = this.getQfpaGen().mkAndBool(formGe,
 							this.vertexBorderEdgeWeightAndDropRequirements(in, out, thisInVar, thisOutVar, lastOutVar, nextInVar));
-					
-					// add positive requirement
-					
+					// add non-negative requirements
 					formGe = this.getQfpaGen().mkAndBool(this.getQfpaGen().mkRequireNonNeg(midVar), formGe);
-					
-					// add existential 
+					// add existential quantifier
 					IntExpr[] midVarQuant = new IntExpr[1];
 					midVarQuant[0] = midVar;
 					formGe = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(midVarQuant, formGe);
 				}
 				// length < 2n^2 + 1
 				BoolExpr formLt = this.type1DynamicPartFormula(support, inport, outport, thisInVar, thisOutVar);
-				
+				// if not reachable ignore the support and does not generate any formula 
 				if(formLt == null) {
 					continue;
 				}
-				
 				// add border edge requirements
 				formLt = this.getQfpaGen().mkAndBool(formLt, 
 						this.vertexBorderEdgeWeightAndDropRequirements(in, out, thisInVar, thisOutVar, lastOutVar, nextInVar));
-				
 				BoolExpr formula = this.getQfpaGen().mkOrBool(formLt, formGe);
 				exprs.add(formula);
 			} else {
@@ -500,10 +447,10 @@ public class Converter {
 				}
 				
 				
-				// guess it is a simple path
+				// guess it to be a simple path
 				BoolExpr formula = this.getQfpaGen().mkAndBool(
 					this.vertexBorderEdgeWeightAndDropRequirements(in, out, thisInVar, thisOutVar, lastOutVar, nextInVar),
-					// there is a concrete path from inport to outport in concreteScc
+					// there is a concrete path from inport to outport in concrete SCC graph
 					concretePathFormula
 				);
 				exprs.add(formula);
@@ -514,18 +461,15 @@ public class Converter {
 	
 	public BoolExpr type1DynamicPartFormula(DGraph support, SDGVertex inport, SDGVertex outport, 
 															IntExpr thisInVar, IntExpr thisOutVar) {
-		System.out.println("dynamic from " +   inport.getVertexIndex() + " to " + outport.getVertexIndex());
 		BoolExpr formDynamic = this.getQfpaGen().mkFalse();
 		if(inport.getVertexIndex() == outport.getVertexIndex()) {
-			// if inport and outport is the same vertex, it is  naturally reachable
-			System.out.println("same in out");
+			// if inport and outport is the same vertex, it is naturally reachable
 			formDynamic = this.getQfpaGen().mkEqBool(thisInVar, thisOutVar);
 			if(support.getTable().getEntry(inport.getVertexIndex(), outport.getVertexIndex()) == null) {
 				// if the entry does not exists, return the natural one
 				return formDynamic;
 			}
 		} else {
-			System.out.println("different in out");
 			formDynamic = this.getQfpaGen().mkFalse();
 			if(support.getTable().getEntry(inport.getVertexIndex(), outport.getVertexIndex()) == null) {
 				// if the entry does not exists, ignore the support
@@ -533,7 +477,7 @@ public class Converter {
 			}
 		}
 		
-		System.out.println("table entry null:" + (support.getTable().getEntry(inport.getVertexIndex(), outport.getVertexIndex()) == null) + " table len:" +  support.getTable().getMaxLength());
+		
 		for(DWTuple t : support.getTable().getEntry(inport.getVertexIndex(), outport.getVertexIndex()).getSetOfDWTuples()) {
 			BoolExpr temp = this.getQfpaGen().mkAndBool(
 				// weight sum correctly in the concreteScc
@@ -553,8 +497,6 @@ public class Converter {
 	
 	public BoolExpr genPathFlowFormula(DGraph g, int startIndex, int endIndex,
 												 IntExpr startVar, IntExpr endVar) {
-		//TODO debug
-		System.out.println("genPathFlow: " + startIndex + " to " + endIndex);
 		List<DGEdge> edgeList = g.getEdges();
 		IntExpr[] flowVars = new IntExpr[edgeList.size()];
 		DGFlowTuple[] flowTuples = new DGFlowTuple[edgeList.size()];
@@ -569,7 +511,7 @@ public class Converter {
 			BoolExpr body = this.getQfpaGen().mkTrue();
 			BoolExpr startVertexForm = null;
 			BoolExpr endVertexForm = null;
-			// different start and end 
+			// different start and end vertex
 			if(startIndex != endIndex) {
 				// start vertex flow requirements
 				startVertexForm = this.getQfpaGen().mkEqBool(
@@ -581,14 +523,13 @@ public class Converter {
 					this.getQfpaGen().sumUpVars(this.getAllFlowInVars(vt, flowTuples)), 
 					this.getQfpaGen().mkAddInt(this.getQfpaGen().sumUpVars(this.getAllFlowOutVars(vt, flowTuples)), this.getQfpaGen().mkConstantInt(1))
 				);
-			// same start and end
+			// same start and end vertex
 			} else {
-				// following  formulae should be the same 
+				// the following formulae should be the same 
 				startVertexForm = this.getQfpaGen().mkEqBool(
 						this.getQfpaGen().sumUpVars(this.getAllFlowInVars(vs, flowTuples)),
 						this.getQfpaGen().sumUpVars(this.getAllFlowOutVars(vs, flowTuples))
 				);
-				
 				endVertexForm = this.getQfpaGen().mkEqBool(
 						this.getQfpaGen().sumUpVars(this.getAllFlowInVars(vt, flowTuples)),
 						this.getQfpaGen().sumUpVars(this.getAllFlowOutVars(vt, flowTuples))
@@ -606,7 +547,7 @@ public class Converter {
 				}
 			}
 			// weight requirements
-			// drop requirements are guranteed by the 3n^2 + 1 or type3 certificate
+			// drop requirements are guaranteed by the 2n^2 + 1 or type-3 certificate
 			IntExpr sum = this.getQfpaGen().mkConstantInt(0);
 			for(DGFlowTuple t : flowTuples) {
 				sum = this.getQfpaGen().mkAddInt(
@@ -632,7 +573,7 @@ public class Converter {
 			return this.getQfpaGen().mkFalse();
 		}
 	}
-	//TODO: debug
+
 	public List<IntExpr> getAllFlowInVars(DGVertex v, DGFlowTuple[] flowTuples){
 		List<IntExpr> inVars = new ArrayList<IntExpr>();
 		for(DGFlowTuple t : flowTuples) {
@@ -642,7 +583,7 @@ public class Converter {
 		}
 		return inVars;
 	}
-	//TODO: debug
+
 	public List<IntExpr> getAllFlowOutVars(DGVertex v, DGFlowTuple[] flowTuples){
 		List<IntExpr> outVars = new ArrayList<IntExpr>();
 		for(DGFlowTuple t : flowTuples) {
@@ -653,13 +594,12 @@ public class Converter {
 		return outVars;
 	}	
 	
-	//TODO: debug
 	public BoolExpr genType12Formulae(ASDGPath p, int startIndex, int endIndex,
 												   IntExpr startVar, IntExpr endVar) {
-		// assert that there exists a postive tag absVertex
+		// assert there exists a positive tag abstract vertex
 		assert(p.containsPosTagVertex());
 		List<ASDGVertex> posVertices = p.getAllType12Split();
-		// split the absPath
+		// split the abstrac path
 		IntExpr[] splitVars = new IntExpr[2];
 		splitVars[0] = this.getQfpaGen().mkVariableInt("vt_1");
 		splitVars[1] = this.getQfpaGen().mkVariableInt("vs_2");
@@ -667,20 +607,15 @@ public class Converter {
 		BoolExpr type12Form = this.getQfpaGen().mkFalse();
 		for(ASDGVertex v : posVertices) {
 			ASDGPath[] paths = p.splitPathAt(v);
-
-			
 			if(paths[0] != null) {
 				hasBorder = true;
 				// if there exists type1 path
-				// for all the possible splited borderedges
+				// for all the possible split border edges
 				BoolExpr borderEdgesFormula = this.getQfpaGen().mkFalse();
 				for(BorderEdge e : p.getG().getBorderEdgesByAbsEdge(paths[0].getLastVertex().getSccIndex(), 
 																	paths[1].getInit().getSccIndex())) {
 					BoolExpr expr1 = this.genType1Formulae(paths[0], startIndex, e.getFromVertex().getVertexIndex(), startVar, splitVars[0], false);
 					BoolExpr expr2 = this.genType1Formulae(paths[1], e.getToVertex().getVertexIndex(), endIndex, splitVars[1], endVar, true);
-					System.out.println("type1 of type12: " + expr1.toString());
-					System.out.println("type2 of type12: " + expr2.toString());
-					
 					borderEdgesFormula = this.getQfpaGen().mkOrBool(
 						this.getQfpaGen().mkAndBool(
 							expr1,
@@ -701,8 +636,6 @@ public class Converter {
 			} else {
 				// if there is no type1 path
 				type12Form = this.genType1Formulae(paths[1], startIndex, endIndex, startVar, endVar, true);
-				System.out.println(" path 0 is null: " + (paths[0] == null));
-				System.out.println("type2 of type12 : " + type12Form.toString());
 			}
 		}
 		type12Form = hasBorder ? (BoolExpr) this.getQfpaGen().mkExistsQuantifier(splitVars, type12Form) : type12Form;
@@ -713,35 +646,31 @@ public class Converter {
 	
 	public BoolExpr genType132Formulae(ASDGPath p, int startIndex, int endIndex, 
 												 IntExpr startVar, IntExpr endVar) {
-		//TODO: debug
 		// assert there is a condition for type132
 		assert(p.containsNegTagVertex() && p.containsNegTagVertex());
 		List<ASDGVertex[]> splitVertices = p.getAllType132Split();
 		BoolExpr type132Form = this.getQfpaGen().mkFalse();
-		//132 mid vars
+		// subtype 132 mid vars
 		IntExpr[] fullSplitVars = new IntExpr[4];
 		fullSplitVars[0] = this.getQfpaGen().mkVariableInt("vt_1");
 		fullSplitVars[1] = this.getQfpaGen().mkVariableInt("vs_3");
 		fullSplitVars[2] = this.getQfpaGen().mkVariableInt("vt_3");
 		fullSplitVars[3] = this.getQfpaGen().mkVariableInt("vs_2");
-		//13 mid vars
+		// subtype 13 mid vars
 		IntExpr[] splitVars13 = new IntExpr[2];
 		splitVars13[0] = fullSplitVars[0];
 		splitVars13[1] = fullSplitVars[1];
-		//32 mid vars
+		// subtype 32 mid vars
 		IntExpr[] splitVars32 = new IntExpr[2];
 		splitVars32[0] = fullSplitVars[2];
 		splitVars32[1] = fullSplitVars[3];
 		
 		for(ASDGVertex[] s : splitVertices) {
-			System.out.println("HERERERERE " );
-			System.out.println("split Vertices form gen: " + s[0].getSccIndex() + " & " + s[1].getSccIndex());
 			ASDGPath[] paths = p.getAllType132SplitPaths(s);
 			BoolExpr portForm = this.getQfpaGen().mkTrue();
 			assert(paths[1] != null);
 			if(paths[0] != null && paths[1] != null && paths[2] != null) {
-				//132
-				System.out.println("subtype 132 gen");
+				// subtype 132
 				for(SDGVertex[] inouts : p.getType132LinkInportOutport(s)) {
 					portForm = this.getQfpaGen().mkAndBool(
 							this.genType1Formulae(paths[0], startIndex, inouts[0].getVertexIndex(), startVar, fullSplitVars[0], false),
@@ -771,8 +700,7 @@ public class Converter {
 				);
 				type132Form = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(fullSplitVars, type132Form);
 			} else if(paths[0] != null && paths[2] == null) {
-				//13
-				System.out.println("subtype 13 gen");
+				// subtype 13
 				for(SDGVertex[] inouts : p.getType132LinkInportOutport(s)) {
 					portForm = this.getQfpaGen().mkAndBool(
 							this.genType1Formulae(paths[0], startIndex, inouts[0].getVertexIndex(), startVar, splitVars13[0], false),
@@ -793,8 +721,7 @@ public class Converter {
 				);
 				type132Form = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(splitVars13, type132Form);
 			} else if(paths[0] == null && paths[2] != null) {
-				//32
-				System.out.println("subtype 32 gen");
+				// subtype 32
 				for(SDGVertex[] inouts : p.getType132LinkInportOutport(s)) {
 					portForm = this.getQfpaGen().mkAndBool(
 							this.genType3Formula(paths[1], startIndex, inouts[0].getVertexIndex(), startVar, splitVars32[0]),
@@ -816,8 +743,7 @@ public class Converter {
 				type132Form = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(splitVars32, type132Form);
 			} else {
 				assert(paths[0] == null && paths[2] == null);
-				//3
-				System.out.println("subtype 3 gen");
+				// subtype 3
 				portForm = this.genType3Formula(paths[1], startIndex, endIndex, startVar, endVar);
 				type132Form = (BoolExpr) portForm;
 			}
@@ -836,7 +762,6 @@ public class Converter {
 		return result;
 	}
 	
-	//TODO: debug
 	public BoolExpr genType3Formula(ASDGPath p3, int startIndex, int endIndex,
 												  IntExpr startVar, IntExpr endVar) {
 		ASDGVertex startVertex = p3.getInit();
@@ -853,11 +778,9 @@ public class Converter {
 		BoolExpr startPosTemp = this.getQfpaGen().mkFalse();
 		BoolExpr endPosTemp = this.getQfpaGen().mkFalse();
 		for(DGVertex vms : p3Graph.getVertices()) {
-			System.out.println("vms");
 			startPosTemp = this.getQfpaGen().mkOrBool(startPosTemp, this.genPosCycleTemplateFormula(p3Graph, startIndex, vms.getIndex(), startVar, startMidVar));
 		}
 		for(DGVertex vme : p3SkewGraph.getVertices()) {
-			System.out.println("vme");
 			endPosTemp = this.getQfpaGen().mkOrBool(endPosTemp, this.genPosCycleTemplateFormula(p3SkewGraph, endIndex, vme.getIndex(), endVar, endMidVar));
 		}
 		BoolExpr posTemp = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(boundVars, this.getQfpaGen().mkAndBool(
@@ -874,7 +797,6 @@ public class Converter {
 	}
 	
 	public DGraph genType3ConcreteGraph(ASDGPath p3, int startIndex, int endIndex) {
-		// generate the graph
 		List<DGEdge> concreteEdgeList = new ArrayList<DGEdge>();
 		for(int i = 0; i < p3.getPath().size() - 1; i++) {
 			List<BorderEdge> borderEdges = p3.getVertex(i).getAllConcreteEdgesTo(p3.getVertex(i+1));
@@ -891,11 +813,8 @@ public class Converter {
 		return type3Graph;
 	}
 	
-	//TODO: formula for postive cycle template
-	
 	public BoolExpr genPosCycleTemplateFormula(DGraph g, int startIndex, int guessIndex, IntExpr startVar, IntExpr guessVar) {
-		//TODO: DEBUG REDUNDANT 
-		// desciption: return the possible positive cycle template with the minimum drop, if none return null
+		// description: return the possible positive cycle template with the minimum drop, if none return null
 		assert(g.containsVertex(startIndex) && g.containsVertex(guessIndex));
 		if(g.getTag() == null) {
 			g.computeLoopTag();
@@ -905,12 +824,9 @@ public class Converter {
 		int maxDrop = -2*g.getVertices().size() - 1;
 		BoolExpr maxForm = this.getQfpaGen().mkFalse();
 		if(startToGuessEntry != null) {
-			System.out.println("Start entry size: " + startToGuessEntry.getSetOfDWTuples().size());
 			for(DWTuple t : startToGuessEntry.getSetOfDWTuples()) {
 				DWTEntry guessLoopEntry = g.getTable().getEntry(guessIndex, guessIndex);
 				if(guessLoopEntry != null) {
-					System.out.println("Guess loop entry size: " + guessLoopEntry.getSetOfDWTuples().size());
-					List<Integer> weightMem = new ArrayList<Integer>();
 					for(DWTuple tg : guessLoopEntry.getSetOfDWTuples()) {
 						if(tg.getWeight() > 0) {
 							int drop = Math.min(t.getDrop(), tg.getDrop() + t.getWeight());
