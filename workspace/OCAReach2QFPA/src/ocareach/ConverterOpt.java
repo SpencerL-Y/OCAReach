@@ -6,6 +6,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.IntExpr;
+import com.microsoft.z3.Solver;
+import com.microsoft.z3.Status;
 
 import automata.State;
 import automata.counter.OCA;
@@ -103,7 +105,7 @@ public class ConverterOpt extends Converter {
 			);
 			resultExpr = this.getQfpaGen().mkAndBool(resultExpr, xsXtPosRequirements);	
 			String solveResult = null;result = resultExpr.toString();
-			/*// ----------------------EQUIV DEBUG-----------------------
+			// ----------------------EQUIV DEBUG-----------------------
 			resultExpr = this.equivDebug(sVar, tVar, resultExpr);
 			
 			result = resultExpr.simplify().toString();
@@ -114,7 +116,7 @@ public class ConverterOpt extends Converter {
 			} else {
 				solveResult = "\n SAT \n" + solver.getModel().toString();
 			}
-			// --------------------------------------------------------*/
+			/*// --------------------------------------------------------*/
 			
 			return (solveResult == null) ? result : result + solveResult;
 		}
@@ -128,13 +130,13 @@ public class ConverterOpt extends Converter {
 			sum.add(null);
 			sum.add(null);
 			sum.add(null);
-			sum.set(0, this.getQfpaGen().mkScalarTimes(this.getQfpaGen().mkConstantInt(2), iVar));
-			sum.set(1, this.getQfpaGen().mkScalarTimes(this.getQfpaGen().mkConstantInt(-4), jVar));
+			sum.set(0, this.getQfpaGen().mkScalarTimes(this.getQfpaGen().mkConstantInt(-2), iVar));
+			sum.set(1, this.getQfpaGen().mkScalarTimes(this.getQfpaGen().mkConstantInt(1), jVar));
 			sum.set(2, sVar);
 			IntExpr[] bounds = new IntExpr[2];
 			bounds[0] = iVar;
 			bounds[1] = jVar;
-			/*BoolExpr equiv = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(bounds,
+			BoolExpr equiv = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(bounds,
 						this.getQfpaGen().mkAndBool(
 								this.getQfpaGen().mkEqBool(tVar, this.getQfpaGen().mkSubInt(this.getQfpaGen().sumUpVars(sum), this.getQfpaGen().mkConstantInt(2))),
 						this.getQfpaGen().mkRequireNonNeg(iVar),
@@ -142,14 +144,14 @@ public class ConverterOpt extends Converter {
 						this.getQfpaGen().mkRequireNonNeg(sVar)
 						//this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(1))
 					));
-			*/
-			BoolExpr equiv = this.getQfpaGen().mkAndBool(
+			
+			/*BoolExpr equiv = this.getQfpaGen().mkAndBool(
 				this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(2)),
 				this.getQfpaGen().mkGeBool(tVar, this.getQfpaGen().mkConstantInt(0)),
 				this.getQfpaGen().mkRequireNonNeg(tVar),
 				this.getQfpaGen().mkGeBool(this.getQfpaGen().mkSubInt(sVar, this.getQfpaGen().mkConstantInt(2)), tVar)
 					//this.getQfpaGen().mkGeBool(tVar, this.getQfpaGen().mkSubInt(sVar, this.getQfpaGen().mkConstantInt(2)))
-			);
+			);*/
 			resultExpr = this.getQfpaGen().mkAndBool(this.getQfpaGen().getCtx().mkImplies(tempResult, equiv), this.getQfpaGen().getCtx().mkImplies(equiv, tempResult));
 			resultExpr = this.getQfpaGen().mkNotBool(resultExpr);
 			return resultExpr;
@@ -172,6 +174,8 @@ public class ConverterOpt extends Converter {
 				midVars[2*i] = this.getQfpaGen().mkVariableInt("v_i_" + p.getVertex(i).getSccIndex());
 				midVars[2*i + 1] = this.getQfpaGen().mkVariableInt("v_o_" + p.getVertex(i).getSccIndex());
 			}
+			midVars[0] = sVar;
+			midVars[p.length()] = tVar;
 			allPossibleInOut = p.inportsOutportsCartesianProduct(p.getG().getSdg().getVertex(startIndex), 
 																 p.getG().getSdg().getVertex(endIndex), false);
 			BoolExpr resultForm = this.getQfpaGen().mkFalse();
@@ -213,7 +217,13 @@ public class ConverterOpt extends Converter {
 				}
 				resultForm = this.getQfpaGen().mkOrBool(resultForm, pathForm);
 			}
-			
+			for(int i = 1; i < 2*p.getPath().size() - 1; i++) {
+				resultForm = this.getQfpaGen().mkAndBool(
+					resultForm,
+					this.getQfpaGen().mkRequireNonNeg(midVars[i])
+				);
+			}
+			resultForm = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(midVars, resultForm);
 			return resultForm;
 		}
 		
@@ -233,6 +243,8 @@ public class ConverterOpt extends Converter {
 				} else {
 					loopNum.incrementAndGet();
 					IntExpr loopTimeVar = this.getQfpaGen().mkVariableInt("loop_" + loopNum);
+					IntExpr[] existsVars = new IntExpr[1];
+					existsVars[0] = loopTimeVar;
 					varList.add(loopTimeVar);
 					// abstract vertex with loop
 					BoolExpr loopRequirement = this.genFlatLoopForm(g, inportIndex, outportIndex, thisInVar, thisOutVar, loopTimeVar);
@@ -248,7 +260,8 @@ public class ConverterOpt extends Converter {
 								this.getQfpaGen().mkAddInt(lastOutVar, this.getQfpaGen().mkConstantInt(lastOutEdge.getWeight())), 
 								thisInVar)
 					);
-					return this.getQfpaGen().mkAndBool(loopRequirement, otherRequirements);
+					BoolExpr resultForm = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(existsVars, this.getQfpaGen().mkAndBool(loopRequirement, otherRequirements));
+					return resultForm;
 				}
 			}
 			
