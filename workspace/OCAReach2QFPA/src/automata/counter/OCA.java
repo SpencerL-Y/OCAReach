@@ -20,7 +20,6 @@ public class OCA implements Automaton{
 	}
 	
 	//basic operations
-	
 	public void addState(int index) {
 		for(State s : this.getStates()) {
 			if(s.getIndex() == index) {

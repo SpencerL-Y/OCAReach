@@ -33,13 +33,13 @@ public class Converter {
 	// output: A QFPA formula \phi(x, y) which is true iff
 	// there is a run from (s, x) --->* (t, y)
 	
-	private OCA oca;
-	private DGraph dgraph;
-	private SDGraph sdg;
-	private ASDGraph asdg;
-	private QFPAGenerator qfpaGen;
-	private State startState;
-	private State endState;
+	protected OCA oca;
+	protected DGraph dgraph;
+	protected SDGraph sdg;
+	protected ASDGraph asdg;
+	protected QFPAGenerator qfpaGen;
+	protected State startState;
+	protected State endState;
 	
 	public Converter(OCA oca) {
 		this.setOca(oca);
@@ -70,7 +70,6 @@ public class Converter {
 		IntExpr sVar = this.getQfpaGen().mkVariableInt("xs");
 		IntExpr tVar = this.getQfpaGen().mkVariableInt("xt");
 		for(ASDGPath p : paths) {
-			System.out.print("ABSTRACT PATH layer0: ");
 			for(ASDGVertex v : p.getPath()) {
 				System.out.print(v.getSccIndex());
 			}
@@ -115,13 +114,13 @@ public class Converter {
 					this.getQfpaGen().mkRequireNonNeg(tVar)
 		);
 		resultExpr = this.getQfpaGen().mkAndBool(resultExpr, xsXtPosRequirements);	
-		// /*----------------------EQUIV DEBUG-----------------------
+		String solveResult = null;
+		/*// ----------------------EQUIV DEBUG-----------------------
 		resultExpr = this.equivDebug(sVar, tVar, resultExpr);
 		
 		result = resultExpr.simplify().toString();
 		Solver solver = this.getQfpaGen().getCtx().mkSolver();
 		solver.add((BoolExpr)resultExpr.simplify());
-		String solveResult = null;
 		if(solver.check() == Status.UNSATISFIABLE) {
 			solveResult = "\n UNSAT";
 		} else {

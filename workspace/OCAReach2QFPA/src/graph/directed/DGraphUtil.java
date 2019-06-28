@@ -31,7 +31,6 @@ public class DGraphUtil {
 	}
 	
 	// algorithm
-	//TODO: debug
 	public static <T> List<List<T>> getPowerSet(List<T> set){
 		return DGraphUtil.powerSet(set);
 	}

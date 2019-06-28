@@ -21,7 +21,7 @@ public class ASDGraph {
 			for(DGEdge e : v.getVertex().getEdges()) {
 				SDGVertex w = v.getGraph().getVertex(e.getTo().getIndex());
 				if(v.getSccMark() != w.getSccMark()) {
-					// if the two vertices are not in the same scc
+					// if the two vertices are not in the same SCC
 					// create a border edge in ASDG
 					BorderEdge edge = new BorderEdge(v, w);
 					this.borderEdges.add(edge);
@@ -32,7 +32,6 @@ public class ASDGraph {
 			System.out.println("ERROR: SDG haven't run tarjan algorithm");
 			System.out.checkError();
 		}
-		//System.out.println("scc Num :" + sdg.getSccNum());
 		// after add all the border edges then we construct the vertices
 		for(int i = 1; i <= sdg.getSccNum(); i++) {
 			this.vertices.add(new ASDGVertex(this, i));

@@ -24,7 +24,6 @@ public class SDGraph implements Graph{
 	}
 	
 	// basic operation
-	
 	public SDGVertex getVertex(int vertexIndex) {
 		for(SDGVertex v : this.getVertices()) {
 			if(v.getVertex().getIndex() == vertexIndex) {
@@ -45,32 +44,25 @@ public class SDGraph implements Graph{
 		DGraph graph = new DGraph();
 		for(SDGVertex v : this.getVertices()) {
 			if(v.getSccMark() == sccIndex) {
-				// add all the scc vertices into the subgraph
-				//System.out.println("vertex:" + v.getVertexIndex() + "scc:" + sccIndex);
+				// add all SCCs vertices into the subgraph
 				graph.addVertex(v.getVertexIndex());
 			}
 		}
 		for(SDGVertex v : this.getVertices()) {
 			for(DGEdge e : v.getVertex().getEdges()) {
 				if(v.getSccMark() == sccIndex && this.getEdgeTo(e).getSccMark() == sccIndex) {
-					// if the transition is in the scc, add it to the sub dgraph
+					// if the transition is in the SCC, add it to the sub directed graph
 					graph.addEdge(e.getFrom().getIndex(), 
 								  e.getTo().getIndex(),
 								  e.getWeight());
 				}
 			}
 		}
-		// create a conScc 
-		//SDGraph conScc = new SDGraph(graph);
-		//conScc.setSccNum(1);
-		//for(SDGVertex v : conScc.getVertices()) {
-		//	v.setSccMark(sccIndex);
-		//}
 		return graph;
 	}
 	
-	// algorithm tarjan
-	//TODO: debug
+	// algorithm
+	// Tarjan's algorithm
 	public void tarjan() {
 		AtomicInteger index = new AtomicInteger(0);
 		AtomicInteger sccIndex = new AtomicInteger(1);
@@ -84,15 +76,13 @@ public class SDGraph implements Graph{
 	}
 	
 	public SDGraph getSkewTranspose() {
-		//TODO: debug
-		// tarjan must be computed before computing skew transpose
+		// Tarjan's algorithm must be computed before computing skew transpose
 		DGraph sktG = this.getGraph().getSkewTranspose();
 		SDGraph sktSG = new SDGraph(sktG);
 		return sktSG;
 	}
 	
 	// getters and setters
-
 	public DGraph getGraph() {
 		return graph;
 	}

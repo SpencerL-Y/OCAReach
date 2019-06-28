@@ -191,14 +191,12 @@ public class DGraph implements Graph{
 			DGraph temp = this.edgeListToGraph(list, startIndex, endIndex);
 			if(temp.containsVertex(startIndex) && temp.containsVertex(endIndex)) {
 				temp.computeLoopTag();
-				System.out.println("cycled: " + temp.getTag());
 				graphs.add(temp);
 			}
 		}
 		return graphs;
 	}
 	
-	//TODO: debug
 	public DGraph getSkewTranspose() {
 		DGraph g = new DGraph();
 		for(DGVertex v : this.getVertices()) {
@@ -210,16 +208,12 @@ public class DGraph implements Graph{
 			}
 		}
 		int oldStart = this.getStartVertexIndex();
-		int oldEnd = this.getEndingVertexIndex();
-		System.out.println("oldStart:" + oldStart + " oldEnd: " + oldEnd);
 		g.setStartVertexIndex(this.getEndingVertexIndex());
 		g.setEndingVertexIndex(oldStart);
-		System.out.println("newStart:" + g.startVertexIndex + " newEnd:" + g.endingVertexIndex);
 		return g;
 	}
 	
 	
-	//TODO: DEBUG SPECIAL CASE
 	public DGraph edgeListToGraph(List<DGEdge> list, int startIndex, int endIndex) {
 		DGraph g = new DGraph();
 		if(list.size() == 0 && this.getVertices().size() != 0) {
@@ -229,7 +223,6 @@ public class DGraph implements Graph{
 			} 
 		}
 		for(DGEdge e : list) {
-			//System.out.println("Support add edge");
 			if(this.containsVertex(e.getTo().getIndex()) && !g.containsVertex(e.getTo().getIndex())) {
 				g.addVertex(e.getTo().getIndex());
 			}
@@ -243,7 +236,6 @@ public class DGraph implements Graph{
 		return g;
 	}
 	
-	//TODO: debug
 	public boolean isConnected() {
 		// return true if the graph is a connected graph
 		// here we only need the integrity of the graph
@@ -262,7 +254,29 @@ public class DGraph implements Graph{
 		return true;
 	}
 	
-	//TODO debug
+	public boolean isFlatSCCGraph() {
+		//TODO: DEBUG whether the flatness is correctly expressed here
+		// the strongly connected property should be guaranteed
+		
+		// if the graph is a trivial state
+		if(this.getVertices().size() == 1) {
+			return true;
+		}
+		// otherwise
+		for(DGVertex v : this.getVertices()) {
+			if(v.getEdges().size() > 1) {
+				return false;
+			} else if(v.getEdges().size() == 1) {
+				continue;
+			} else {
+				// not possible
+				System.out.println("ERROR: DGraph flatness error!!");
+			}
+		}
+		return true;
+	}
+	
+	
 	private void connectedBFS(Queue<DGVertex> list, List<DGVertex> visited) {
 		// BFS and store all the reached vertices into list visited
 		while(!list.isEmpty()) {
@@ -291,7 +305,6 @@ public class DGraph implements Graph{
 		return true;
 	}
 
-	//TODO: debug
 	public DGraph union(DGraph graph) {
 		DGraph newG = new DGraph();
 		for(DGVertex v : this.getVertices()) {
@@ -319,7 +332,6 @@ public class DGraph implements Graph{
 		return newG;
 	}
 	
-	//TODO: debug
 	public boolean containsCycle() {
 		if(this.table == null) {
 			this.computeLoopTag();
@@ -327,7 +339,6 @@ public class DGraph implements Graph{
 		if(this.getTag().equals(LoopTag.None)){
 			return false;
 		} else {
-			System.out.println("edge : " + this.getEdges().size());
 			return true;
 		}
 	}
@@ -353,7 +364,7 @@ public class DGraph implements Graph{
 		}
 	}
 	
-	//getters and setters
+	// getters and setters
 	public List<DGVertex> getVertices() {
 		return vertices;
 	}

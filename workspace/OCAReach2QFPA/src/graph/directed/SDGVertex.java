@@ -22,7 +22,6 @@ public class SDGVertex implements Vertex{
 	}
 	
 	//algorithm 
-	//TODO: debug
 	public void strongConnected(Stack<SDGVertex> stack, AtomicInteger index, AtomicInteger sccIndex) {
 		this.setSccMark(index.get());
 		this.setLowLink(index.get());
@@ -39,7 +38,6 @@ public class SDGVertex implements Vertex{
 				this.setLowLink(Math.min(this.lowLink, w.getSccMark()));
 			} 
 		}
-		
 		if(this.lowLink == this.getSccMark()) {
 			SDGVertex w = null;
 			do {

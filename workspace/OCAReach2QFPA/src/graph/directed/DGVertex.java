@@ -46,7 +46,7 @@ public class DGVertex implements Vertex{
 		return false;
 	}
 	
-	//getters and setters
+	// getters and setters
 	public List<DGEdge> getEdges() {
 		return edges;
 	}

@@ -41,8 +41,8 @@ public class State {
 		}
 		return false;
 	}	
-	//setters and getters
 	
+	//setters and getters
 	public int getIndex() {
 		return this.index;
 	}

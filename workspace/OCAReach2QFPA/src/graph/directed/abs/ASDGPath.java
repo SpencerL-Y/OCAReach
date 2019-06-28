@@ -3,6 +3,7 @@ package graph.directed.abs;
 import java.util.ArrayList;
 import java.util.List;
 
+import graph.directed.DGraph;
 import graph.directed.SDGVertex;
  
 public class ASDGPath {
@@ -16,7 +17,6 @@ public class ASDGPath {
 	}
 	
 	//basic operations
-	
 	public void concatVertex(ASDGVertex vertex) {
 		ASDGVertex v = this.getLastVertex();
 		if(v.checkAbsEdge(vertex.getSccIndex())) {
@@ -102,6 +102,17 @@ public class ASDGPath {
 		return this.getPath().size() - 1;
 	}
 	
+	public boolean isFlatPath() {
+		//TODO: DEBUG
+		for(ASDGVertex v : this.getPath()) {
+			DGraph sccGraph = v.getConcreteDGraph();
+			if(!sccGraph.isFlatSCCGraph()) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	// algorithm
 	public ASDGPath getSkewPath() {
 		ASDGraph skewASDG = this.getG().getSkewTranspose();
@@ -113,11 +124,9 @@ public class ASDGPath {
 		}
 		return skewP;
 	}
-	
-	
-	// TODO: debug
+
 	public ASDGPath[] splitPathAt(ASDGVertex v) {
-		// return a pair of absPaths, the first is type1 and the second is type1 in G^{op}
+		// return a pair of abstract paths, the first is type-1 and the second is type1 in G^{op}
 		// v cannot be a repeat vertex by definition
 		ASDGPath[] paths = new ASDGPath[2];
 		int breakPoint = 0;
@@ -146,7 +155,6 @@ public class ASDGPath {
 		return paths;
 	}
 	
-	//TODO: debug
 	public List<List<SDGVertex>> inportsOutportsCartesianProduct(SDGVertex start, SDGVertex end, boolean isSkew) {
 		List<List<SDGVertex>> list = new ArrayList<List<SDGVertex>>();
 		List<SDGVertex> startList = new ArrayList<SDGVertex>();
@@ -188,8 +196,6 @@ public class ASDGPath {
 		return list;
 	}
 	
-	
-	//TODO: debug
 	private List<List<SDGVertex>> connectIOSequence(List<List<SDGVertex>> list, List<List<SDGVertex>> connect){
 		if(list.size() == 0) {
 			return connect;
@@ -211,9 +217,6 @@ public class ASDGPath {
 		return newList;
 	}
 	
-	
-	//TODO: debug
-	
 	public List<ASDGVertex> getAllType12Split(){
 		List<ASDGVertex> list = new ArrayList<ASDGVertex>();
 		for(ASDGVertex v : this.getPath()) {
@@ -225,7 +228,6 @@ public class ASDGPath {
 		return list;
 	}
 	
-	//TODO: debug
 	public List<ASDGVertex[]> getAllType132Split(){
 		List<ASDGVertex[]> list = new ArrayList<ASDGVertex[]>();
 		for(int i = 0; i < this.getPath().size(); i++) {
@@ -247,22 +249,16 @@ public class ASDGPath {
 	public ASDGPath[] getAllType132SplitPaths(ASDGVertex[] splitVertices){
 		assert(this.containsVertex(splitVertices[0]) && this.containsVertex(splitVertices[1]));
 
-		System.out.println("SPLIT begin");
 		ASDGPath[] splittedPaths = new ASDGPath[3];
 		if(splitVertices[0] != this.getInit() && splitVertices[1] != this.getLastVertex()) {
-			System.out.println("subType 132");
-			//132
-			// construct type 1 abs path
+			// subtype 132
+			// construct type 1 abstract path
 			ASDGPath p1 = new ASDGPath(this.getInit());
 			int i = 1;
-
-			System.out.println("AbsConcat p1");
 			for(i = 1; i < this.getPath().size() && this.getVertex(i).getSccIndex() != splitVertices[0].getSccIndex(); i ++) {
 				p1.concatVertex(this.getVertex(i));
 			}
-
-			System.out.println("AbsConcat p3");
-			// construct type 3  abs path
+			// construct type 3  abstract path
 			ASDGPath p3 = new ASDGPath(splitVertices[0]);
 			for(     ; i < this.getPath().size() && this.getVertex(i).getSccIndex() != splitVertices[1].getSccIndex(); i++) {
 				if(this.getPath().get(i).getSccIndex() != splitVertices[0].getSccIndex()) {
@@ -275,26 +271,20 @@ public class ASDGPath {
 					p3.concatVertex(this.getVertex(i));
 				}
 			}
-			
-			// construct type2 abs path
+			// construct type2 abstract path
 			i = i + 1;
 			ASDGPath p2 = new ASDGPath(this.getVertex(i));
-			System.out.println("AbsConcat p2");
 			for(     ; i < this.getPath().size(); i++) {
 				p2.concatVertex(this.getVertex(i));
 			}
-			
 			splittedPaths[0] = p1;
 			splittedPaths[1] = p3;
 			splittedPaths[2] = p2;
 		} else if(splitVertices[0] != this.getInit() && splitVertices[1] == this.getLastVertex()) {
-			//13
+			// subtype 13
 
-			System.out.println("subType 13");
 			ASDGPath p1 = new ASDGPath(this.getInit());
 			int i = 1;
-
-			System.out.println("AbsConcat p1");
 			System.out.print(p1.getInit().getSccIndex());
 			for(i = 1; i < this.getPath().size() && this.getVertex(i).getSccIndex() != splitVertices[0].getSccIndex(); i ++) {
 				p1.concatVertex(this.getVertex(i));
@@ -303,7 +293,6 @@ public class ASDGPath {
 			
 			System.out.println();
 			ASDGPath p3 = new ASDGPath(splitVertices[0]);
-			System.out.println("AbsConcat p3");
 			System.out.print(p3.getInit().getSccIndex());
 			for(     ; i < this.getPath().size() && this.getVertex(i).getSccIndex() != splitVertices[1].getSccIndex(); i++) {
 				if(this.getVertex(i).getSccIndex() != splitVertices[0].getSccIndex()) {
@@ -326,13 +315,9 @@ public class ASDGPath {
 			splittedPaths[1] = p3;
 			splittedPaths[2] = p2;
 		} else if(splitVertices[0] == this.getInit() && splitVertices[1] != this.getLastVertex()) {
-			//32
-
-			System.out.println("subType 32");
+			// subtype 32
 			ASDGPath p1 = null;
 			int i = 0;
-
-			System.out.println("AbsConcat p3");
 			ASDGPath p3 = new ASDGPath(splitVertices[0]);
 			for(     ; i < this.getPath().size() && this.getVertex(i).getSccIndex() != splitVertices[1].getSccIndex(); i++) {
 				if(i != 0) {
@@ -344,9 +329,6 @@ public class ASDGPath {
 			}
 			i = i + 1;
 			ASDGPath p2 = new ASDGPath(this.getVertex(i));
-
-
-			System.out.println("AbsConcat p2");
 			for(i = i + 1; i < this.getPath().size(); i++) {
 				p2.concatVertex(this.getVertex(i));
 			}
@@ -354,13 +336,9 @@ public class ASDGPath {
 			splittedPaths[1] = p3;
 			splittedPaths[2] = p2;
 		} else {
-			//3
-
-			System.out.println("subType 3");
+			// subtype 3
 			ASDGPath p1 = null;
 			int i = 1;
-
-			System.out.println("AbsConcat p3");
 			ASDGPath p3 = new ASDGPath(splitVertices[0]);
 			for(     ; i < this.getPath().size() && this.getVertex(i).getSccIndex() != splitVertices[1].getSccIndex(); i++) {
 				p3.concatVertex(this.getVertex(i));
@@ -375,13 +353,10 @@ public class ASDGPath {
 			splittedPaths[1] = p3;
 			splittedPaths[2] = p2;
 		}
-		
-		System.out.println("SPLIT over");
 		return splittedPaths;
 	}
 	
 	public List<SDGVertex[]> getType132LinkInportOutport(ASDGVertex[] splitVertices){
-		// TODO DEBUG CHECK AGAIN
 		boolean subType132 = false, subType13 = false, subType32 = false, subType3 = false;
 		if(splitVertices[0] == this.getInit() && splitVertices[1] == this.getLastVertex()) {
 			subType3 = true;
