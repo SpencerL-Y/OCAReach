@@ -254,6 +254,19 @@ public class DGraph implements Graph{
 		return true;
 	}
 	
+	public boolean isReachable(int fromIndex, int toIndex) {
+		DGVertex fromVertex = this.getVertex(fromIndex);
+		Queue<DGVertex> list = new LinkedList<DGVertex>();
+		List<DGVertex> visited = new ArrayList<DGVertex>();
+		list.add(fromVertex);
+		this.connectedBFS(list, visited);
+		if(visited.contains(this.getVertex(toIndex))) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
 	public boolean isFlatSCCGraph() {
 		//TODO: DEBUG whether the flatness is correctly expressed here
 		// the strongly connected property should be guaranteed
@@ -277,8 +290,8 @@ public class DGraph implements Graph{
 	}
 	
 	
-	private void connectedBFS(Queue<DGVertex> list, List<DGVertex> visited) {
-		// BFS and store all the reached vertices into list visited
+	public void connectedBFS(Queue<DGVertex> list, List<DGVertex> visited) {
+		// BFS and store all the reached vertices into visited
 		while(!list.isEmpty()) {
 			visited.add(list.peek());
 			for(DGEdge e : list.poll().getEdges()) {
@@ -362,6 +375,34 @@ public class DGraph implements Graph{
 				i = this.getTable().getMaxLength()) {
 			this.getTable().increMaxLenUpdate();
 		}
+	}
+	
+	
+	public int getZeroEdgeNum() {
+		int n = 0;
+		for(DGVertex v : this.getVertices()) {
+			for(DGEdge e : v.getEdges()) {
+				if(e.getWeight() == 0) {
+					n ++;
+				}
+			}
+		}
+		return n;
+	}
+	
+	public DGraph getGraphZeroEdgeRemoved() {
+		DGraph graph = new DGraph();
+		for(DGVertex v : this.getVertices()) {
+			graph.addVertex(v.getIndex());
+		}
+		for(DGVertex v : this.getVertices()) {
+			for(DGEdge e : v.getEdges()) {
+				if(e.getWeight() != 0) {
+					graph.addEdge(e.getFrom().getIndex(), e.getTo().getIndex(), e.getWeight());
+				}
+			}
+		}
+		return graph;
 	}
 	
 	// getters and setters

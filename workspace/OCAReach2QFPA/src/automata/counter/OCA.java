@@ -63,6 +63,17 @@ public class OCA implements Automaton{
 		return false;
 	}
 	
+	public boolean containsZeroTransition() {
+		for(State s : this.getStates()) {
+			for(Transition t : s.getTransitions()) {
+				if(t.getLabel().equals("zero")) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
 	// getters and setters
 	public List<State> getStates() {
 		return states;

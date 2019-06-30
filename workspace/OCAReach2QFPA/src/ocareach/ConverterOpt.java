@@ -58,7 +58,7 @@ public class ConverterOpt extends Converter {
 				
 				// there is no cycle in  SCCs (trivial case: every SCC is a concrete vertex)
 				boolean trivial = !p.containsCycledVertex();
-				// the counter automata is flat which can be optimised
+				// the counter automata is flat which can be optimized
 				boolean isFlat = p.isFlatPath();
 				// there might be type-1 certificate
 				boolean type1 = true;
