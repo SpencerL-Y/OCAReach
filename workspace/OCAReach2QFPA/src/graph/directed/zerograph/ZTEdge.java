@@ -4,6 +4,9 @@ public class ZTEdge {
 	private ZTVertex from, to;
 	
 	public ZTEdge(ZTVertex from, ZTVertex to) {
+		if(from == null || to == null) {
+			System.out.println("ERROR: ZTEdge init error");
+		}
 		this.setFrom(from);
 		this.setTo(to);
 	}

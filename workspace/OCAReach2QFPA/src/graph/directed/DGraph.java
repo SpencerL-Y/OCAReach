@@ -260,7 +260,7 @@ public class DGraph implements Graph{
 		List<DGVertex> visited = new ArrayList<DGVertex>();
 		list.add(fromVertex);
 		this.connectedBFS(list, visited);
-		if(visited.contains(this.getVertex(toIndex))) {
+		if(!visited.contains(this.getVertex(toIndex))) {
 			return false;
 		} else {
 			return true;
