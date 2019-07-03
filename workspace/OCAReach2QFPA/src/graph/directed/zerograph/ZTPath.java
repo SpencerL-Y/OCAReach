@@ -18,6 +18,7 @@ public class ZTPath {
 		if(stack.size() == 0) {
 			System.out.println("ERROR: stack init ztpath failed");
 		}
+		this.path = new ArrayList<ZTVertex>();
 		this.zGraph = stack.peek().getZg();
 		for(ZTVertex v : stack) {
 			// TODO: DEBUG
@@ -26,7 +27,7 @@ public class ZTPath {
 	}
 	
 	// basic operations
-	public ZTVertex getIndex(int i) {
+	public ZTVertex getVertex(int i) {
 		return this.getPath().get(i);
 	}
 	
@@ -67,6 +68,14 @@ public class ZTPath {
 			}
 		}
 		return false;
+	}
+	
+	public void print() {
+		System.out.print("ZTPath print: ");
+		for(ZTVertex v : this.getPath()) {
+			System.out.print(v.getIndex());
+		}
+		System.out.println();
 	}
 	
 	// setters and getters

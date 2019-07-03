@@ -50,10 +50,12 @@ public class Converter {
 	
 	// ALGORITHM
 	public String convert() {
-		return this.convert(this.oca.getInitState(), this.oca.getTargetState());
+		IntExpr sVar = this.getQfpaGen().mkVariableInt("xs");
+		IntExpr tVar = this.getQfpaGen().mkVariableInt("xt");
+		return this.convert(this.oca.getInitState(), this.oca.getTargetState(), sVar, tVar);
 	}
 	
-	public String convert(State startState, State endState) {
+	public String convert(State startState, State endState, IntExpr sVar, IntExpr tVar) {
 		assert(this.getOca().containsState(startState) && this.getOca().containsState(endState));
 		// set starting and ending vertex in DG
 		this.getDgraph().setStartVertexIndex(startState.getIndex());
@@ -67,8 +69,6 @@ public class Converter {
 		// get all the possible abstract path
 		List<ASDGPath> paths = this.getAsdg().DFSFindAbsPaths(absStart.getSccIndex(), absEnd.getSccIndex());
 		List<BoolExpr> formulae = new ArrayList<BoolExpr>();
-		IntExpr sVar = this.getQfpaGen().mkVariableInt("xs");
-		IntExpr tVar = this.getQfpaGen().mkVariableInt("xt");
 		for(ASDGPath p : paths) {
 			for(ASDGVertex v : p.getPath()) {
 				System.out.print(v.getSccIndex());
@@ -88,7 +88,7 @@ public class Converter {
 			BoolExpr type12Form = this.getQfpaGen().mkFalse();
 			BoolExpr type132Form = this.getQfpaGen().mkFalse();
 			if(trivial) {
-				trivialForm = this.genTrivialFormula(p);
+				trivialForm = this.genTrivialFormula(p, sVar, tVar);
 			}
 			if(type1 && !trivial) {
 				type1Form = this.genType1Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar, false);
@@ -165,7 +165,7 @@ public class Converter {
 		return resultExpr;
 	}
 	
-	public BoolExpr genTrivialFormula(ASDGPath p) {
+	public BoolExpr genTrivialFormula(ASDGPath p, IntExpr sVar, IntExpr tVar) {
 		// convert abstract vertices to concrete vertices
 		// we need the edge information so the path is constructed like this
 		DGVertex startV = this.getDgraph().getVertex(p.getVertex(0).getConcreteDGraph().getVertices().get(0).getIndex());
@@ -174,8 +174,6 @@ public class Converter {
 			DGVertex currentV = this.getDgraph().getVertex(p.getVertex(i).getConcreteDGraph().getVertices().get(0).getIndex());
 			cp.concatVertex(currentV);
 		}
-		IntExpr sVar = this.getQfpaGen().mkVariableInt("xs");
-		IntExpr tVar = this.getQfpaGen().mkVariableInt("xt");
 		BoolExpr result = this.getQfpaGen()
 						  .mkAndBool(this.getQfpaGen().mkEqBool(this.getQfpaGen().mkSubInt(tVar, sVar), 
 								  								this.getQfpaGen().mkConstantInt(cp.getWeight())),// weight correctly summed

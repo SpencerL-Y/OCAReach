@@ -28,12 +28,11 @@ public class ConverterOpt extends Converter {
 	}
 	
 	// ALGORITHM
-		@Override
-		public String convert() {
-			return this.convert(this.oca.getInitState(), this.oca.getTargetState());
+		public String convert(IntExpr sVar, IntExpr tVar) {
+			return this.convert(this.oca.getInitState(), this.oca.getTargetState(), sVar, tVar);
 		}
-		@Override
-		public String convert(State startState, State endState) {
+		
+		public BoolExpr convertToForm(State startState, State endState, IntExpr sVar, IntExpr tVar) {
 			assert(this.getOca().containsState(startState) && this.getOca().containsState(endState));
 			// set starting and ending vertex in DG
 			this.getDgraph().setStartVertexIndex(startState.getIndex());
@@ -42,14 +41,11 @@ public class ConverterOpt extends Converter {
 			this.getSdg().tarjan();
 			// construct abstract SDG
 			this.asdg = new ASDGraph(this.getSdg());
-			
 			ASDGVertex absStart = this.getAsdg().getVertex(this.getSdg().getStartingVertex().getSccMark());
 			ASDGVertex absEnd = this.getAsdg().getVertex(this.getSdg().getEndingVertex().getSccMark());
 			// get all the possible abstract path
 			List<ASDGPath> paths = this.getAsdg().DFSFindAbsPaths(absStart.getSccIndex(), absEnd.getSccIndex());
 			List<BoolExpr> formulae = new ArrayList<BoolExpr>();
-			IntExpr sVar = this.getQfpaGen().mkVariableInt("xs");
-			IntExpr tVar = this.getQfpaGen().mkVariableInt("xt");
 			for(ASDGPath p : paths) {
 				for(ASDGVertex v : p.getPath()) {
 					System.out.print(v.getSccIndex());
@@ -72,7 +68,79 @@ public class ConverterOpt extends Converter {
 				BoolExpr type12Form = this.getQfpaGen().mkFalse();
 				BoolExpr type132Form = this.getQfpaGen().mkFalse();
 				if(trivial) {
-					trivialForm = this.genTrivialFormula(p);
+					trivialForm = this.genTrivialFormula(p, sVar, tVar);
+				}
+				if(isFlat && !trivial) {
+					System.out.println("FLAT FORMULA CONFIRM");
+					flatForm = this.genFlatFormulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar);
+					
+				}
+				if(type1 && !trivial && !isFlat) {
+					type1Form = this.genType1Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar, false);
+				}
+				if(type12 && !trivial && !isFlat) {
+					type12Form = this.genType12Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar);
+				}
+				if(type132 && !trivial && !isFlat) {
+					type132Form = this.genType132Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar);
+				}
+				BoolExpr temp = (trivial)? trivialForm : 
+								(isFlat) ? flatForm    : this.combineAllFormlae(type1Form, type12Form, type132Form);
+				formulae.add(temp);
+			}
+			
+			
+			String result = null;
+			BoolExpr resultExpr = this.getQfpaGen().mkFalse();
+			for(BoolExpr formula : formulae) {
+				resultExpr = this.getQfpaGen().mkOrBool(resultExpr, formula);
+			}
+			BoolExpr xsXtPosRequirements = this.getQfpaGen().mkAndBool(
+						this.getQfpaGen().mkRequireNonNeg(sVar),
+						this.getQfpaGen().mkRequireNonNeg(tVar)
+			);
+			resultExpr = this.getQfpaGen().mkAndBool(resultExpr, xsXtPosRequirements);	
+			return resultExpr;
+		}
+		
+		@Override
+		public String convert(State startState, State endState, IntExpr sVar, IntExpr tVar) {
+			assert(this.getOca().containsState(startState) && this.getOca().containsState(endState));
+			// set starting and ending vertex in DG
+			this.getDgraph().setStartVertexIndex(startState.getIndex());
+			this.getDgraph().setEndingVertexIndex(endState.getIndex());
+			// run tarjan and get SCC marks
+			this.getSdg().tarjan();
+			// construct abstract SDG
+			this.asdg = new ASDGraph(this.getSdg());
+			ASDGVertex absStart = this.getAsdg().getVertex(this.getSdg().getStartingVertex().getSccMark());
+			ASDGVertex absEnd = this.getAsdg().getVertex(this.getSdg().getEndingVertex().getSccMark());
+			// get all the possible abstract path
+			List<ASDGPath> paths = this.getAsdg().DFSFindAbsPaths(absStart.getSccIndex(), absEnd.getSccIndex());
+			List<BoolExpr> formulae = new ArrayList<BoolExpr>();
+			for(ASDGPath p : paths) {
+				for(ASDGVertex v : p.getPath()) {
+					System.out.print(v.getSccIndex());
+				}
+				System.out.println();
+				
+				// there is no cycle in  SCCs (trivial case: every SCC is a concrete vertex)
+				boolean trivial = !p.containsCycledVertex();
+				// the counter automata is flat which can be optimized
+				boolean isFlat = p.isFlatPath();
+				// there might be type-1 certificate
+				boolean type1 = true;
+				// there might be type-1 . type-2/ type-2 certificate
+				boolean type12 = p.containsPosTagVertex();
+				// there might be type-1 . type-3 . type-2/ type-1 . type-3/ type-3 . type-2/ type-3 certificate
+				boolean type132 = p.containsNegTagVertex() && p.containsPosTagVertex();
+				BoolExpr trivialForm = this.getQfpaGen().mkFalse();
+				BoolExpr flatForm = this.getQfpaGen().mkFalse();
+				BoolExpr type1Form = this.getQfpaGen().mkFalse();
+				BoolExpr type12Form = this.getQfpaGen().mkFalse();
+				BoolExpr type132Form = this.getQfpaGen().mkFalse();
+				if(trivial) {
+					trivialForm = this.genTrivialFormula(p, sVar, tVar);
 				}
 				if(isFlat && !trivial) {
 					System.out.println("FLAT FORMULA CONFIRM");

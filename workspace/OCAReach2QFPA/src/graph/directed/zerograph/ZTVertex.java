@@ -26,11 +26,28 @@ public class ZTVertex {
 		this.getEdges().add(e);
 	}
 	
+	public boolean isInitVertex() {
+		if(this.getIndex() == this.getZg().getStartZTIndex()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public boolean isTargetVertex() {
+		if(this.getIndex() == this.getZg().getTargetZTIndex()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	// algorithm
 	
 	// TODO: debug
 	public void dfsFindZTPath(List<ZTPath> foundList, Stack<ZTVertex> searched, int targetIndex) {
-		if(this.getIndex() == targetIndex && !searched.contains(this)) {
+		if(this.isTargetVertex()) {
+			System.out.println("push " + this.getIndex());
 			searched.push(this);
 			foundList.add(new ZTPath(searched));
 			searched.pop();
@@ -39,6 +56,7 @@ public class ZTVertex {
 		
 		for(ZTEdge e : this.getEdges()) {
 			if(!searched.contains(this)) {
+				System.out.println("push " + this.getIndex());
 				searched.push(this);
 				e.getTo().dfsFindZTPath(foundList, searched, targetIndex);
 				searched.pop();

@@ -1,5 +1,8 @@
 package graph.directed.zerograph;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import formula.generator.QFPAGenerator;
 import graph.directed.DGraph;
 import junit.framework.TestCase;
@@ -13,14 +16,16 @@ public class ZeroEdgeDGraphTest extends TestCase {
 			this.graph.addVertex(i);
 		}
 		this.graph.setStartVertexIndex(0);
-		this.graph.setEndingVertexIndex(5);
+		this.graph.setEndingVertexIndex(0);
 		this.graph.addEdge(0, 1, 1);
-		this.graph.addEdge(0,2,-1);
-		this.graph.addEdge(0,3,0);
+		this.graph.addEdge(0, 2, -1);
+		this.graph.addEdge(0, 3, 0);
 		this.graph.addEdge(3, 4, 0);
 		this.graph.addEdge(4, 5, 1);
 		this.graph.addEdge(1, 3, 1);
 		this.graph.addEdge(2, 3, 1);
+		this.graph.addEdge(5, 0, 1);
+		this.graph.addEdge(3, 5, -1);
 	}
 
 	protected void tearDown() throws Exception {
@@ -44,7 +49,11 @@ public class ZeroEdgeDGraphTest extends TestCase {
 	}
 
 	public void testDfsFindAllZTPath() {
-		fail("Not yet implemented");
+		ZeroEdgeDGraph zg = new ZeroEdgeDGraph(this.graph);
+		List<ZTPath> paths = zg.dfsFindAllZTPath();
+		for(ZTPath p : paths) {
+			p.print();
+		}
 	}
 
 }

@@ -74,6 +74,26 @@ public class OCA implements Automaton{
 		return false;
 	}
 	
+	public OCA removeZeroTransitionOCA() {
+		OCA newOca = new OCA();
+		for(State s : this.getStates()) {
+			newOca.addState(s.getIndex());
+		}
+		for(State s : this.getStates()) {
+			for(Transition t : s.getTransitions()) {
+				if(!t.getLabel().equals("zero")) {
+					if(t.getLabel().equals("add")) {
+						newOca.addTransition(s.getIndex(), OCAOp.Add, t.getTo().getIndex());
+					} else if(t.getLabel().equals("sub")) {
+						newOca.addTransition(s.getIndex(), OCAOp.Sub, t.getTo().getIndex());
+					}
+				}
+			}
+		}
+		return newOca;
+	}
+	
+	
 	// getters and setters
 	public List<State> getStates() {
 		return states;

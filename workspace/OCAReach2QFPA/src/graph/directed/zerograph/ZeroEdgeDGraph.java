@@ -57,6 +57,7 @@ public class ZeroEdgeDGraph {
 					} else if(v.getTo() == -1 && w.getFrom() != -1) {
 						// if w is not, v is target vertex
 						if(this.getDg().isReachable(v.getFrom(), w.getFrom())) {
+							System.out.println("ADD EDGE " + v.getIndex() + w.getIndex());
 							this.addEdge(v.getIndex(), w.getIndex());
 						}
 					} else if(v.getTo() == -1 && w.getFrom() == -1){
