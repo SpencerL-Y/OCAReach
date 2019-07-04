@@ -64,6 +64,9 @@ public class SDGraph implements Graph{
 	// algorithm
 	// Tarjan's algorithm
 	public void tarjan() {
+		for(SDGVertex v : this.getVertices()) {
+			v.setSccMark(-1);
+		}
 		AtomicInteger index = new AtomicInteger(0);
 		AtomicInteger sccIndex = new AtomicInteger(1);
 		Stack<SDGVertex> stack = new Stack<SDGVertex>();

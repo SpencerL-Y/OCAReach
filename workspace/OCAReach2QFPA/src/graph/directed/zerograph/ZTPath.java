@@ -28,6 +28,10 @@ public class ZTPath {
 	
 	// basic operations
 	public ZTVertex getVertex(int i) {
+		if(i >= this.getPath().size()) {
+			System.out.println("ERROR: ztPath getVertex out of bound");
+			return null;
+		}
 		return this.getPath().get(i);
 	}
 	

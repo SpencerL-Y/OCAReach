@@ -33,12 +33,19 @@ public class ConverterOpt extends Converter {
 		}
 		
 		public BoolExpr convertToForm(State startState, State endState, IntExpr sVar, IntExpr tVar) {
-			assert(this.getOca().containsState(startState) && this.getOca().containsState(endState));
+			System.out.println("ConvertToForm");
+			if(!(this.getOca().containsState(startState) && this.getOca().containsState(endState))) {
+				System.out.println("ERROR: does not contain start and end states");
+				return null;
+			}
 			// set starting and ending vertex in DG
+			this.dgraph = this.getOca().toDGraph();
 			this.getDgraph().setStartVertexIndex(startState.getIndex());
 			this.getDgraph().setEndingVertexIndex(endState.getIndex());
 			// run tarjan and get SCC marks
 			this.getSdg().tarjan();
+			System.out.println("vertexNum: " + this.getSdg().getVertices().size());
+			System.out.println("sccNum: " + this.getSdg().getSccNum());
 			// construct abstract SDG
 			this.asdg = new ASDGraph(this.getSdg());
 			ASDGVertex absStart = this.getAsdg().getVertex(this.getSdg().getStartingVertex().getSccMark());
@@ -47,6 +54,13 @@ public class ConverterOpt extends Converter {
 			List<ASDGPath> paths = this.getAsdg().DFSFindAbsPaths(absStart.getSccIndex(), absEnd.getSccIndex());
 			List<BoolExpr> formulae = new ArrayList<BoolExpr>();
 			for(ASDGPath p : paths) {
+				for(ASDGVertex v : p.getPath()) {
+					System.out.print(v.getSccIndex());
+				}
+				System.out.println();
+			}
+			for(ASDGPath p : paths) {
+				System.out.println("test");
 				for(ASDGVertex v : p.getPath()) {
 					System.out.print(v.getSccIndex());
 				}
@@ -68,20 +82,25 @@ public class ConverterOpt extends Converter {
 				BoolExpr type12Form = this.getQfpaGen().mkFalse();
 				BoolExpr type132Form = this.getQfpaGen().mkFalse();
 				if(trivial) {
+					System.out.println("TRIVIAL");
 					trivialForm = this.genTrivialFormula(p, sVar, tVar);
+					System.out.println(trivialForm.toString());
 				}
 				if(isFlat && !trivial) {
-					System.out.println("FLAT FORMULA CONFIRM");
+					System.out.println("FLAT");
 					flatForm = this.genFlatFormulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar);
 					
 				}
 				if(type1 && !trivial && !isFlat) {
+					System.out.println("TYPE 1");
 					type1Form = this.genType1Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar, false);
 				}
 				if(type12 && !trivial && !isFlat) {
+					System.out.println("TYPE 12");
 					type12Form = this.genType12Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar);
 				}
 				if(type132 && !trivial && !isFlat) {
+					System.out.println("TYPE 132");
 					type132Form = this.genType132Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar);
 				}
 				BoolExpr temp = (trivial)? trivialForm : 
@@ -100,6 +119,7 @@ public class ConverterOpt extends Converter {
 						this.getQfpaGen().mkRequireNonNeg(tVar)
 			);
 			resultExpr = this.getQfpaGen().mkAndBool(resultExpr, xsXtPosRequirements);	
+			System.out.println("RETURN");
 			return resultExpr;
 		}
 		

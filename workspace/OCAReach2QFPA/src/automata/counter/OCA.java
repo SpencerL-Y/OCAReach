@@ -90,6 +90,8 @@ public class OCA implements Automaton{
 				}
 			}
 		}
+		newOca.setInitIndex(this.getInitIndex());
+		newOca.setTargetIndex(this.getTargetIndex());
 		return newOca;
 	}
 	
