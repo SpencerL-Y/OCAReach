@@ -61,15 +61,15 @@ public class ConverterZero {
 	public BoolExpr genZTPathForm(ZTPath p, IntExpr sVar, IntExpr tVar) {
 		System.out.println("genZTPathForm");
 		BoolExpr pathResult = this.converter.getQfpaGen().mkTrue();
-		IntExpr[] midVars = new IntExpr[2*(p.getPath().size())];
+		IntExpr[] midVars = new IntExpr[2*(p.getPath().size()-1)];
 		midVars[0] = sVar;
-		for(int i = 1; i < p.getPath().size(); i++) {
+		for(int i = 1; i < p.getPath().size()-1; i++) {
 			midVars[2*i-1] = this.converter.getQfpaGen().mkVariableInt("zv_t_" + p.getVertex(i).getIndex());
 			midVars[2*i] = this.converter.getQfpaGen().mkVariableInt("zv_s_" + p.getVertex(i).getIndex());
 		}
-		midVars[2*p.getPath().size() - 1] = tVar;
-		IntExpr[] boundVars = new IntExpr[2*(p.getPath().size() - 1)];
-		for(int i = 1; i < p.getPath().size() - 1; i++) {
+		midVars[2*(p.getPath().size()-1) - 1] = tVar;
+		IntExpr[] boundVars = new IntExpr[2*(p.getPath().size() - 2)];
+		for(int i = 1; i < midVars.length-1; i++) {
 			boundVars[i - 1] = midVars[i];
 		}
 		
@@ -87,7 +87,7 @@ public class ConverterZero {
 		} else {
 
 			System.out.println("more steps");
-			for(int i = 0; i < p.getPath().size(); i++) {
+			for(int i = 0; i < p.getPath().size()-1; i++) {
 				pathResult = this.converter.getQfpaGen().mkAndBool(
 							pathResult,
 							this.converter.convertToForm(this.converter.oca.getState(p.getVertex(i).getTo()), 
@@ -100,8 +100,6 @@ public class ConverterZero {
 			pathResult = (BoolExpr) this.converter.getQfpaGen().mkExistsQuantifier(boundVars, pathResult);
 			System.out.println("finished");
 		}
-
-		System.out.println("partial: " + pathResult.toString());
 		return pathResult;
 	}
 
