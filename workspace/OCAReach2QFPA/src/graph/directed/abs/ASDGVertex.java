@@ -27,9 +27,13 @@ public class ASDGVertex {
 	public void constructAbsEdgesByBorderEdges(List<BorderEdge> borderEdges) {
 		for(BorderEdge e : borderEdges) {
 			if(e.getToScc() == this.getSccIndex()) {
-				this.inports.add(e.getToVertex());
+				if(!this.inports.contains(e.getToVertex())) {
+					this.inports.add(e.getToVertex());
+				}
 			} else if(e.getFromScc() == this.getSccIndex()) {
-				this.outports.add(e.getFromVertex());
+				if(!this.outports.contains(e.getFromVertex())) {
+					this.outports.add(e.getFromVertex());
+				}
 				this.absEdges.add(new ASDGEdge(this, this.getGraph().getVertex(e.getToScc())));
 			}
 		}

@@ -11,6 +11,7 @@ import com.microsoft.z3.Status;
 
 import automata.State;
 import automata.counter.OCA;
+import graph.directed.DGEdge;
 import graph.directed.DGPath;
 import graph.directed.DGVertex;
 import graph.directed.DGraph;
@@ -196,9 +197,9 @@ public class ConverterOpt extends Converter {
 			// ----------------------EQUIV DEBUG-----------------------
 			resultExpr = this.equivDebug(sVar, tVar, resultExpr);
 			
-			result = resultExpr.simplify().toString();
+			result = resultExpr.toString();
 			Solver solver = this.getQfpaGen().getCtx().mkSolver();
-			solver.add((BoolExpr)resultExpr.simplify());
+			solver.add((BoolExpr)resultExpr);
 			if(solver.check() == Status.UNSATISFIABLE) {
 				solveResult = "\n UNSAT";
 			} else {
@@ -214,32 +215,15 @@ public class ConverterOpt extends Converter {
 			BoolExpr resultExpr = null;
 			IntExpr iVar = this.getQfpaGen().mkVariableInt("i");
 			IntExpr jVar = this.getQfpaGen().mkVariableInt("j");
-			List<IntExpr> sum = new ArrayList<IntExpr>(3);
-			sum.add(null);
-			sum.add(null);
-			sum.add(null);
-			sum.set(0, this.getQfpaGen().mkScalarTimes(this.getQfpaGen().mkConstantInt(-2), iVar));
-			sum.set(1, this.getQfpaGen().mkScalarTimes(this.getQfpaGen().mkConstantInt(1), jVar));
-			sum.set(2, sVar);
-			IntExpr[] bounds = new IntExpr[2];
-			bounds[0] = iVar;
-			bounds[1] = jVar;
-			BoolExpr equiv = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(bounds,
-						this.getQfpaGen().mkAndBool(
-								this.getQfpaGen().mkEqBool(tVar, this.getQfpaGen().mkSubInt(this.getQfpaGen().sumUpVars(sum), this.getQfpaGen().mkConstantInt(2))),
-						this.getQfpaGen().mkRequireNonNeg(iVar),
-						this.getQfpaGen().mkRequireNonNeg(tVar),
-						this.getQfpaGen().mkRequireNonNeg(sVar)
-						//this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(1))
-					));
-			
-			/*BoolExpr equiv = this.getQfpaGen().mkAndBool(
-				this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(2)),
-				this.getQfpaGen().mkGeBool(tVar, this.getQfpaGen().mkConstantInt(0)),
-				this.getQfpaGen().mkRequireNonNeg(tVar),
-				this.getQfpaGen().mkGeBool(this.getQfpaGen().mkSubInt(sVar, this.getQfpaGen().mkConstantInt(2)), tVar)
-					//this.getQfpaGen().mkGeBool(tVar, this.getQfpaGen().mkSubInt(sVar, this.getQfpaGen().mkConstantInt(2)))
-			);*/
+			BoolExpr xsRequire = this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkAddInt(this.getQfpaGen().mkConstantInt(3), iVar));
+			BoolExpr xtRequire = this.getQfpaGen().mkGeBool(tVar, this.getQfpaGen().mkConstantInt(1));
+			BoolExpr weight = this.getQfpaGen().mkEqBool(tVar, this.getQfpaGen().mkAddInt(sVar, this.getQfpaGen().mkScalarTimes(iVar, this.getQfpaGen().mkConstantInt(-1))));
+			BoolExpr xsxt = this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkAddInt(tVar, this.getQfpaGen().mkConstantInt(2)));
+			BoolExpr iRequire = this.getQfpaGen().mkGeBool(iVar, this.getQfpaGen().mkConstantInt(0));
+			BoolExpr equiv = this.getQfpaGen().mkAndBool(xsRequire, xtRequire, iRequire, xsxt);
+			IntExpr[] exists = new IntExpr[1];
+			exists[0] = iVar;
+			equiv = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(exists, equiv);
 			resultExpr = this.getQfpaGen().mkAndBool(this.getQfpaGen().getCtx().mkImplies(tempResult, equiv), this.getQfpaGen().getCtx().mkImplies(equiv, tempResult));
 			resultExpr = this.getQfpaGen().mkNotBool(resultExpr);
 			return resultExpr;
@@ -263,11 +247,16 @@ public class ConverterOpt extends Converter {
 				midVars[2*i + 1] = this.getQfpaGen().mkVariableInt("v_o_" + p.getVertex(i).getSccIndex());
 			}
 			midVars[0] = sVar;
-			midVars[p.length()] = tVar;
+			midVars[2*p.length()+1] = tVar;
 			allPossibleInOut = p.inportsOutportsCartesianProduct(p.getG().getSdg().getVertex(startIndex), 
 																 p.getG().getSdg().getVertex(endIndex), false);
 			BoolExpr resultForm = this.getQfpaGen().mkFalse();
+			System.out.println("allPossible Inout: " + allPossibleInOut.size());
 			for(List<SDGVertex> list : allPossibleInOut) {
+				for(SDGVertex v : list) {
+					System.out.print(v.getVertexIndex());
+				}
+				System.out.println();
 				AtomicInteger loopNum = new AtomicInteger();
 				loopNum.set(0);
 				BoolExpr pathForm = this.getQfpaGen().mkTrue();
@@ -305,13 +294,16 @@ public class ConverterOpt extends Converter {
 				}
 				resultForm = this.getQfpaGen().mkOrBool(resultForm, pathForm);
 			}
-			for(int i = 1; i < 2*p.getPath().size() - 1; i++) {
+			
+			IntExpr[] existsVars = new IntExpr[midVars.length - 2];
+			for(int i = 1; i < midVars.length - 1; i++) {
+				existsVars[i-1] = midVars[i];
 				resultForm = this.getQfpaGen().mkAndBool(
-					resultForm,
-					this.getQfpaGen().mkRequireNonNeg(midVars[i])
+						resultForm,
+						this.getQfpaGen().mkRequireNonNeg(midVars[i])
 				);
 			}
-			resultForm = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(midVars, resultForm);
+			resultForm = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(existsVars, resultForm);
 			return resultForm;
 		}
 		
@@ -386,20 +378,40 @@ public class ConverterOpt extends Converter {
 				DGPath i2oPath = new DGPath(g.getVertex(inportIndex));
 				DGVertex currentV = g.getVertex(inportIndex);
 				while(currentV.getIndex() != outportIndex) {
-					currentV = currentV.getEdges().get(0).getTo();
+					for(DGEdge e : currentV.getEdges()) {
+						if(this.getSdg().getVertex(e.getTo().getIndex()).getSccMark() == 
+						   this.getSdg().getVertex(currentV.getIndex()).getSccMark()) {
+							currentV = e.getTo();
+							break;
+						}
+					}
 					i2oPath.concatVertex(currentV);
 				}
+				
 				DGPath o2oPath = new DGPath(g.getVertex(outportIndex));
-				currentV = g.getVertex(outportIndex).getEdges().get(0).getTo();
+				currentV = g.getVertex(outportIndex);
+				for(DGEdge e : currentV.getEdges()) {
+					if(this.getSdg().getVertex(e.getTo().getIndex()).getSccMark() == 
+					   this.getSdg().getVertex(currentV.getIndex()).getSccMark()) {
+						currentV = e.getTo();
+						break;
+					}
+				}
 				o2oPath.concatVertex(currentV);
 				while(currentV.getIndex() != outportIndex) {
-					currentV = currentV.getEdges().get(0).getTo();
+					for(DGEdge e : currentV.getEdges()) {
+						if(this.getSdg().getVertex(e.getTo().getIndex()).getSccMark() == 
+						   this.getSdg().getVertex(currentV.getIndex()).getSccMark()) {
+							currentV = e.getTo();
+							break;
+						}
+					}
 					o2oPath.concatVertex(currentV);
 				}
 				
 				IntExpr dropI2O = this.getQfpaGen().mkConstantInt(Math.min(i2oPath.getDrop(), 0));
 				IntExpr dropFirstO2O = this.getQfpaGen().mkConstantInt(Math.min(i2oPath.getWeight() + o2oPath.getDrop(), 0));
-				// the drop may be large if the weight of the loop is negative
+				// the drop may be smaller if the weight of the loop is negative
 				IntExpr dropFinal = this.getQfpaGen().mkAddInt(dropFirstO2O,
 					this.getQfpaGen().mkScalarTimes(
 						this.getQfpaGen().mkSubInt(loopTimeVar, this.getQfpaGen().mkConstantInt(1)), 
@@ -407,7 +419,9 @@ public class ConverterOpt extends Converter {
 					)
 				);
 				IntExpr weightI2O = this.getQfpaGen().mkConstantInt(i2oPath.getWeight());
+				System.out.println("weightI2O: " + weightI2O);
 				IntExpr weightO2O = this.getQfpaGen().mkConstantInt(o2oPath.getWeight());
+				System.out.println("weightO2O: " + weightO2O);
 				IntExpr weightLoop = this.getQfpaGen().mkScalarTimes(loopTimeVar, weightO2O);
 				IntExpr weightPreAndLoop = this.getQfpaGen().mkAddInt(weightI2O, weightLoop);
 				IntExpr con0 = this.getQfpaGen().mkConstantInt(0);
@@ -441,24 +455,51 @@ public class ConverterOpt extends Converter {
 			} else {
 				DGVertex currentV = g.getVertex(outportIndex);
 				DGPath o2oPath = new DGPath(currentV);
-				currentV = currentV.getEdges().get(0).getTo();
+				System.out.print("o2oPath: " + outportIndex);
+				// find the next vertex of the loop path
+				for(DGEdge e : currentV.getEdges()) {
+					if(this.getSdg().getVertex(e.getTo().getIndex()).getSccMark() == 
+					   this.getSdg().getVertex(currentV.getIndex()).getSccMark()) {
+						currentV = e.getTo();
+						break;
+					}
+				}
 				while(currentV.getIndex() != outportIndex) {
 					o2oPath.concatVertex(currentV);
-					currentV = currentV.getEdges().get(0).getTo();
+					System.out.print(currentV.getIndex());
+					for(DGEdge e : currentV.getEdges()) {
+						if(this.getSdg().getVertex(e.getTo().getIndex()).getSccMark() == 
+						   this.getSdg().getVertex(currentV.getIndex()).getSccMark()) {
+							currentV = e.getTo();
+							break;
+						}
+					}
 				}
+				o2oPath.concatVertex(currentV);
+				System.out.print(currentV.getIndex());
+				System.out.println();
 				IntExpr dropFirstO2O = this.getQfpaGen().mkConstantInt(o2oPath.getDrop());
 				IntExpr dropFinal = this.getQfpaGen().mkAddInt(
 							this.getQfpaGen().mkConstantInt(o2oPath.getDrop()), 
-							this.getQfpaGen().mkScalarTimes(loopTimeVar, this.getQfpaGen().mkConstantInt(o2oPath.getWeight()))
+							this.getQfpaGen().mkScalarTimes(
+								this.getQfpaGen().mkSubInt(loopTimeVar, this.getQfpaGen().mkConstantInt(1)),
+								this.getQfpaGen().mkConstantInt(o2oPath.getWeight())
+							)
 				);
 				
 				IntExpr weightO2O = this.getQfpaGen().mkConstantInt(o2oPath.getWeight());
+				System.out.println("weightO2O: " + weightO2O);
+				System.out.println("dropFirst: " + dropFirstO2O.toString());
+				System.out.println("dropFinal: " + dropFinal.toString());
 				IntExpr weightLoop = this.getQfpaGen().mkScalarTimes(loopTimeVar, weightO2O);
 
 				IntExpr con0 = this.getQfpaGen().mkConstantInt(0);
-				BoolExpr dropRequirement = this.getQfpaGen().mkAndBool(
-					this.getQfpaGen().mkGeBool(this.getQfpaGen().mkAddInt(thisInVar, dropFirstO2O), con0),
-					this.getQfpaGen().mkGeBool(this.getQfpaGen().mkAddInt(thisInVar, dropFinal), con0)
+				BoolExpr dropRequirement = this.getQfpaGen().mkOrBool(
+						this.getQfpaGen().mkEqBool(loopTimeVar, this.getQfpaGen().mkConstantInt(0)),
+						this.getQfpaGen().mkAndBool(
+							this.getQfpaGen().mkGeBool(loopTimeVar, this.getQfpaGen().mkConstantInt(1)),
+							this.getQfpaGen().mkGeBool(this.getQfpaGen().mkAddInt(thisInVar, dropFirstO2O), con0),
+							this.getQfpaGen().mkGeBool(this.getQfpaGen().mkAddInt(thisInVar, dropFinal), con0))
 				);
 				BoolExpr weightRequirement = this.getQfpaGen().mkEqBool(this.getQfpaGen().mkAddInt(thisInVar, weightLoop), thisOutVar);
 

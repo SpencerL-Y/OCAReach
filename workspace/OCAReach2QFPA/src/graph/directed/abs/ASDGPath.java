@@ -167,6 +167,8 @@ public class ASDGPath {
 				for(SDGVertex lastOut : this.getPath().get(i-1).getOutports()) {
 					for(SDGVertex nextIn : this.getPath().get(i).getInports()) {
 						if(g.containsBorderEdge(lastOut, nextIn)) {
+							//System.out.println(this.getPath().get(i-1).getOutports().size() + " " + this.getPath().get(i).getInports().size());
+							//System.out.println("lastOut: " + lastOut.getVertexIndex() + " nextIn: " + nextIn.getVertexIndex());
 							List<SDGVertex> newCon = new ArrayList<SDGVertex>();
 							newCon.add(lastOut);
 							newCon.add(nextIn);
