@@ -4,10 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.microsoft.z3.ApplyResult;
 import com.microsoft.z3.BoolExpr;
+import com.microsoft.z3.Context;
+import com.microsoft.z3.Goal;
 import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.Solver;
 import com.microsoft.z3.Status;
+import com.microsoft.z3.Tactic;
 
 import automata.State;
 import automata.counter.OCA;
@@ -192,12 +196,20 @@ public class ConverterOpt extends Converter {
 						this.getQfpaGen().mkRequireNonNeg(sVar),
 						this.getQfpaGen().mkRequireNonNeg(tVar)
 			);
-			resultExpr = this.getQfpaGen().mkAndBool(resultExpr, xsXtPosRequirements);	
+			resultExpr = this.getQfpaGen().mkAndBool(resultExpr, xsXtPosRequirements);
+			
 			String solveResult = null;result = resultExpr.toString();
+
+			System.out.println("-----------APPLY TACTIC---------");
+			Goal goal = this.getQfpaGen().getCtx().mkGoal(true, false, false);
+			goal.add(resultExpr);
+			Tactic qeTac = this.getQfpaGen().getCtx().mkTactic("qe");
+			ApplyResult ar = applyTactic(this.getQfpaGen().getCtx(), qeTac, goal);
+			resultExpr = ar.getSubgoals()[0].AsBoolExpr();
 			// ----------------------EQUIV DEBUG-----------------------
 			resultExpr = this.equivDebug(sVar, tVar, resultExpr);
 			
-			result = resultExpr.toString();
+			result = resultExpr.simplify().toString();
 			Solver solver = this.getQfpaGen().getCtx().mkSolver();
 			solver.add((BoolExpr)resultExpr);
 			if(solver.check() == Status.UNSATISFIABLE) {
@@ -207,8 +219,19 @@ public class ConverterOpt extends Converter {
 			}
 			/*// --------------------------------------------------------*/
 			
+			
 			return (solveResult == null) ? result : result + solveResult;
 		}
+		
+		public ApplyResult applyTactic(Context ctx, Tactic t, Goal g)
+	    {
+	        System.out.println("\nGoal: " + g);
+
+	        ApplyResult res = t.apply(g);
+	        System.out.println("Application result: " + res);
+	        return res;
+	}
+		
 		
 		@Override
 		public BoolExpr equivDebug(IntExpr sVar, IntExpr tVar, BoolExpr tempResult) {
