@@ -120,6 +120,18 @@ public class ZeroEdgeDGraph {
 		return false;
 	}
 	
+	public boolean containsEdge(int fromIndex, int toIndex) {
+		if(!containsVertex(fromIndex) || !containsVertex(toIndex)) {
+			System.out.println("ERROR: ZTEdge does not contains vertex");
+		}
+		for(ZTEdge e : this.getVertex(fromIndex).getEdges()) {
+			if(e.getFrom().getIndex() == fromIndex && e.getTo().getIndex() == toIndex) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public void addEdge(int from, int to) {
 		if(!(this.containsVertex(from) && this.containsVertex(to))) {
 			System.out.println("ERROR: add ztedge error");
@@ -128,6 +140,10 @@ public class ZeroEdgeDGraph {
 		//TODO
 		System.out.println("Add zt edge: " + from + " to " + to);
 		this.getVertex(from).addEdge(to);
+	}
+	
+	public int getVerticesNum() {
+		return this.getVertices().size();
 	}
 	
 	// algorithm

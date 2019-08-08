@@ -76,6 +76,10 @@ public class QFPAGenerator {
 		return this.mkGeBool(var, this.mkConstantInt(0));
 	}
 	
+	public BoolExpr mkNotEqual(IntExpr left, IntExpr right) {
+		return this.getCtx().mkNot(this.getCtx().mkEq(left, right));
+	}
+	
 	// propositional logic operation
 	
 	public BoolExpr mkNotBool(BoolExpr arg) {
@@ -88,6 +92,10 @@ public class QFPAGenerator {
 	
 	public BoolExpr mkOrBool(BoolExpr... arg0) {
 		return this.getCtx().mkOr(arg0);
+	}
+	
+	public BoolExpr mkImplies(BoolExpr left, BoolExpr right) {
+		return this.getCtx().mkImplies(left, right);
 	}
 	
 	// Quantifier

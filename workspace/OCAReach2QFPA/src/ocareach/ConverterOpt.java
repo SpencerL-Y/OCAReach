@@ -114,7 +114,6 @@ public class ConverterOpt extends Converter {
 			}
 			
 			
-			String result = null;
 			BoolExpr resultExpr = this.getQfpaGen().mkFalse();
 			for(BoolExpr formula : formulae) {
 				resultExpr = this.getQfpaGen().mkOrBool(resultExpr, formula);
@@ -397,7 +396,6 @@ public class ConverterOpt extends Converter {
 				return null;
 			}
 			if(inportIndex != outportIndex) {
-				int minDrop = 0;
 				DGPath i2oPath = new DGPath(g.getVertex(inportIndex));
 				DGVertex currentV = g.getVertex(inportIndex);
 				while(currentV.getIndex() != outportIndex) {

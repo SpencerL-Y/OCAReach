@@ -9,6 +9,7 @@ import automata.State;
 import automata.counter.OCA;
 import graph.directed.DGraph;
 import graph.directed.zerograph.ZTPath;
+import graph.directed.zerograph.ZTVertex;
 import graph.directed.zerograph.ZeroEdgeDGraph;
 
 public class ConverterZero {
@@ -35,6 +36,113 @@ public class ConverterZero {
 	}
 	
 	public String convertZero(State startState, State endState) {
+		System.out.println("ConvertZero");
+		ZeroEdgeDGraph z = new ZeroEdgeDGraph(this.getOriginOCA().toDGraph());
+		IntExpr[] vertexVars = new IntExpr[z.getVerticesNum()];
+		IntExpr[] counterVars = new IntExpr[2*z.getVerticesNum() - 2];
+		int startIndex = -1;
+		int endIndex = -1;
+		for(int i = 0; i < z.getVerticesNum(); i++) {
+			vertexVars[i] = this.getConverter().getQfpaGen().mkVariableInt("z_"+ startState.getIndex() + "_" + endState.getIndex() + "_" + 
+							z.getVertices().get(i).getIndex());
+			if(z.getVertices().get(i).isTargetVertex()) {
+				endIndex = i;
+			} else if(z.getVertices().get(i).isInitVertex()) {
+				startIndex = i;
+			} 
+		}
+		counterVars[0] = this.getConverter().getQfpaGen().mkVariableInt("xs");
+		counterVars[1] = this.getConverter().getQfpaGen().mkVariableInt("xt");
+		int index = 2;
+		for(int i = 0; i < z.getVerticesNum(); i++) {
+			if(i != startIndex && i != endIndex) {
+				counterVars[index] = this.getConverter().getQfpaGen().mkVariableInt("zv_t_" + z.getVertex(i).getFrom());
+				counterVars[index+1] = this.getConverter().getQfpaGen().mkVariableInt("zv_s_" + z.getVertex(i).getTo());
+			}
+		}
+		BoolExpr dfsForm = this.getConverter().getQfpaGen().mkEqBool(vertexVars[startIndex], this.getConverter().getQfpaGen().mkConstantInt(1));
+		dfsForm = this.getConverter().getQfpaGen().mkAndBool(
+				dfsForm, 
+				this.getConverter().getQfpaGen().mkGtBool(vertexVars[endIndex], this.getConverter().getQfpaGen().mkConstantInt(0)));
+		BoolExpr startUniqueForm = this.getConverter().getQfpaGen().mkTrue();
+		for(int i = 0; i < z.getVerticesNum(); i ++) {
+			if(!(i == startIndex)) {
+				startUniqueForm = this.getConverter().getQfpaGen().mkAndBool(
+					startUniqueForm, 
+					this.getConverter().getQfpaGen().mkNotEqual(vertexVars[i], this.getConverter().getQfpaGen().mkConstantInt(1))
+				);
+			}
+		}
+		dfsForm = this.getConverter().getQfpaGen().mkAndBool(dfsForm, startUniqueForm);
+		BoolExpr reachForm = this.getConverter().getQfpaGen().mkTrue();
+		for(int i = 0; i < z.getVerticesNum(); i++) {
+			if(i != startIndex) {
+				BoolExpr onThePath = this.getConverter().getQfpaGen().mkGtBool(vertexVars[i], this.getConverter().getQfpaGen().mkConstantInt(0));
+				BoolExpr hasLessNumForm = this.getConverter().getQfpaGen().mkFalse();
+				
+				for(int j = 0; j < z.getVerticesNum(); j++) {
+					if(j != i && z.containsEdge(z.getVertex(j).getIndex(), z.getVertex(i).getIndex())) {
+						BoolExpr partForm = null;
+						if(j == startIndex) {
+							if(i == endIndex) {
+								System.out.println("HERE 1");
+								partForm = this.getConverter().convertToForm(this.getConverter().getOca().getState(z.getVertex(j).getTo()),	
+																		     this.getConverter().getOca().getState(z.getVertex(i).getFrom()),
+																		     counterVars[0], 
+																		     counterVars[1]);
+							} else {
+								System.out.println("HERE 2 " + z.getVertex(j).getTo() + " " + z.getVertex(i).getFrom());
+								partForm = this.getConverter().convertToForm(this.getConverter().getOca().getState(z.getVertex(j).getTo()),
+																		     this.getConverter().getOca().getState(z.getVertex(i).getFrom()),
+																		     counterVars[0], 
+																		     this.getConverter().getQfpaGen().mkVariableInt("zv_t_" + z.getVertex(i).getFrom()));
+							}
+						} else if (j == endIndex){
+							System.out.println("HERE 3 " + z.getVertex(j).getTo() + " " + z.getVertex(i).getFrom());
+							partForm = this.getConverter().convertToForm(this.getConverter().getOca().getState(z.getVertex(j).getFrom()), 
+	 									 								 this.getConverter().getOca().getState(z.getVertex(i).getFrom()), 
+	 									 								 this.getConverter().getQfpaGen().mkVariableInt("zv_t_" + z.getVertex(j).getTo()), 
+	 									 								 this.getConverter().getQfpaGen().mkVariableInt("zv_s_" + z.getVertex(i).getFrom()));
+						
+						} else {
+							if(i == endIndex) {
+								System.out.println("HERE 4 " + z.getVertex(j).getTo() + " " + z.getVertex(i).getFrom());
+								partForm = this.getConverter().convertToForm(this.getConverter().getOca().getState(z.getVertex(j).getTo()), 
+																			 this.getConverter().getOca().getState(z.getVertex(i).getFrom()), 
+																			 this.getConverter().getQfpaGen().mkVariableInt("zv_t_" + z.getVertex(j).getTo()), 
+																			 counterVars[1]);
+							} else {
+								System.out.println("HERE 5 " + z.getVertex(j).getTo() + " " + z.getVertex(i).getFrom());
+								partForm = this.getConverter().convertToForm(this.getConverter().getOca().getState(z.getVertex(j).getTo()), 
+	 									 									 this.getConverter().getOca().getState(z.getVertex(i).getFrom()), 
+	 									 									 this.getConverter().getQfpaGen().mkVariableInt("zv_t_" + z.getVertex(j).getTo()), 
+	 									 									 this.getConverter().getQfpaGen().mkVariableInt("zv_s_" + z.getVertex(i).getFrom()));
+							}
+						}
+						
+						BoolExpr tempForm = this.getConverter().getQfpaGen().mkAndBool(
+							this.getConverter().getQfpaGen().mkGtBool(vertexVars[j], this.getConverter().getQfpaGen().mkConstantInt(0)),
+							this.getConverter().getQfpaGen().mkGtBool(vertexVars[i], vertexVars[j]),
+							partForm
+						);
+						
+						hasLessNumForm = this.getConverter().getQfpaGen().mkOrBool(
+							hasLessNumForm,
+							tempForm
+						);
+					}
+				}
+				reachForm = this.getConverter().getQfpaGen().mkAndBool(
+					reachForm,
+					this.getConverter().getQfpaGen().mkImplies(onThePath, hasLessNumForm)
+				);
+			}
+		}
+		return reachForm.toString();
+	}
+	
+	
+	public String convertZeroNaive(State startState, State endState) {
 		System.out.println("ConvertZero");
 		ZeroEdgeDGraph z = new ZeroEdgeDGraph(this.getOriginOCA().toDGraph());
 		List<ZTPath> ztPaths = z.dfsFindAllZTPath();
@@ -111,11 +219,11 @@ public class ConverterZero {
 		this.originOCA = originOCA;
 	}
 
-	public ConverterOpt getConvert() {
+	public ConverterOpt getConverter() {
 		return converter;
 	}
 
-	public void setConvert(ConverterOpt converter) {
+	public void setConverter(ConverterOpt converter) {
 		this.converter = converter;
 	}
 }
