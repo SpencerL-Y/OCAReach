@@ -38,6 +38,7 @@ public class ConverterZero {
 	
 	public String convertZero(State startState, State endState) {
 		System.out.println("ConvertZero");
+		this.oca.print();
 		ZeroEdgeDGraph z = new ZeroEdgeDGraph(this.getOriginOCA().toDGraph());
 		IntExpr[] vertexVars = new IntExpr[z.getVerticesNum()];
 		IntExpr[] counterVars = new IntExpr[2*z.getVerticesNum() - 2];
@@ -54,7 +55,6 @@ public class ConverterZero {
 		}
 		counterVars[0] = this.getConverter().getQfpaGen().mkVariableInt("xs");
 		counterVars[1] = this.getConverter().getQfpaGen().mkVariableInt("xt");
-		IntExpr[] existsCounterVars = new IntExpr[1];
 		List<IntExpr> existsArray = new ArrayList<IntExpr>();
 		BoolExpr dfsForm = this.getConverter().getQfpaGen().mkEqBool(vertexVars[startIndex], this.getConverter().getQfpaGen().mkConstantInt(1));
 		dfsForm = this.getConverter().getQfpaGen().mkAndBool(

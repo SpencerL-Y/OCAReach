@@ -20,6 +20,7 @@ import graph.directed.DGPath;
 import graph.directed.DGVertex;
 import graph.directed.DGraph;
 import graph.directed.SDGVertex;
+import graph.directed.SDGraph;
 import graph.directed.abs.ASDGPath;
 import graph.directed.abs.ASDGVertex;
 import graph.directed.abs.ASDGraph;
@@ -44,10 +45,14 @@ public class ConverterOpt extends Converter {
 				return null;
 			}
 			// set starting and ending vertex in DG
+			this.getOca().setInitIndex(startState.getIndex());
+			this.getOca().setTargetIndex(endState.getIndex());
 			this.dgraph = this.getOca().toDGraph();
-			this.getDgraph().setStartVertexIndex(startState.getIndex());
-			this.getDgraph().setEndingVertexIndex(endState.getIndex());
+			//this.getDgraph().setStartVertexIndex(startState.getIndex());
+			//this.getDgraph().setEndingVertexIndex(endState.getIndex());
+			System.out.println(this.getDgraph().getStartVertexIndex() + ", " + this.getDgraph().getEndingVertexIndex());
 			// run tarjan and get SCC marks
+			this.sdg = new SDGraph(this.dgraph);
 			this.getSdg().tarjan();
 			System.out.println("vertexNum: " + this.getSdg().getVertices().size());
 			System.out.println("sccNum: " + this.getSdg().getSccNum());
@@ -56,8 +61,10 @@ public class ConverterOpt extends Converter {
 			ASDGVertex absStart = this.getAsdg().getVertex(this.getSdg().getStartingVertex().getSccMark());
 			ASDGVertex absEnd = this.getAsdg().getVertex(this.getSdg().getEndingVertex().getSccMark());
 			// get all the possible abstract path
+			System.out.println(absStart.getSccIndex() + " | " + absEnd.getSccIndex());
 			List<ASDGPath> paths = this.getAsdg().DFSFindAbsPaths(absStart.getSccIndex(), absEnd.getSccIndex());
 			List<BoolExpr> formulae = new ArrayList<BoolExpr>();
+			System.out.println("path size: " + paths.size());
 			for(ASDGPath p : paths) {
 				for(ASDGVertex v : p.getPath()) {
 					System.out.print(v.getSccIndex());
