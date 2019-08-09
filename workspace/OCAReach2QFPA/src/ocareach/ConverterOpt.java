@@ -205,7 +205,7 @@ public class ConverterOpt extends Converter {
 			Tactic qeTac = this.getQfpaGen().getCtx().mkTactic("qe");
 			ApplyResult ar = applyTactic(this.getQfpaGen().getCtx(), qeTac, goal);
 			resultExpr = ar.getSubgoals()[0].AsBoolExpr();
-			// ----------------------EQUIV DEBUG-----------------------
+			/*// ----------------------EQUIV DEBUG-----------------------
 			resultExpr = this.equivDebug(sVar, tVar, resultExpr);
 			
 			result = resultExpr.simplify().toString();
@@ -216,7 +216,7 @@ public class ConverterOpt extends Converter {
 			} else {
 				solveResult = "\n SAT \n" + solver.getModel().toString();
 			}
-			/*// --------------------------------------------------------*/
+			/// --------------------------------------------------------*/
 			
 			
 			return (solveResult == null) ? result : result + solveResult;
