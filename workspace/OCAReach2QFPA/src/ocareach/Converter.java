@@ -380,7 +380,8 @@ public class Converter {
 				BoolExpr formGe = this.getQfpaGen().mkFalse();
 				// guess the mid vertex and initialize an Int type variable for it
 				for(DGVertex ve : support.getVertices()) {
-					IntExpr midVar = this.getQfpaGen().mkVariableInt("z"+ ve.getIndex());
+					//TODO: REC change the name here
+					IntExpr midVar = this.getQfpaGen().mkVariableInt("z_mid_"+ ve.getIndex());
 					// latter dynamic part
 					BoolExpr formGeDynamic = this.type1DynamicPartFormula(support, this.getSdg().getVertex(ve.getIndex()), outport, midVar, thisOutVar);
 					if(formGeDynamic == null) {
@@ -393,6 +394,7 @@ public class Converter {
 							// path flow
 							this.genPathFlowFormula(support, inport.getVertexIndex(), ve.getIndex(), thisInVar, midVar),
 							// z > |V|, this guarantee the counter value along the path to be positive
+							//TODO: GEN change the midVar bound
 							this.getQfpaGen().mkGeBool(midVar, this.getQfpaGen().mkConstantInt(support.getVertices().size())),
 							formGeDynamic
 						)

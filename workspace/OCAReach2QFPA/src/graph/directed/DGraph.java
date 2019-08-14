@@ -213,6 +213,17 @@ public class DGraph implements Graph{
 		return g;
 	}
 	
+	public int getMaximalAbsWeight() {
+		int max = 1;
+		for(DGVertex v : this.getVertices()) {
+			for(DGEdge e : v.getEdges()) {
+				if(Math.abs(e.getWeight()) > max) {
+					max = Math.abs(e.getWeight());
+				}
+			}
+		}
+		return max;
+	}
 	
 	public DGraph edgeListToGraph(List<DGEdge> list, int startIndex, int endIndex) {
 		DGraph g = new DGraph();
@@ -364,7 +375,9 @@ public class DGraph implements Graph{
 	}
 	
 	public void increaseDWTLenLimit() {
+		//TODO: GEN add the absolute value of the weight to the length limit
 		// increase the length limit to 2|V|^2 + 1 and
+		
 		if(this.getTable() == null) {
 			this.computeLoopTag();
 		}

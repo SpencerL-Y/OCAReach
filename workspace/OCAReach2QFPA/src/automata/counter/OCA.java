@@ -20,6 +20,7 @@ public class OCA implements Automaton{
 	}
 	
 	//basic operations
+	@Override
 	public void addState(int index) {
 		for(State s : this.getStates()) {
 			if(s.getIndex() == index) {
@@ -31,6 +32,7 @@ public class OCA implements Automaton{
 		this.states.add(new State(index));
 	}
 	
+	@Override
 	public State getState(int index) {
 		for(State s : this.getStates()) {
 			if(s.getIndex() == index) {

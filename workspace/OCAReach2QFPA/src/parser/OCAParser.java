@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 
 import automata.counter.OCA;
 import automata.counter.OCAOp;
+import automata.counter.OCAOpUtil;
 
 public class OCAParser {
 	
@@ -144,7 +145,7 @@ public class OCAParser {
 			}
 			int tFromNum = Integer.parseInt(tFrom.substring(1));
 			int tToNum = Integer.parseInt(tTo.substring(0, tTo.length() - 1));
-			OCAOp op = OCAOp.parseOp(tLabel);
+			OCAOp op = (OCAOp) OCAOpUtil.parseOp(tLabel);
 			oca.addTransition(tFromNum, op, tToNum);
 
 			System.out.println("add");
