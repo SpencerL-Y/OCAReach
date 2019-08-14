@@ -119,7 +119,6 @@ public class DGraph implements Graph{
 	}
 	
 	//Algorithms
-	//TODO: debug
 	public LoopTag computeLoopTag() {
 		if(this.table != null) {
 			return this.getTag();
@@ -179,6 +178,7 @@ public class DGraph implements Graph{
 		// find the supports that contains startVertex and endVertex
 		// the support also needs to be a strong connect component
 		// TODO: find a better implementation 
+		// TODO: NEW wait for algorithm
 		List<DGraph> graphs = new ArrayList<DGraph>();
 		List<DGEdge> edges = new ArrayList<DGEdge>();
 		for(DGVertex v : this.getVertices()) {
@@ -268,9 +268,7 @@ public class DGraph implements Graph{
 	}
 	
 	public boolean isFlatSCCGraph() {
-		//TODO: DEBUG whether the flatness is correctly expressed here
 		// the strongly connected property should be guaranteed
-		
 		// if the graph is a trivial state
 		if(this.getVertices().size() == 1) {
 			return true;

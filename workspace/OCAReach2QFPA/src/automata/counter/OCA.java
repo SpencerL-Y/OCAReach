@@ -75,6 +75,7 @@ public class OCA implements Automaton{
 	}
 	
 	public OCA removeZeroTransitionOCA() {
+		System.out.println("Original: start: " + this.getInitIndex() + " end: " +  this.getTargetIndex());
 		OCA newOca = new OCA();
 		for(State s : this.getStates()) {
 			newOca.addState(s.getIndex());
@@ -92,6 +93,7 @@ public class OCA implements Automaton{
 		}
 		newOca.setInitIndex(this.getInitIndex());
 		newOca.setTargetIndex(this.getTargetIndex());
+		System.out.println("New: start: " + newOca.getInitIndex() + " end: " +  newOca.getTargetIndex());
 		return newOca;
 	}
 	
@@ -129,6 +131,7 @@ public class OCA implements Automaton{
 		for(State s : this.getStates()) {
 			udg.addVertex(s.getIndex());
 		}
+		//TODO: GEN
 		for(State s : this.getStates()) {
 			for(Transition t : s.getTransitions()) {
 				int fromIndex = t.getFrom().getIndex();

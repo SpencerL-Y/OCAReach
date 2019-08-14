@@ -54,7 +54,6 @@ public class SDGraphTest extends TestCase {
 		}
 	}
 
-	//TODO: need second review
 	public final void testTarjan() {
 		System.out.println("TarjanTest:");
 		this.sdg = new SDGraph(kdg);

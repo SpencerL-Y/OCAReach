@@ -103,7 +103,6 @@ public class ASDGPath {
 	}
 	
 	public boolean isFlatPath() {
-		//TODO: DEBUG
 		for(ASDGVertex v : this.getPath()) {
 			DGraph sccGraph = v.getConcreteDGraph();
 			if(!sccGraph.isFlatSCCGraph()) {

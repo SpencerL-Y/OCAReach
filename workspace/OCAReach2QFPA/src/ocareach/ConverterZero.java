@@ -14,7 +14,6 @@ import graph.directed.zerograph.ZTVertex;
 import graph.directed.zerograph.ZeroEdgeDGraph;
 
 public class ConverterZero {
-	//TODO: DEBUG
 	// add ConverterOpt as a property
 	private OCA originOCA;
 	private OCA oca;
@@ -37,7 +36,8 @@ public class ConverterZero {
 	}
 	
 	public String convertZero(State startState, State endState) {
-		System.out.println("ConvertZero");
+		//System.out.println("ConvertZero");
+		System.out.println("--------------------Original OCA--------------------");
 		this.oca.print();
 		ZeroEdgeDGraph z = new ZeroEdgeDGraph(this.getOriginOCA().toDGraph());
 		IntExpr[] vertexVars = new IntExpr[z.getVerticesNum()];
@@ -71,25 +71,24 @@ public class ConverterZero {
 		}
 		dfsForm = this.getConverter().getQfpaGen().mkAndBool(dfsForm, startUniqueForm);
 		BoolExpr reachForm = this.getConverter().getQfpaGen().mkTrue();
-		System.out.println("startIndex: " + startIndex + " endIndex: " + endIndex);
+		///System.out.println("startIndex: " + startIndex + " endIndex: " + endIndex);
 		for(int i = 0; i < z.getVerticesNum(); i++) {
 			if(i != startIndex) {
 				BoolExpr onThePath = this.getConverter().getQfpaGen().mkGtBool(vertexVars[i], this.getConverter().getQfpaGen().mkConstantInt(0));
 				BoolExpr hasLessNumForm = this.getConverter().getQfpaGen().mkFalse();
-				
 				for(int j = 0; j < z.getVerticesNum(); j++) {
 					if(j != i && z.containsEdge(z.getVertex(j).getIndex(), z.getVertex(i).getIndex())) {
-						System.out.println("ContainEdge: " + z.getVertex(j).getIndex() + " " + z.getVertex(i).getIndex());
+						//System.out.println("ContainEdge: " + z.getVertex(j).getIndex() + " " + z.getVertex(i).getIndex());
 						BoolExpr partForm = null;
 						if(j == startIndex) {
 							if(i == endIndex) {
-								System.out.println("HERE 1");
+								//System.out.println("HERE 1");
 								partForm = this.getConverter().convertToForm(this.getConverter().getOca().getState(z.getVertex(j).getTo()),	
 																		     this.getConverter().getOca().getState(z.getVertex(i).getFrom()),
 																		     counterVars[0], 
 																		     counterVars[1]);
 							} else {
-								System.out.println("HERE 2 " + z.getVertex(j).getTo() + " " + z.getVertex(i).getFrom());
+								//System.out.println("HERE 2 " + z.getVertex(j).getTo() + " " + z.getVertex(i).getFrom());
 								IntExpr newVar = this.getConverter().getQfpaGen().mkVariableInt("zv_t_" + z.getVertex(i).getFrom());
 								existsArray.add(newVar);
 								partForm = this.getConverter().convertToForm(this.getConverter().getOca().getState(z.getVertex(j).getTo()),
@@ -98,7 +97,7 @@ public class ConverterZero {
 																		     newVar);
 							}
 						} else if (j == endIndex){
-							System.out.println("HERE 3 " + z.getVertex(j).getTo() + " " + z.getVertex(i).getFrom());
+							//System.out.println("HERE 3 " + z.getVertex(j).getTo() + " " + z.getVertex(i).getFrom());
 							IntExpr newVar1 = this.getConverter().getQfpaGen().mkVariableInt("zv_s_" + z.getVertex(j).getFrom());
 							IntExpr newVar2 = this.getConverter().getQfpaGen().mkVariableInt("zv_t_" + z.getVertex(i).getFrom());
 							existsArray.add(newVar1); existsArray.add(newVar2);
@@ -108,7 +107,7 @@ public class ConverterZero {
 	 									 								 newVar2);
 						} else {
 							if(i == endIndex) {
-								System.out.println("HERE 4 " + z.getVertex(j).getTo() + " " + z.getVertex(i).getFrom());
+								//System.out.println("HERE 4 " + z.getVertex(j).getTo() + " " + z.getVertex(i).getFrom());
 								IntExpr newVar = this.getConverter().getQfpaGen().mkVariableInt("zv_s_" + z.getVertex(j).getTo());
 								existsArray.add(newVar);
 								partForm = this.getConverter().convertToForm(this.getConverter().getOca().getState(z.getVertex(j).getTo()), 
@@ -116,7 +115,7 @@ public class ConverterZero {
 																			 newVar, 
 																			 counterVars[1]);
 							} else {
-								System.out.println("HERE 5 " + z.getVertex(j).getTo() + " " + z.getVertex(i).getFrom());
+								//System.out.println("HERE 5 " + z.getVertex(j).getTo() + " " + z.getVertex(i).getFrom());
 								IntExpr newVar1 = this.getConverter().getQfpaGen().mkVariableInt("zv_s_" + z.getVertex(j).getTo());
 								IntExpr newVar2 = this.getConverter().getQfpaGen().mkVariableInt("zv_t_" + z.getVertex(i).getFrom());
 								existsArray.add(newVar1); existsArray.add(newVar2);
@@ -126,16 +125,12 @@ public class ConverterZero {
 	 									 									 newVar2);
 							}
 						}
-						
-						System.out.println("PART: " + partForm.toString());
-				
-						
+						//System.out.println("PART: " + partForm.toString());
 						BoolExpr tempForm = this.getConverter().getQfpaGen().mkAndBool(
 							this.getConverter().getQfpaGen().mkGtBool(vertexVars[j], this.getConverter().getQfpaGen().mkConstantInt(0)),
 							this.getConverter().getQfpaGen().mkGtBool(vertexVars[i], vertexVars[j]),
 							partForm
 						);
-						
 						hasLessNumForm = this.getConverter().getQfpaGen().mkOrBool(
 							hasLessNumForm,
 							tempForm
@@ -148,16 +143,28 @@ public class ConverterZero {
 				);
 			}
 		}
+		reachForm = this.getConverter().getQfpaGen().mkAndBool(
+			reachForm,
+			dfsForm
+		);
 		IntExpr[] a = new IntExpr[existsArray.size()];
-		reachForm = (BoolExpr) this.getConverter().getQfpaGen().mkExistsQuantifier(existsArray.toArray(a), reachForm);
+		existsArray.toArray(a);
+		reachForm = this.getConverter().getQfpaGen().mkAndBool(
+			reachForm,
+			this.getConverter().getQfpaGen().mkRequireNonNeg(vertexVars),
+			this.getConverter().getQfpaGen().mkRequireNonNeg(a)
+		);
+		reachForm = (BoolExpr) this.getConverter().getQfpaGen().mkExistsQuantifier(a, reachForm);
 		reachForm = (BoolExpr) this.getConverter().getQfpaGen().mkExistsQuantifier(vertexVars, reachForm);
-		
-		return reachForm.toString();
+		String resultStr = null;
+		resultStr = reachForm.toString();
+		// simplified
+		//resultStr = reachForm.simplify().toString();
+		return resultStr;
 	}
 	
 	
 	public String convertZeroNaive(State startState, State endState) {
-		System.out.println("ConvertZero");
 		ZeroEdgeDGraph z = new ZeroEdgeDGraph(this.getOriginOCA().toDGraph());
 		List<ZTPath> ztPaths = z.dfsFindAllZTPath();
 		for(ZTPath p : ztPaths) {
@@ -167,7 +174,6 @@ public class ConverterZero {
 		IntExpr sVar = this.converter.getQfpaGen().mkVariableInt("xs");
 		IntExpr tVar = this.converter.getQfpaGen().mkVariableInt("xt");
 		for(ZTPath zp : ztPaths) {
-			System.out.print("p form: ");
 			zp.print();
 			resultExpr = this.converter.getQfpaGen().mkOrBool(
 				resultExpr,
@@ -178,10 +184,7 @@ public class ConverterZero {
 		return resultExpr.toString();
 	}
 	
-	
-	//TODO: DEBUG start vertex and target vertex are the same in the OCA
 	public BoolExpr genZTPathForm(ZTPath p, IntExpr sVar, IntExpr tVar) {
-		System.out.println("genZTPathForm");
 		BoolExpr pathResult = this.converter.getQfpaGen().mkTrue();
 		IntExpr[] midVars = new IntExpr[2*(p.getPath().size()-1)];
 		midVars[0] = sVar;
@@ -200,15 +203,11 @@ public class ConverterZero {
 			return null;
 		} 
 		if(p.getPath().size() == 2) {
-			System.out.println("one step");
 			// if the path does not contain any zero vertex
 			pathResult = this.converter.convertToForm(this.converter.oca.getState(p.getInitVertex().getTo()),
 					this.converter.oca.getState(p.getLastVertex().getFrom()),
 													  sVar, tVar);
-			System.out.println("finished");
 		} else {
-
-			System.out.println("more steps");
 			for(int i = 0; i < p.getPath().size()-1; i++) {
 				pathResult = this.converter.getQfpaGen().mkAndBool(
 							pathResult,
@@ -216,11 +215,9 @@ public class ConverterZero {
 											   			 this.converter.oca.getState(p.getVertex(i+1).getFrom()),
 											   			 midVars[2*i], midVars[2*i+1])
 							
-				);System.out.println("make and");
+				);
 			}
-			System.out.println("existstence");
 			pathResult = (BoolExpr) this.converter.getQfpaGen().mkExistsQuantifier(boundVars, pathResult);
-			System.out.println("finished");
 		}
 		return pathResult;
 	}

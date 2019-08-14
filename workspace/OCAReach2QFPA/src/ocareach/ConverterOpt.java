@@ -39,7 +39,7 @@ public class ConverterOpt extends Converter {
 		}
 		
 		public BoolExpr convertToForm(State startState, State endState, IntExpr sVar, IntExpr tVar) {
-			System.out.println("ConvertToForm");
+			//System.out.println("ConvertToForm");
 			if(!(this.getOca().containsState(startState) && this.getOca().containsState(endState))) {
 				System.out.println("ERROR: does not contain start and end states");
 				return null;
@@ -50,34 +50,34 @@ public class ConverterOpt extends Converter {
 			this.dgraph = this.getOca().toDGraph();
 			//this.getDgraph().setStartVertexIndex(startState.getIndex());
 			//this.getDgraph().setEndingVertexIndex(endState.getIndex());
-			System.out.println(this.getDgraph().getStartVertexIndex() + ", " + this.getDgraph().getEndingVertexIndex());
+			//System.out.println(this.getDgraph().getStartVertexIndex() + ", " + this.getDgraph().getEndingVertexIndex());
 			// run tarjan and get SCC marks
 			this.sdg = new SDGraph(this.dgraph);
 			this.getSdg().tarjan();
-			System.out.println("vertexNum: " + this.getSdg().getVertices().size());
-			System.out.println("sccNum: " + this.getSdg().getSccNum());
+			//System.out.println("vertexNum: " + this.getSdg().getVertices().size());
+			//System.out.println("sccNum: " + this.getSdg().getSccNum());
 			// construct abstract SDG
 			this.asdg = new ASDGraph(this.getSdg());
 			ASDGVertex absStart = this.getAsdg().getVertex(this.getSdg().getStartingVertex().getSccMark());
 			ASDGVertex absEnd = this.getAsdg().getVertex(this.getSdg().getEndingVertex().getSccMark());
 			// get all the possible abstract path
-			System.out.println(absStart.getSccIndex() + " | " + absEnd.getSccIndex());
+			//System.out.println(absStart.getSccIndex() + " | " + absEnd.getSccIndex());
 			List<ASDGPath> paths = this.getAsdg().DFSFindAbsPaths(absStart.getSccIndex(), absEnd.getSccIndex());
 			List<BoolExpr> formulae = new ArrayList<BoolExpr>();
-			System.out.println("path size: " + paths.size());
-			for(ASDGPath p : paths) {
+			//System.out.println("path size: " + paths.size());
+			/*for(ASDGPath p : paths) {
 				for(ASDGVertex v : p.getPath()) {
 					System.out.print(v.getSccIndex());
 				}
 				System.out.println();
-			}
+			}*/
 			for(ASDGPath p : paths) {
-				System.out.println("test");
-				for(ASDGVertex v : p.getPath()) {
+				//System.out.println("test");
+				/*for(ASDGVertex v : p.getPath()) {
 					System.out.print(v.getSccIndex());
 				}
 				System.out.println();
-				
+				*/
 				// there is no cycle in  SCCs (trivial case: every SCC is a concrete vertex)
 				boolean trivial = !p.containsCycledVertex();
 				// the counter automata is flat which can be optimized
@@ -94,25 +94,25 @@ public class ConverterOpt extends Converter {
 				BoolExpr type12Form = this.getQfpaGen().mkFalse();
 				BoolExpr type132Form = this.getQfpaGen().mkFalse();
 				if(trivial) {
-					System.out.println("TRIVIAL");
+					//System.out.println("TRIVIAL");
 					trivialForm = this.genTrivialFormula(p, sVar, tVar);
-					System.out.println(trivialForm.toString());
+					//System.out.println(trivialForm.toString());
 				}
 				if(isFlat && !trivial) {
-					System.out.println("FLAT");
+					//System.out.println("FLAT");
 					flatForm = this.genFlatFormulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar);
 					
 				}
 				if(type1 && !trivial && !isFlat) {
-					System.out.println("TYPE 1");
+					//System.out.println("TYPE 1");
 					type1Form = this.genType1Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar, false);
 				}
 				if(type12 && !trivial && !isFlat) {
-					System.out.println("TYPE 12");
+					//System.out.println("TYPE 12");
 					type12Form = this.genType12Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar);
 				}
 				if(type132 && !trivial && !isFlat) {
-					System.out.println("TYPE 132");
+					//System.out.println("TYPE 132");
 					type132Form = this.genType132Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar);
 				}
 				BoolExpr temp = (trivial)? trivialForm : 
@@ -130,7 +130,15 @@ public class ConverterOpt extends Converter {
 						this.getQfpaGen().mkRequireNonNeg(tVar)
 			);
 			resultExpr = this.getQfpaGen().mkAndBool(resultExpr, xsXtPosRequirements);	
-			System.out.println("RETURN");
+			/*
+			System.out.println("-----------APPLY TACTIC---------");
+			Goal goal = this.getQfpaGen().getCtx().mkGoal(true, false, false);
+			goal.add(resultExpr);
+			Tactic qeTac = this.getQfpaGen().getCtx().mkTactic("qe");
+			ApplyResult ar = applyTactic(this.getQfpaGen().getCtx(), qeTac, goal);
+			resultExpr = ar.getSubgoals()[0].AsBoolExpr();
+			/*----------------------------------------------------------------*/
+			//System.out.println("RETURN");
 			return resultExpr;
 		}
 		
@@ -150,11 +158,11 @@ public class ConverterOpt extends Converter {
 			List<ASDGPath> paths = this.getAsdg().DFSFindAbsPaths(absStart.getSccIndex(), absEnd.getSccIndex());
 			List<BoolExpr> formulae = new ArrayList<BoolExpr>();
 			for(ASDGPath p : paths) {
-				for(ASDGVertex v : p.getPath()) {
+				/*for(ASDGVertex v : p.getPath()) {
 					System.out.print(v.getSccIndex());
 				}
 				System.out.println();
-				
+				*/
 				// there is no cycle in  SCCs (trivial case: every SCC is a concrete vertex)
 				boolean trivial = !p.containsCycledVertex();
 				// the counter automata is flat which can be optimized
@@ -174,7 +182,6 @@ public class ConverterOpt extends Converter {
 					trivialForm = this.genTrivialFormula(p, sVar, tVar);
 				}
 				if(isFlat && !trivial) {
-					System.out.println("FLAT FORMULA CONFIRM");
 					flatForm = this.genFlatFormulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar);
 					
 				}
@@ -236,7 +243,7 @@ public class ConverterOpt extends Converter {
 	        ApplyResult res = t.apply(g);
 	        System.out.println("Application result: " + res);
 	        return res;
-	}
+	    }
 		
 		
 		@Override
@@ -280,7 +287,7 @@ public class ConverterOpt extends Converter {
 			allPossibleInOut = p.inportsOutportsCartesianProduct(p.getG().getSdg().getVertex(startIndex), 
 																 p.getG().getSdg().getVertex(endIndex), false);
 			BoolExpr resultForm = this.getQfpaGen().mkFalse();
-			System.out.println("allPossible Inout: " + allPossibleInOut.size());
+			//System.out.println("allPossible Inout: " + allPossibleInOut.size());
 			for(List<SDGVertex> list : allPossibleInOut) {
 				for(SDGVertex v : list) {
 					System.out.print(v.getVertexIndex());

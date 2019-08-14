@@ -12,7 +12,7 @@ import ocareach.ConverterZero;
 public class ConverterZeroTest {
 	public static void main(String[] args) throws IOException {
 		OCA oca = new OCA();
-		for(int i = 0; i < 4; i++) {
+		for(int i = 0; i < 7; i++) {
 			oca.addState(i);
 		}
 		/*
@@ -28,18 +28,43 @@ public class ConverterZeroTest {
 		oca.setInitIndex(0);
 		oca.setTargetIndex(5);
 		*/
-		
-		oca.addTransition(0, OCAOp.Add, 1);
+		// example 1 
+		/*
+		oca.addTransition(0, OCAOp.Sub, 1);
 		oca.addTransition(1, OCAOp.Zero, 2);
-		oca.addTransition(2, OCAOp.Sub, 3);
+		oca.addTransition(2, OCAOp.Add, 3);
 		oca.setInitIndex(0);
 		oca.setTargetIndex(3);
+		*/
+		//example 2
+		/*
+		oca.addTransition(0, OCAOp.Add, 1);
+		oca.addTransition(0, OCAOp.Sub, 4);
+		oca.addTransition(1, OCAOp.Zero, 2);
+		oca.addTransition(4, OCAOp.Zero, 5);
+		oca.addTransition(2, OCAOp.Sub, 3);
+		oca.addTransition(5, OCAOp.Add, 3);
+		oca.setInitIndex(0);
+		oca.setTargetIndex(3);
+		*/
 		
+		oca.addTransition(0, OCAOp.Sub, 1);
+		oca.addTransition(1, OCAOp.Zero, 2);
+		oca.addTransition(2, OCAOp.Add, 3);
+		oca.addTransition(3, OCAOp.Zero, 4);
+		oca.addTransition(3, OCAOp.Zero, 5);
+		oca.addTransition(4, OCAOp.Add, 6);
+		oca.addTransition(5, OCAOp.Sub, 6);
+		oca.setInitIndex(0);
+		oca.setTargetIndex(6);
 		
 		ConverterZero cz = new ConverterZero(oca);
 		String resultStr = cz.convert();
 		DataOutputStream out = new DataOutputStream(new FileOutputStream("/home/clexma/Desktop/test.smt"));
 		out.writeChars(resultStr);
-		System.out.println(cz.convert());
+		System.out.println();
+		System.out.println("--------------------FORMULA OUTPUT--------------------");
+		System.out.println(resultStr);
+		System.out.println("------------------------------------------------------");
 	}
 }

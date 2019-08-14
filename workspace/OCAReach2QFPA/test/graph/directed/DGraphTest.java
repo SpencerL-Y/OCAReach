@@ -61,7 +61,6 @@ public class DGraphTest extends TestCase {
 	}
 
 	public final void testComputeLoopTag() {
-		//TODO: test after the test of table
 		System.out.println("ComputeLoopTagTest:");
 		LoopTag t = this.ddg.computeLoopTag();
 		System.out.println("known looptag: " + t.toString());
@@ -197,7 +196,7 @@ public class DGraphTest extends TestCase {
 	}
 
 	public final void testIncreaseDWTLenLimit() {
-		//TODO: problem, it takes to much time to increase the bound to 3n^2+1 
+		//Problem: it takes to much time to increase the bound to 3n^2+1 
 		System.out.println("IncreaseDWTLenLimitTest:");
 		this.ddg.increaseDWTLenLimit();
 		for(int i = 0; i < 5; i++) {

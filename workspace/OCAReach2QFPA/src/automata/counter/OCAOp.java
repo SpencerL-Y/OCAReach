@@ -6,6 +6,7 @@ public enum OCAOp {
 	Zero;
 	
 	public static OCAOp parseOp(String str) {
+		//TODO: GEN add number OCAOp
 		if(str.equals("sub")) {
 			return Sub;
 		} else if(str.equals("add")) {

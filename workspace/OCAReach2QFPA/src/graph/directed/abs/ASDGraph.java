@@ -108,8 +108,6 @@ public class ASDGraph {
 	}
 	
 	public ASDGraph getSkewTranspose() {
-		//TODO: MAYBE EASIER?
-		
 		SDGraph skewSdg = this.getSdg().getSkewTranspose();
 		for(SDGVertex v : this.getSdg().getVertices()) {
 			skewSdg.getVertex(v.getVertexIndex()).setSccMark(v.getSccMark());
@@ -124,7 +122,6 @@ public class ASDGraph {
 		
 	}
 	
-	//TODO: debug
 	public List<ASDGPath> DFSFindAbsPaths(int startSccIndex, int toSccIndex) {
 		List<ASDGPath> result = new ArrayList<ASDGPath>();
 		Stack<ASDGVertex> stack = new Stack<ASDGVertex>();
@@ -133,7 +130,7 @@ public class ASDGraph {
 		stack.pop();
 		return result;
 	}
-	//TODO: debug
+
 	private void dfsProcess(List<ASDGPath> result, Stack<ASDGVertex> stack, int toSccIndex) {
 		// termination situations 1 & 2
 		if(stack.peek().getSccIndex() == toSccIndex) {
@@ -159,7 +156,6 @@ public class ASDGraph {
 		}
 	}
 	
-	//TODO: debug
 	private void computeAllLoopTag() {
 		for(ASDGVertex v : this.getVertices()) {
 			v.computeLoopTag();

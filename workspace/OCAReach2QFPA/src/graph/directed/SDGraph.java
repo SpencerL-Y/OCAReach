@@ -39,7 +39,6 @@ public class SDGraph implements Graph{
 		return this.getVertex(e.getTo().getIndex());
 	}
 	
-	//TODO: debug
 	public DGraph getConcreteSCC(int sccIndex) {
 		DGraph graph = new DGraph();
 		for(SDGVertex v : this.getVertices()) {

@@ -23,7 +23,6 @@ public class DWTableImpl implements DWTable {
 	
 	// algorithm 
 	
-	//TODO: debug
 	private void updateByGraph() {
 		boolean updated = true;
 		for(DWTEntry e : this.getEntryList()) {

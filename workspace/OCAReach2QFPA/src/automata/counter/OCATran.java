@@ -29,6 +29,7 @@ public class OCATran implements Transition {
 
 	@Override
 	public String getLabel() {
+		//TODO: GEN number OCAOp
 		if(this.getOp() == OCAOp.Add) {
 			return "add";
 		} else if(this.getOp() == OCAOp.Sub) {

@@ -39,7 +39,6 @@ public class ASDGVertex {
 		}
 	}
 	
-	//TODO: DEBUG CAREFUL WHETHER ADD skew or not
 	public DGraph getConcreteDGraph() {
 		return this.getGraph().getSdg().getConcreteSCC(this.getSccIndex());
 	}
@@ -78,7 +77,6 @@ public class ASDGVertex {
 	// algorithm
 	
 	public void computeLoopTag() {
-		//TODO debug
 		// compute loop information using DWT
 		DGraph concreteG = this.getConcreteDGraph();
 		this.setLoopTag(concreteG.computeLoopTag());

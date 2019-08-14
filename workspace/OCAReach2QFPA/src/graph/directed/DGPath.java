@@ -98,7 +98,6 @@ public class DGPath {
 		return this.getPath().size() - 1;
 	}
 	
-	//TODO debug
 	public DGPath getSubpath(int startIndex, int endIndex) {
 		assert(startIndex >= 0 && endIndex <= this.length() && startIndex <= endIndex);
 		DGPath p = new DGPath(this.getVertex(startIndex));

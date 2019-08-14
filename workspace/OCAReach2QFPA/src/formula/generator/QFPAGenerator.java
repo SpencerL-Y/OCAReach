@@ -4,8 +4,7 @@ import java.util.List;
 import com.microsoft.z3.*;
 
 public class QFPAGenerator {
-	// by doing so we restrict Z3 on logic class  PA
-	//TODO debug
+	// by doing so we restrict Z3 on Presburger Arithmetic
 	private Context ctx;
 	private Sort intSort;
 	private Sort boolSort;
@@ -47,7 +46,7 @@ public class QFPAGenerator {
 	public IntExpr mkScalarTimes(IntExpr constant, IntExpr exp) {
 		return (IntExpr) this.getCtx().mkMul(constant, exp);
 	}
-	//TODO: debug
+	
 	public IntExpr sumUpVars(List<IntExpr> l) {
 		IntExpr result = this.getCtx().mkInt(0);
 		for(IntExpr e : l) {
@@ -74,6 +73,14 @@ public class QFPAGenerator {
 	//speciala
 	public BoolExpr mkRequireNonNeg(IntExpr var) {
 		return this.mkGeBool(var, this.mkConstantInt(0));
+	}
+	
+	public BoolExpr mkRequireNonNeg(IntExpr[] vars) {
+		BoolExpr resultForm = this.mkTrue();
+		for(IntExpr v : vars) {
+			resultForm = this.mkAndBool(resultForm, this.mkRequireNonNeg(v));
+		}
+		return resultForm;
 	}
 	
 	public BoolExpr mkNotEqual(IntExpr left, IntExpr right) {
