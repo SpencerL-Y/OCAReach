@@ -17,7 +17,7 @@ public class ConverterOptTest {
 		oca.addTransition(2, OCAOp.Sub, 3);
 		oca.addTransition(3, OCAOp.Sub, 2);
 		oca.setInitIndex(0);
-		oca.setTargetIndex(1);
+		oca.setTargetIndex(2);
 		
 		ConverterOpt converter = new ConverterOpt(oca);
 		String result = converter.convert();

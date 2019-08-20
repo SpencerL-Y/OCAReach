@@ -105,7 +105,7 @@ public class Converter {
 		
 		
 		String result = null;
-		BoolExpr resultExpr = this.getQfpaGen().mkFalse();
+		BoolExpr resultExpr = this.getQfpaGen().mkEqBool(sVar, tVar);
 		for(BoolExpr formula : formulae) {
 			resultExpr = this.getQfpaGen().mkOrBool(resultExpr, formula);
 		}

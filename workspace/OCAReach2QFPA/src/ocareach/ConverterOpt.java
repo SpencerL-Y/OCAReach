@@ -94,26 +94,29 @@ public class ConverterOpt extends Converter {
 				BoolExpr type12Form = this.getQfpaGen().mkFalse();
 				BoolExpr type132Form = this.getQfpaGen().mkFalse();
 				if(trivial) {
-					//System.out.println("TRIVIAL");
+					System.out.println("TRIVIAL");
 					trivialForm = this.genTrivialFormula(p, sVar, tVar);
-					//System.out.println(trivialForm.toString());
+					System.out.println(trivialForm.toString());
 				}
 				if(isFlat && !trivial) {
-					//System.out.println("FLAT");
+					System.out.println("FLAT");
 					flatForm = this.genFlatFormulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar);
-					
+					System.out.println(flatForm.toString());
 				}
 				if(type1 && !trivial && !isFlat) {
-					//System.out.println("TYPE 1");
+					System.out.println("TYPE 1");
 					type1Form = this.genType1Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar, false);
+					System.out.println(type1Form.toString());
 				}
 				if(type12 && !trivial && !isFlat) {
-					//System.out.println("TYPE 12");
+					System.out.println("TYPE 12");
 					type12Form = this.genType12Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar);
+					System.out.println(type12Form.toString());
 				}
 				if(type132 && !trivial && !isFlat) {
-					//System.out.println("TYPE 132");
+					System.out.println("TYPE 132");
 					type132Form = this.genType132Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar);
+					System.out.println(type132Form);
 				}
 				BoolExpr temp = (trivial)? trivialForm : 
 								(isFlat) ? flatForm    : this.combineAllFormlae(type1Form, type12Form, type132Form);
@@ -121,7 +124,7 @@ public class ConverterOpt extends Converter {
 			}
 			
 			
-			BoolExpr resultExpr = this.getQfpaGen().mkFalse();
+			BoolExpr resultExpr = this.getQfpaGen().mkEqBool(sVar, tVar);
 			for(BoolExpr formula : formulae) {
 				resultExpr = this.getQfpaGen().mkOrBool(resultExpr, formula);
 			}
@@ -139,6 +142,7 @@ public class ConverterOpt extends Converter {
 			resultExpr = ar.getSubgoals()[0].AsBoolExpr();
 			/*----------------------------------------------------------------*/
 			//System.out.println("RETURN");
+			System.out.println("RESULT: " + resultExpr.toString());
 			return resultExpr;
 		}
 		
@@ -201,7 +205,7 @@ public class ConverterOpt extends Converter {
 			
 			
 			String result = null;
-			BoolExpr resultExpr = this.getQfpaGen().mkFalse();
+			BoolExpr resultExpr = this.getQfpaGen().mkEqBool(sVar, tVar);
 			for(BoolExpr formula : formulae) {
 				resultExpr = this.getQfpaGen().mkOrBool(resultExpr, formula);
 			}
@@ -250,14 +254,30 @@ public class ConverterOpt extends Converter {
 		public BoolExpr equivDebug(IntExpr sVar, IntExpr tVar, BoolExpr tempResult) {
 			BoolExpr resultExpr = null;
 			IntExpr iVar = this.getQfpaGen().mkVariableInt("i");
+
+			IntExpr jVar = this.getQfpaGen().mkVariableInt("j");
 			BoolExpr equiv = this.getQfpaGen().mkAndBool(
 				this.getQfpaGen().mkGeBool(iVar, this.getQfpaGen().mkConstantInt(0)),
-				this.getQfpaGen().mkEqBool(tVar, this.getQfpaGen().mkSubInt(sVar, this.getQfpaGen().mkAddInt(this.getQfpaGen().mkConstantInt(1), this.getQfpaGen().mkScalarTimes(iVar, this.getQfpaGen().mkConstantInt(2))))),
-				this.getQfpaGen().mkRequireNonNeg(sVar),
+				this.getQfpaGen().mkRequireNonNeg(jVar),
+				this.getQfpaGen().mkEqBool(
+					tVar, 
+					this.getQfpaGen().mkAddInt(
+						sVar, 
+						this.getQfpaGen().mkAddInt(
+						this.getQfpaGen().mkAddInt(
+								this.getQfpaGen().mkConstantInt(1), 
+								this.getQfpaGen().mkScalarTimes(iVar, this.getQfpaGen().mkConstantInt(-2))
+						),
+						this.getQfpaGen().mkScalarTimes(jVar, this.getQfpaGen().mkConstantInt(-2))
+						)
+					)
+				),
+				this.getQfpaGen().mkGeBool(this.getQfpaGen().mkAddInt(sVar, this.getQfpaGen().mkScalarTimes(iVar, this.getQfpaGen().mkConstantInt(-2))), this.getQfpaGen().mkConstantInt(0)),
 				this.getQfpaGen().mkRequireNonNeg(tVar)
 			);
-			IntExpr[] exists = new IntExpr[1];
+			IntExpr[] exists = new IntExpr[2];
 			exists[0] = iVar;
+			exists[1] = jVar;
 			equiv = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(exists, equiv);
 			resultExpr = this.getQfpaGen().mkAndBool(this.getQfpaGen().getCtx().mkImplies(tempResult, equiv), this.getQfpaGen().getCtx().mkImplies(equiv, tempResult));
 			resultExpr = this.getQfpaGen().mkNotBool(resultExpr);

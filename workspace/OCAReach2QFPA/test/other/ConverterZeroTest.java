@@ -69,7 +69,7 @@ public class ConverterZeroTest {
 		oca.setTargetIndex(5);
 		*/
 		
-		oca.addTransition(0, OCAOp.Sub, 1);
+		/*oca.addTransition(0, OCAOp.Sub, 1);
 		oca.addTransition(1, OCAOp.Sub, 0);
 		oca.addTransition(0, OCAOp.Add, 2);
 		oca.addTransition(2, OCAOp.Sub, 3);
@@ -77,7 +77,11 @@ public class ConverterZeroTest {
 		oca.addTransition(2, OCAOp.Zero, 4);
 		oca.addTransition(1, OCAOp.Zero, 4);
 		oca.setInitIndex(0);
-		oca.setTargetIndex(4);
+		oca.setTargetIndex(4);*/
+		
+		oca.addTransition(0, OCAOp.Zero, 1);
+		oca.setInitIndex(0);
+		oca.setTargetIndex(1);
 		
 		ConverterZero cz = new ConverterZero(oca);
 		String resultStr = cz.convert();
