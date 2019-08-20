@@ -43,18 +43,7 @@ public class ConverterZero {
 		System.out.println("--------------------Original OCA--------------------");
 		this.oca.print();
 		ZeroEdgeDGraph z = new ZeroEdgeDGraph(this.getOriginOCA().toDGraph());
-		IntExpr[] vertexVars = new IntExpr[z.getVerticesNum()];
-		int startIndex = -1;
-		int endIndex = -1;
-		for(int i = 0; i < z.getVerticesNum(); i++) {
-			vertexVars[i] = this.getConverter().getQfpaGen().mkVariableInt("z_"+ startState.getIndex() + "_" + endState.getIndex() + "_" + 
-							z.getVertices().get(i).getIndex());
-			if(z.getVertices().get(i).isTargetVertex()) {
-				endIndex = i;
-			} else if(z.getVertices().get(i).isInitVertex()) {
-				startIndex = i;
-			} 
-		}
+		
 		IntExpr sVar = this.getConverter().getQfpaGen().mkVariableInt("xs");
 		IntExpr tVar = this.getConverter().getQfpaGen().mkVariableInt("xt");
 		System.out.print("DIRECT");
@@ -67,21 +56,31 @@ public class ConverterZero {
 		BoolExpr oneStepForm = this.getConverter().getQfpaGen().mkFalse();
 		for(ZTVertex v : z.getVertices()) {
 			if(v.getFrom() >= 0 && v.getTo() >= 0) {
-				System.out.println("vFrom: " + v.getFrom() + " " + "vTo: " + v.getTo());
+				System.out.println("vFrom: " + this.getConverter().getOca().getState(v.getFrom()).getIndex()
+						   + " " + "vTo: "   + this.getConverter().getOca().getState(v.getTo()).getIndex());
+				System.out.println("startState: " + this.getConverter().getOca().getInitState().getIndex());
+				System.out.println("targetState: " + this.getConverter().getOca().getTargetState().getIndex());
 				//make sure the vertex represents a zero edge rather than the starting vertex and ending vertex
+				
 				BoolExpr midForm = this.getConverter().getQfpaGen().mkAndBool(
-					this.getConverter().convertToForm(this.getConverter().getOca().getInitState(),
+					this.getConverter().convertToForm(this.getConverter().getOca().getState(startState.getIndex()),
 													  this.getConverter().getOca().getState(v.getFrom()),
 													  sVar, 
 													  this.getConverter().getQfpaGen().mkConstantInt(0)),
 					this.getConverter().convertToForm(this.getConverter().getOca().getState(v.getTo()), 
-													  this.getConverter().getOca().getTargetState(), 
+													  this.getConverter().getOca().getState(endState.getIndex()), 
 													  this.getConverter().getQfpaGen().mkConstantInt(0), 
 													  tVar)
 				);
 				System.out.println("HERE: ");
+				
 				System.out.println(midForm.toString());
 				System.out.println();
+				System.out.println("test");
+				System.out.println(this.getConverter().convertToForm(this.getConverter().getOca().getState(v.getTo()), 
+						  this.getConverter().getOca().getTargetState(), 
+						  this.getConverter().getQfpaGen().mkConstantInt(0), 
+						  tVar).toString());
 				oneStepForm = this.getConverter().getQfpaGen().mkOrBool(
 					oneStepForm,
 					midForm

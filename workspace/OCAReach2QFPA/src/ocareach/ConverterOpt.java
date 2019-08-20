@@ -50,12 +50,12 @@ public class ConverterOpt extends Converter {
 			this.dgraph = this.getOca().toDGraph();
 			//this.getDgraph().setStartVertexIndex(startState.getIndex());
 			//this.getDgraph().setEndingVertexIndex(endState.getIndex());
-			//System.out.println(this.getDgraph().getStartVertexIndex() + ", " + this.getDgraph().getEndingVertexIndex());
+			System.out.println(this.getDgraph().getStartVertexIndex() + ", " + this.getDgraph().getEndingVertexIndex());
 			// run tarjan and get SCC marks
 			this.sdg = new SDGraph(this.dgraph);
 			this.getSdg().tarjan();
-			//System.out.println("vertexNum: " + this.getSdg().getVertices().size());
-			//System.out.println("sccNum: " + this.getSdg().getSccNum());
+			System.out.println("vertexNum: " + this.getSdg().getVertices().size());
+			System.out.println("sccNum: " + this.getSdg().getSccNum());
 			// construct abstract SDG
 			this.asdg = new ASDGraph(this.getSdg());
 			ASDGVertex absStart = this.getAsdg().getVertex(this.getSdg().getStartingVertex().getSccMark());
@@ -65,19 +65,19 @@ public class ConverterOpt extends Converter {
 			List<ASDGPath> paths = this.getAsdg().DFSFindAbsPaths(absStart.getSccIndex(), absEnd.getSccIndex());
 			List<BoolExpr> formulae = new ArrayList<BoolExpr>();
 			//System.out.println("path size: " + paths.size());
-			/*for(ASDGPath p : paths) {
+			for(ASDGPath p : paths) {
 				for(ASDGVertex v : p.getPath()) {
 					System.out.print(v.getSccIndex());
 				}
 				System.out.println();
-			}*/
+			}
 			for(ASDGPath p : paths) {
 				//System.out.println("test");
-				/*for(ASDGVertex v : p.getPath()) {
+				for(ASDGVertex v : p.getPath()) {
 					System.out.print(v.getSccIndex());
 				}
 				System.out.println();
-				*/
+				
 				// there is no cycle in  SCCs (trivial case: every SCC is a concrete vertex)
 				boolean trivial = !p.containsCycledVertex();
 				// the counter automata is flat which can be optimized
@@ -93,38 +93,47 @@ public class ConverterOpt extends Converter {
 				BoolExpr type1Form = this.getQfpaGen().mkFalse();
 				BoolExpr type12Form = this.getQfpaGen().mkFalse();
 				BoolExpr type132Form = this.getQfpaGen().mkFalse();
+				boolean debugSignal = true;
 				if(trivial) {
 					System.out.println("TRIVIAL");
 					trivialForm = this.genTrivialFormula(p, sVar, tVar);
 					System.out.println(trivialForm.toString());
+					debugSignal = false;
 				}
 				if(isFlat && !trivial) {
 					System.out.println("FLAT");
 					flatForm = this.genFlatFormulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar);
 					System.out.println(flatForm.toString());
+					debugSignal = false;
 				}
 				if(type1 && !trivial && !isFlat) {
 					System.out.println("TYPE 1");
 					type1Form = this.genType1Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar, false);
 					System.out.println(type1Form.toString());
+					debugSignal = false;
 				}
 				if(type12 && !trivial && !isFlat) {
 					System.out.println("TYPE 12");
 					type12Form = this.genType12Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar);
 					System.out.println(type12Form.toString());
+					debugSignal = false;
 				}
 				if(type132 && !trivial && !isFlat) {
 					System.out.println("TYPE 132");
 					type132Form = this.genType132Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar);
 					System.out.println(type132Form);
+					debugSignal = false;
 				}
 				BoolExpr temp = (trivial)? trivialForm : 
 								(isFlat) ? flatForm    : this.combineAllFormlae(type1Form, type12Form, type132Form);
 				formulae.add(temp);
+				if(debugSignal) {
+					System.out.println("!!!!!!!!!!!!!ERROR!!!!!!!!!!!!!");
+				}
 			}
 			
 			
-			BoolExpr resultExpr = this.getQfpaGen().mkEqBool(sVar, tVar);
+			BoolExpr resultExpr =  this.getQfpaGen().mkFalse();
 			for(BoolExpr formula : formulae) {
 				resultExpr = this.getQfpaGen().mkOrBool(resultExpr, formula);
 			}
@@ -205,7 +214,7 @@ public class ConverterOpt extends Converter {
 			
 			
 			String result = null;
-			BoolExpr resultExpr = this.getQfpaGen().mkEqBool(sVar, tVar);
+			BoolExpr resultExpr =  this.getQfpaGen().mkFalse();
 			for(BoolExpr formula : formulae) {
 				resultExpr = this.getQfpaGen().mkOrBool(resultExpr, formula);
 			}
