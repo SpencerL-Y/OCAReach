@@ -189,6 +189,7 @@ public class ConverterZero {
 				}
 			}
 		}
+		longForm = (BoolExpr) this.getConverter().getQfpaGen().mkExistsQuantifier(varsMapArray, longForm);
 		System.out.println("TEMPORARY RESULT----------------------");
 		System.out.println("DIRECT: " + directForm.toString());
 		System.out.println("ONESTEP: " + oneStepForm.toString());
@@ -357,7 +358,7 @@ public class ConverterZero {
 			this.getConverter().getQfpaGen().mkRequireNonNeg(tVar)
 		);*/
 		
-		longForm = (BoolExpr) this.getConverter().getQfpaGen().mkExistsQuantifier(varsMapArray, longForm);
+		
 		
 		// simplified
 		//resultStr = longForm.simplify().toString();
@@ -376,7 +377,6 @@ public class ConverterZero {
 			solveResult = "\n UNSAT";
 		} else {
 			solveResult = "\nSAT \n" + solver.getModel().toString();
-			System.out.println(solveResult);
 		}
 		/*/// --------------------------------------------------------*/
 		
@@ -387,26 +387,46 @@ public class ConverterZero {
 	public BoolExpr equivDebug(IntExpr sVar, IntExpr tVar, BoolExpr tempResult) {
 		//TODO: add equiv debug
 		BoolExpr equiv = null;
-		/*IntExpr iVar = this.getConverter().getQfpaGen().mkVariableInt("i");
-		equiv = this.getConverter().getQfpaGen().mkAndBool(
+		IntExpr con0 = this.getConverter().getQfpaGen().mkConstantInt(0);
+		IntExpr iVar = this.getConverter().getQfpaGen().mkVariableInt("i");
+		IntExpr jVar = this.getConverter().getQfpaGen().mkVariableInt("j");
+		BoolExpr weightForm = this.getConverter().getQfpaGen().mkOrBool(
 			this.getConverter().getQfpaGen().mkEqBool(
-				sVar, 
 				this.getConverter().getQfpaGen().mkAddInt(
-					this.getConverter().getQfpaGen().mkScalarTimes(iVar, this.getConverter().getQfpaGen().mkConstantInt(2)),
-					this.getConverter().getQfpaGen().mkConstantInt(1))),
-			this.getConverter().getQfpaGen().mkRequireNonNeg(iVar),
+						this.getConverter().getQfpaGen().mkAddInt(
+							sVar, 
+							this.getConverter().getQfpaGen().mkScalarTimes(iVar, this.getConverter().getQfpaGen().mkConstantInt(-2))
+						),
+						this.getConverter().getQfpaGen().mkConstantInt(-1)
+				)
+				,
+				tVar
+			),
+			this.getConverter().getQfpaGen().mkEqBool(
+					this.getConverter().getQfpaGen().mkAddInt(
+							this.getConverter().getQfpaGen().mkAddInt(
+								sVar, 
+								this.getConverter().getQfpaGen().mkScalarTimes(jVar, this.getConverter().getQfpaGen().mkConstantInt(-3))
+							),
+							this.getConverter().getQfpaGen().mkConstantInt(1)
+					)
+					,
+					tVar
+				)
+		);
+		equiv = this.getConverter().getQfpaGen().mkAndBool(
+			//this.getConverter().getQfpaGen().mkRequireNonNeg(iVar),
+			//this.getConverter().getQfpaGen().mkRequireNonNeg(jVar),
 			this.getConverter().getQfpaGen().mkRequireNonNeg(sVar),
 			this.getConverter().getQfpaGen().mkRequireNonNeg(tVar),
-			tempResult
+			this.getConverter().getQfpaGen().mkEqBool(tVar, con0),
+			this.getConverter().getQfpaGen().mkEqBool(sVar, con0)
 		);
-		IntExpr[] exists = new IntExpr[1];
+		IntExpr[] exists = new IntExpr[2];
 		exists[0] = iVar;
-		equiv = (BoolExpr) this.getConverter().getQfpaGen().mkExistsQuantifier(exists, equiv);*/
-		IntExpr con0 = this.getConverter().getQfpaGen().mkConstantInt(0);
-		equiv = this.getConverter().getQfpaGen().mkAndBool(
-			this.getConverter().getQfpaGen().mkEqBool(sVar, con0),
-			this.getConverter().getQfpaGen().mkEqBool(tVar, con0)
-		);
+		exists[1] = jVar;
+		//equiv = (BoolExpr) this.getConverter().getQfpaGen().mkExistsQuantifier(exists, equiv);
+		
 		BoolExpr resultExpr = this.getConverter().getQfpaGen().mkAndBool(
 			this.getConverter().getQfpaGen().mkImplies(equiv, tempResult),
 			this.getConverter().getQfpaGen().mkImplies(tempResult, equiv)

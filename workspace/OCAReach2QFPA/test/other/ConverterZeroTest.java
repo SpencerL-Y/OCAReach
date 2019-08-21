@@ -12,7 +12,7 @@ import ocareach.ConverterZero;
 public class ConverterZeroTest {
 	public static void main(String[] args) throws IOException {
 		OCA oca = new OCA();
-		for(int i = 0; i < 5; i++) {
+		for(int i = 0; i < 7; i++) {
 			oca.addState(i);
 		}
 		/*
@@ -78,11 +78,62 @@ public class ConverterZeroTest {
 		oca.addTransition(1, OCAOp.Zero, 4);
 		oca.setInitIndex(0);
 		oca.setTargetIndex(4);*/
+		//Exmaple 1
+		/*oca.addTransition(0, OCAOp.Zero, 1);
+		oca.setInitIndex(0);
+		oca.setTargetIndex(1);*/
+		//Example 2
 		
+		/*
+		oca.addTransition(0, OCAOp.Sub, 1);
+		oca.addTransition(1, OCAOp.Zero, 2);
+		oca.addTransition(2, OCAOp.Sub, 3);
+		oca.setInitIndex(0);
+		oca.setTargetIndex(3);*/
+		
+		//Example 3
+		/*oca.addTransition(0, OCAOp.Zero, 1);
+		oca.addTransition(0, OCAOp.Sub, 1);
+		oca.setInitIndex(0);
+		oca.setTargetIndex(1);*/
+		
+		//Example 4
+		/*
+		oca.addTransition(0, OCAOp.Sub, 0);
 		oca.addTransition(0, OCAOp.Zero, 1);
 		oca.setInitIndex(0);
-		oca.setTargetIndex(1);
+		oca.setTargetIndex(1);*/
 		
+		//Example 5
+		/*
+		oca.addTransition(0, OCAOp.Sub, 1);
+		oca.addTransition(1, OCAOp.Sub, 0);
+		oca.addTransition(1, OCAOp.Zero, 2);
+		oca.setInitIndex(0);
+		oca.setTargetIndex(2);*/
+		
+		//Example 6
+		/*
+		oca.addTransition(0, OCAOp.Add, 1);
+		oca.addTransition(0, OCAOp.Sub, 4);
+		oca.addTransition(1, OCAOp.Sub, 2);
+		oca.addTransition(2, OCAOp.Sub, 3);
+		oca.addTransition(3, OCAOp.Sub, 1);
+		oca.addTransition(4, OCAOp.Sub, 5);
+		oca.addTransition(5, OCAOp.Sub, 4);
+		oca.addTransition(1, OCAOp.Zero, 6);
+		oca.addTransition(4, OCAOp.Zero, 6);
+		oca.setInitIndex(0);
+		oca.setTargetIndex(6);
+		*/
+		
+		oca.addTransition(0, OCAOp.Zero, 1);
+		oca.addTransition(1, OCAOp.Add, 2);
+		oca.addTransition(2, OCAOp.Sub, 3);
+		oca.addTransition(3, OCAOp.Add, 3);
+		oca.addTransition(3, OCAOp.Sub, 0);
+		oca.setInitIndex(0);
+		oca.setTargetIndex(1);
 		ConverterZero cz = new ConverterZero(oca);
 		String resultStr = cz.convert();
 		DataOutputStream out = new DataOutputStream(new FileOutputStream("/home/clexma/Desktop/test.smt"));
