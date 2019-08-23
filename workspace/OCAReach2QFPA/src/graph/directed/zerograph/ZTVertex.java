@@ -65,6 +65,12 @@ public class ZTVertex {
 		return;
 	}
 	
+	//debug
+	
+	public void printZeroEdge() {
+		System.out.println(this.getFrom() + "---------->" + this.getTo());
+	}
+	
 	
 	// setters and getters
 	public int getFrom() {

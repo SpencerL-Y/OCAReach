@@ -39,7 +39,9 @@ public class ConverterOpt extends Converter {
 		}
 		
 		public BoolExpr convertToForm(State startState, State endState, IntExpr sVar, IntExpr tVar) {
-			//System.out.println("ConvertToForm");
+			System.out.println("ConvertToForm");
+			int originalStart = this.getOca().getInitIndex();
+			int originalEnd = this.getOca().getTargetIndex();
 			if(!(this.getOca().containsState(startState) && this.getOca().containsState(endState))) {
 				System.out.println("ERROR: does not contain start and end states");
 				return null;
@@ -152,6 +154,8 @@ public class ConverterOpt extends Converter {
 			/*----------------------------------------------------------------*/
 			//System.out.println("RETURN");
 			System.out.println("RESULT: " + resultExpr.toString());
+			this.getOca().setInitIndex(originalStart);
+			this.getOca().setTargetIndex(originalEnd);
 			return resultExpr;
 		}
 		

@@ -126,14 +126,21 @@ public class ConverterZeroTest {
 		oca.setInitIndex(0);
 		oca.setTargetIndex(6);
 		*/
-		
+		/*
 		oca.addTransition(0, OCAOp.Zero, 1);
 		oca.addTransition(1, OCAOp.Add, 2);
 		oca.addTransition(2, OCAOp.Sub, 3);
 		oca.addTransition(3, OCAOp.Add, 3);
 		oca.addTransition(3, OCAOp.Sub, 0);
 		oca.setInitIndex(0);
-		oca.setTargetIndex(1);
+		oca.setTargetIndex(1);*/
+		oca.addTransition(0, OCAOp.Sub, 1);
+		oca.addTransition(1, OCAOp.Zero, 2);
+		oca.addTransition(2, OCAOp.Zero, 1);
+		oca.addTransition(2, OCAOp.Add, 3);
+		oca.setInitIndex(0);
+		oca.setTargetIndex(3);
+		
 		ConverterZero cz = new ConverterZero(oca);
 		String resultStr = cz.convert();
 		DataOutputStream out = new DataOutputStream(new FileOutputStream("/home/clexma/Desktop/test.smt"));
