@@ -292,6 +292,12 @@ public class ConverterOpt extends Converter {
 			exists[0] = iVar;
 			exists[1] = jVar;
 			equiv = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(exists, equiv);
+			equiv = this.getQfpaGen().mkAndBool(
+				this.getQfpaGen().mkRequireNonNeg(sVar),
+				this.getQfpaGen().mkRequireNonNeg(tVar),
+				this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(1)),
+				this.getQfpaGen().mkEqBool(sVar, tVar)
+			);
 			resultExpr = this.getQfpaGen().mkAndBool(this.getQfpaGen().getCtx().mkImplies(tempResult, equiv), this.getQfpaGen().getCtx().mkImplies(equiv, tempResult));
 			resultExpr = this.getQfpaGen().mkNotBool(resultExpr);
 			return resultExpr;

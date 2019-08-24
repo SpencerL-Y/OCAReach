@@ -32,12 +32,14 @@ public class ZeroEdgeDGraph {
 			for(DGEdge e : v.getEdges()) {
 				if(e.getWeight() == 0) {
 					ZTVertex newV = new ZTVertex(this, index, e.getFrom().getIndex(), e.getTo().getIndex());
+					System.out.println("ZTVertex: " + newV.getIndex());
+					newV.printZeroEdge();
 					this.addVertex(newV);
 					index ++;
 				}
 			}
 		}
-		
+		System.out.println();
 		// add edges according to the reachability
 		// TODO: DEBUG 
 		for(ZTVertex v : this.getVertices()) {
@@ -57,7 +59,7 @@ public class ZeroEdgeDGraph {
 					} else if(v.getTo() == -1 && w.getFrom() != -1) {
 						// if w is not, v is target vertex
 						if(this.getDg().isReachable(v.getFrom(), w.getFrom())) {
-							System.out.println("ADD EDGE " + v.getIndex() + w.getIndex());
+							//System.out.println("ADD EDGE " + v.getIndex() + w.getIndex());
 							this.addEdge(v.getIndex(), w.getIndex());
 						}
 					} else if(v.getTo() == -1 && w.getFrom() == -1){

@@ -12,7 +12,7 @@ import ocareach.ConverterZero;
 public class ConverterZeroTest {
 	public static void main(String[] args) throws IOException {
 		OCA oca = new OCA();
-		for(int i = 0; i < 7; i++) {
+		for(int i = 0; i < 15; i++) {
 			oca.addState(i);
 		}
 		/*
@@ -126,6 +126,7 @@ public class ConverterZeroTest {
 		oca.setInitIndex(0);
 		oca.setTargetIndex(6);
 		*/
+		//Example 7
 		/*
 		oca.addTransition(0, OCAOp.Zero, 1);
 		oca.addTransition(1, OCAOp.Add, 2);
@@ -134,12 +135,18 @@ public class ConverterZeroTest {
 		oca.addTransition(3, OCAOp.Sub, 0);
 		oca.setInitIndex(0);
 		oca.setTargetIndex(1);*/
+		
+		//Example 8 9 10
+		
 		oca.addTransition(0, OCAOp.Sub, 1);
-		oca.addTransition(1, OCAOp.Zero, 2);
-		oca.addTransition(2, OCAOp.Zero, 1);
-		oca.addTransition(2, OCAOp.Add, 3);
+		//oca.addTransition(1, OCAOp.Zero, 1);
+		oca.addTransition(1, OCAOp.Add, 2);
 		oca.setInitIndex(0);
-		oca.setTargetIndex(3);
+		oca.setTargetIndex(2);
+		
+
+		
+		
 		
 		ConverterZero cz = new ConverterZero(oca);
 		String resultStr = cz.convert();

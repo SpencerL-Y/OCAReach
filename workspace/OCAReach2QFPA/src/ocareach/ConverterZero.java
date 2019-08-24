@@ -112,8 +112,8 @@ public class ConverterZero {
 					if(w.getFrom() >= 0 && w.getTo() >= 0 && w.getIndex() != v.getIndex()) {
 						BoolExpr temp = this.getConverter().getQfpaGen().mkImplies(
 							this.getConverter().getQfpaGen().mkAndBool(
-								this.getConverter().getQfpaGen().mkRequireNonNeg(varsMap.get("the_" + v.getIndex())),
-								this.getConverter().getQfpaGen().mkRequireNonNeg(varsMap.get("the_" + w.getIndex()))
+								this.getConverter().getQfpaGen().mkGtBool((varsMap.get("the_" + v.getIndex())), this.getConverter().getQfpaGen().mkConstantInt(0)),
+								this.getConverter().getQfpaGen().mkGtBool((varsMap.get("the_" + w.getIndex())), this.getConverter().getQfpaGen().mkConstantInt(0))
 							),
 							this.getConverter().getQfpaGen().mkNotEqual(
 								varsMap.get("the_" + v.getIndex()),
@@ -194,7 +194,7 @@ public class ConverterZero {
 			}
 		}
 		longForm = (BoolExpr) this.getConverter().getQfpaGen().mkExistsQuantifier(varsMapArray, longForm);
-		longForm = this.getConverter().getQfpaGen().mkFalse();
+		//longForm = this.getConverter().getQfpaGen().mkFalse();
 		System.out.println("TEMPORARY RESULT----------------------");
 		System.out.println("DIRECT: " + directForm.toString());
 		System.out.println("ONESTEP: " + oneStepForm.toString());
@@ -424,12 +424,17 @@ public class ConverterZero {
 			//this.getConverter().getQfpaGen().mkRequireNonNeg(jVar),
 			this.getConverter().getQfpaGen().mkRequireNonNeg(sVar),
 			this.getConverter().getQfpaGen().mkRequireNonNeg(tVar),
-			this.getConverter().getQfpaGen().mkEqBool(tVar, this.getConverter().getQfpaGen().mkConstantInt(1)),
-			this.getConverter().getQfpaGen().mkEqBool(sVar, this.getConverter().getQfpaGen().mkConstantInt(1))
+			this.getConverter().getQfpaGen().mkGeBool(tVar, this.getConverter().getQfpaGen().mkConstantInt(1)),
+			this.getConverter().getQfpaGen().mkGeBool(sVar, this.getConverter().getQfpaGen().mkConstantInt(1)),
+			this.getConverter().getQfpaGen().mkEqBool(sVar, tVar)
 		);
+		
+		
 		IntExpr[] exists = new IntExpr[2];
 		exists[0] = iVar;
 		exists[1] = jVar;
+		equiv = (BoolExpr) this.getConverter().getQfpaGen().mkExistsQuantifier(exists, equiv);
+		
 		//equiv = (BoolExpr) this.getConverter().getQfpaGen().mkExistsQuantifier(exists, equiv);
 		
 		BoolExpr resultExpr = this.getConverter().getQfpaGen().mkAndBool(
