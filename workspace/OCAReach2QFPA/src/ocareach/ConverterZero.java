@@ -106,6 +106,9 @@ public class ConverterZero {
 		
 		BoolExpr thetaNotSameForm = this.getConverter().getQfpaGen().mkTrue();
 		
+		
+		// theta_v > 0 /\ theta_w > 0 ==> theta_v \ne theta_w
+		
 		for(ZTVertex v : z.getVertices()) {
 			if(v.getFrom() >= 0 && v.getTo() >= 0) {
 				for(ZTVertex w : z.getVertices()) {
@@ -125,6 +128,8 @@ public class ConverterZero {
 				}
 			}
 		}
+		
+		
 		BoolExpr dfsForm = this.getConverter().getQfpaGen().mkTrue();
 		for(ZTVertex v : z.getVertices()) {
 			if(v.getFrom() >= 0 && v.getTo() >= 0) {
@@ -132,8 +137,8 @@ public class ConverterZero {
 				for(ZTVertex w : z.getVertices()) {
 					if(w.getIndex() != v.getIndex() && w.getFrom() >= 0 && w.getTo() >= 0) {
 						BoolExpr impliesToTemp = this.getConverter().getQfpaGen().mkAndBool(
-							this.getConverter().convertToForm(this.getConverter().getOca().getState(v.getTo()),
-								                        	  this.getConverter().getOca().getState(w.getFrom()),
+							this.getConverter().convertToForm(this.getConverter().getOca().getState(w.getTo()),
+								                        	  this.getConverter().getOca().getState(v.getFrom()),
 								                        	  this.getConverter().getQfpaGen().mkConstantInt(0),
 								                        	  this.getConverter().getQfpaGen().mkConstantInt(0)),
 							this.getConverter().getQfpaGen().mkGtBool(
@@ -194,6 +199,7 @@ public class ConverterZero {
 			}
 		}
 		longForm = (BoolExpr) this.getConverter().getQfpaGen().mkExistsQuantifier(varsMapArray, longForm);
+		
 		//longForm = this.getConverter().getQfpaGen().mkFalse();
 		System.out.println("TEMPORARY RESULT----------------------");
 		System.out.println("DIRECT: " + directForm.toString());
@@ -424,8 +430,8 @@ public class ConverterZero {
 			//this.getConverter().getQfpaGen().mkRequireNonNeg(jVar),
 			this.getConverter().getQfpaGen().mkRequireNonNeg(sVar),
 			this.getConverter().getQfpaGen().mkRequireNonNeg(tVar),
-			this.getConverter().getQfpaGen().mkGeBool(tVar, this.getConverter().getQfpaGen().mkConstantInt(1)),
-			this.getConverter().getQfpaGen().mkGeBool(sVar, this.getConverter().getQfpaGen().mkConstantInt(1)),
+			this.getConverter().getQfpaGen().mkEqBool(tVar, this.getConverter().getQfpaGen().mkConstantInt(1)),
+			this.getConverter().getQfpaGen().mkEqBool(sVar, this.getConverter().getQfpaGen().mkConstantInt(1)),
 			this.getConverter().getQfpaGen().mkEqBool(sVar, tVar)
 		);
 		
@@ -436,7 +442,11 @@ public class ConverterZero {
 		equiv = (BoolExpr) this.getConverter().getQfpaGen().mkExistsQuantifier(exists, equiv);
 		
 		//equiv = (BoolExpr) this.getConverter().getQfpaGen().mkExistsQuantifier(exists, equiv);
-		
+		equiv = this.getConverter().getQfpaGen().mkAndBool(
+			this.getConverter().getQfpaGen().mkEqBool(sVar, this.getConverter().getQfpaGen().mkConstantInt(1)),
+			this.getConverter().getQfpaGen().mkEqBool(tVar, this.getConverter().getQfpaGen().mkConstantInt(1))
+			
+		);
 		BoolExpr resultExpr = this.getConverter().getQfpaGen().mkAndBool(
 			this.getConverter().getQfpaGen().mkImplies(equiv, tempResult),
 			this.getConverter().getQfpaGen().mkImplies(tempResult, equiv)

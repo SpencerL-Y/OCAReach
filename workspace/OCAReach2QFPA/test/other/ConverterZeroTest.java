@@ -137,13 +137,27 @@ public class ConverterZeroTest {
 		oca.setTargetIndex(1);*/
 		
 		//Example 8 9 10
-		
+		/*
 		oca.addTransition(0, OCAOp.Sub, 1);
 		//oca.addTransition(1, OCAOp.Zero, 1);
 		oca.addTransition(1, OCAOp.Add, 2);
 		oca.setInitIndex(0);
 		oca.setTargetIndex(2);
+		*/
 		
+		oca.addTransition(0, OCAOp.Sub, 1);
+		oca.addTransition(1, OCAOp.Zero, 2);
+		oca.addTransition(2, OCAOp.Add, 3);
+		oca.addTransition(3, OCAOp.Add, 2);
+		oca.addTransition(2, OCAOp.Add, 4);
+		oca.addTransition(4, OCAOp.Sub, 4);
+		oca.addTransition(4, OCAOp.Zero, 6);
+		oca.addTransition(6, OCAOp.Add, 7);
+		oca.addTransition(7, OCAOp.Sub, 7);
+		oca.addTransition(7, OCAOp.Zero, 8);
+		oca.addTransition(8, OCAOp.Add, 9);
+		oca.setInitIndex(0);
+		oca.setTargetIndex(9);
 
 		
 		
