@@ -211,166 +211,6 @@ public class ConverterZero {
 			longForm
 		);
 		
-		/*BoolExpr dfsForm = this.getConverter().getQfpaGen().mkEqBool(vertexVars[startIndex], this.getConverter().getQfpaGen().mkConstantInt(1));
-		dfsForm = this.getConverter().getQfpaGen().mkAndBool(
-				dfsForm, 
-				this.getConverter().getQfpaGen().mkGtBool(vertexVars[endIndex], this.getConverter().getQfpaGen().mkConstantInt(0)));
-		BoolExpr startUniqueForm = this.getConverter().getQfpaGen().mkTrue();
-		for(int i = 0; i < z.getVerticesNum(); i ++) {
-			if(!(i == startIndex)) {
-				startUniqueForm = this.getConverter().getQfpaGen().mkAndBool(
-					startUniqueForm, 
-					this.getConverter().getQfpaGen().mkNotEqual(vertexVars[i], this.getConverter().getQfpaGen().mkConstantInt(1))
-				);
-			}
-		}
-		dfsForm = this.getConverter().getQfpaGen().mkAndBool(dfsForm, startUniqueForm);
-		BoolExpr reachForm = this.getConverter().getQfpaGen().mkTrue();
-		///System.out.println("startIndex: " + startIndex + " endIndex: " + endIndex);
-		HashMap<String, IntExpr> varsMap = new HashMap<String, IntExpr>();
-		for(int i = 0; i < z.getVerticesNum(); i++) {
-			if(i != startIndex) {
-				BoolExpr onThePath = this.getConverter().getQfpaGen().mkGtBool(vertexVars[i], this.getConverter().getQfpaGen().mkConstantInt(0));
-				BoolExpr hasLessNumForm = this.getConverter().getQfpaGen().mkFalse();
-				for(int j = 0; j < z.getVerticesNum(); j++) {
-					if(j != i && z.containsEdge(z.getVertex(j).getIndex(), z.getVertex(i).getIndex())) {
-						//System.out.println("ContainEdge: " + z.getVertex(j).getIndex() + " " + z.getVertex(i).getIndex());
-						BoolExpr partForm = null;
-						if(j == startIndex) {
-							if(i == endIndex) {
-								//System.out.println("HERE 1");
-								partForm = this.getConverter().convertToForm(this.getConverter().getOca().getState(z.getVertex(j).getTo()),	
-																		     this.getConverter().getOca().getState(z.getVertex(i).getFrom()),
-																		     sVar, 
-																		     tVar);
-							} else {
-								//System.out.println("HERE 2 " + z.getVertex(j).getTo() + " " + z.getVertex(i).getFrom());
-								IntExpr newVar = null;
-								if(varsMap.containsKey("zv_t_" + z.getVertex(i).getFrom())) {
-									newVar = varsMap.get("zv_t_" + z.getVertex(i).getFrom());
-								} else {
-									 newVar = this.getConverter().getQfpaGen().mkVariableInt("zv_t_" + z.getVertex(i).getFrom());
-									 varsMap.put("zv_t_" + z.getVertex(i).getFrom(), newVar);
-								}
-								partForm = this.getConverter().convertToForm(this.getConverter().getOca().getState(z.getVertex(j).getTo()),
-																		     this.getConverter().getOca().getState(z.getVertex(i).getFrom()),
-																		     sVar, 
-																		     newVar);
-								partForm = this.getConverter().getQfpaGen().mkAndBool(
-									partForm,
-									this.getConverter().getQfpaGen().mkEqBool(newVar, this.getConverter().getQfpaGen().mkConstantInt(0))
-								);
-							}
-						} else if (j == endIndex){
-							//System.out.println("HERE 3 " + z.getVertex(j).getTo() + " " + z.getVertex(i).getFrom());
-							IntExpr newVar1 = null;
-							IntExpr newVar2 = null;
-							if(varsMap.containsKey("zv_s_" + z.getVertex(j).getFrom())) {
-								newVar1 = varsMap.get("zv_s_" + z.getVertex(j).getFrom());
-							} else {
-								newVar1 = this.getConverter().getQfpaGen().mkVariableInt("zv_s_" + z.getVertex(j).getFrom());
-								varsMap.put("zv_s_" + z.getVertex(j).getFrom(), newVar1);
-							}
-							if(varsMap.containsKey("zv_t_" + z.getVertex(i).getFrom())){
-								newVar2 = varsMap.get("zv_t_" + z.getVertex(i).getFrom());
-							} else{
-								newVar2 = this.getConverter().getQfpaGen().mkVariableInt("zv_t_" + z.getVertex(i).getFrom());
-								varsMap.put("zv_t_" + z.getVertex(i).getFrom(), newVar2);
-							}
-							partForm = this.getConverter().convertToForm(this.getConverter().getOca().getState(z.getVertex(j).getFrom()), 
-	 									 								 this.getConverter().getOca().getState(z.getVertex(i).getFrom()), 
-	 									 								 newVar1, 
-	 									 								 newVar2);
-							partForm = this.getConverter().getQfpaGen().mkAndBool(
-									partForm,
-									this.getConverter().getQfpaGen().mkEqBool(newVar1, this.getConverter().getQfpaGen().mkConstantInt(0)),
-									this.getConverter().getQfpaGen().mkEqBool(newVar2, this.getConverter().getQfpaGen().mkConstantInt(0))
-							);
-						} else {
-							if(i == endIndex) {
-								//System.out.println("HERE 4 " + z.getVertex(j).getTo() + " " + z.getVertex(i).getFrom());
-								
-								IntExpr newVar = null;
-								if(varsMap.containsKey("zv_s_" + z.getVertex(j).getTo())) {
-									newVar = varsMap.get("zv_s_" + z.getVertex(j).getTo());
-								} else {
-									newVar = this.getConverter().getQfpaGen().mkVariableInt("zv_s_" + z.getVertex(j).getTo());
-									varsMap.put("zv_s_" + z.getVertex(j).getTo(), newVar);
-								}
-								partForm = this.getConverter().convertToForm(this.getConverter().getOca().getState(z.getVertex(j).getTo()), 
-																			 this.getConverter().getOca().getState(z.getVertex(i).getFrom()), 
-																			 newVar, 
-																			 tVar);
-								partForm = this.getConverter().getQfpaGen().mkAndBool(
-										partForm,
-										this.getConverter().getQfpaGen().mkEqBool(newVar, this.getConverter().getQfpaGen().mkConstantInt(0))
-								);
-								
-							} else {
-								//System.out.println("HERE 5 " + z.getVertex(j).getTo() + " " + z.getVertex(i).getFrom());
-								IntExpr newVar1 = null;
-								IntExpr newVar2 = null;
-								if(varsMap.containsKey("zv_s_" + z.getVertex(j).getTo())) {
-									newVar1 = varsMap.get("zv_s_" + z.getVertex(j).getTo());
-								} else {
-									newVar1 = this.getConverter().getQfpaGen().mkVariableInt("zv_s_" + z.getVertex(j).getTo());
-									varsMap.put("zv_s_" + z.getVertex(j).getTo(), newVar1);
-								}
-								if(varsMap.containsKey("zv_t_" + z.getVertex(i).getFrom())){
-									newVar2 = varsMap.get("zv_t_" + z.getVertex(i).getFrom());
-								} else{
-									newVar2 = this.getConverter().getQfpaGen().mkVariableInt("zv_t_" + z.getVertex(i).getFrom());
-									varsMap.put("zv_t_" + z.getVertex(i).getFrom(), newVar2);
-								}
-								partForm = this.getConverter().convertToForm(this.getConverter().getOca().getState(z.getVertex(j).getTo()), 
-	 									 									 this.getConverter().getOca().getState(z.getVertex(i).getFrom()), 
-	 									 									 newVar1, 
-	 									 									 newVar2);
-								partForm = this.getConverter().getQfpaGen().mkAndBool(
-										partForm,
-										this.getConverter().getQfpaGen().mkEqBool(newVar1, this.getConverter().getQfpaGen().mkConstantInt(0)),
-										this.getConverter().getQfpaGen().mkEqBool(newVar2, this.getConverter().getQfpaGen().mkConstantInt(0))
-								);
-							}
-						}
-						//System.out.println("PART: " + partForm.toString());
-						BoolExpr tempForm = this.getConverter().getQfpaGen().mkAndBool(
-							this.getConverter().getQfpaGen().mkGtBool(vertexVars[j], this.getConverter().getQfpaGen().mkConstantInt(0)),
-							this.getConverter().getQfpaGen().mkGtBool(vertexVars[i], vertexVars[j]),
-							partForm
-						);
-						hasLessNumForm = this.getConverter().getQfpaGen().mkOrBool(
-							hasLessNumForm,
-							tempForm
-						);
-					}
-				}
-				reachForm = this.getConverter().getQfpaGen().mkAndBool(
-					reachForm,
-					this.getConverter().getQfpaGen().mkImplies(onThePath, hasLessNumForm)
-				);
-			}
-		}
-		reachForm = this.getConverter().getQfpaGen().mkAndBool(
-			reachForm,
-			dfsForm
-		);
-		
-		System.out.println("varsMapSize: " + varsMap.size());
-		varsMap.values().toArray(a);
-		for(IntExpr v : a) {
-			System.out.println(v.toString());
-		}
-		reachForm = this.getConverter().getQfpaGen().mkAndBool(
-			reachForm,
-			this.getConverter().getQfpaGen().mkRequireNonNeg(vertexVars),
-			this.getConverter().getQfpaGen().mkRequireNonNeg(a),
-			this.getConverter().getQfpaGen().mkRequireNonNeg(sVar),
-			this.getConverter().getQfpaGen().mkRequireNonNeg(tVar)
-		);*/
-		
-		
-		
 		// simplified
 		//resultStr = longForm.simplify().toString();
 		
@@ -426,27 +266,31 @@ public class ConverterZero {
 				)
 		);
 		equiv = this.getConverter().getQfpaGen().mkAndBool(
-			//this.getConverter().getQfpaGen().mkRequireNonNeg(iVar),
+			this.getConverter().getQfpaGen().mkRequireNonNeg(iVar),
 			//this.getConverter().getQfpaGen().mkRequireNonNeg(jVar),
 			this.getConverter().getQfpaGen().mkRequireNonNeg(sVar),
 			this.getConverter().getQfpaGen().mkRequireNonNeg(tVar),
-			this.getConverter().getQfpaGen().mkEqBool(tVar, this.getConverter().getQfpaGen().mkConstantInt(1)),
-			this.getConverter().getQfpaGen().mkEqBool(sVar, this.getConverter().getQfpaGen().mkConstantInt(1)),
-			this.getConverter().getQfpaGen().mkEqBool(sVar, tVar)
+			this.getConverter().getQfpaGen().mkGeBool(sVar, this.getConverter().getQfpaGen().mkConstantInt(1)),
+			this.getConverter().getQfpaGen().mkLtBool(sVar, this.getConverter().getQfpaGen().mkConstantInt(3)),
+			this.getConverter().getQfpaGen().mkEqBool(tVar, 
+				this.getConverter().getQfpaGen().mkAddInt(
+						this.getConverter().getQfpaGen().mkScalarTimes(iVar, this.getConverter().getQfpaGen().mkConstantInt(2)), 
+						this.getConverter().getQfpaGen().mkConstantInt(1))
+				)
 		);
 		
 		
-		IntExpr[] exists = new IntExpr[2];
+		IntExpr[] exists = new IntExpr[1];
 		exists[0] = iVar;
-		exists[1] = jVar;
-		equiv = (BoolExpr) this.getConverter().getQfpaGen().mkExistsQuantifier(exists, equiv);
-		
+		//exists[1] = jVar;
 		//equiv = (BoolExpr) this.getConverter().getQfpaGen().mkExistsQuantifier(exists, equiv);
-		equiv = this.getConverter().getQfpaGen().mkAndBool(
+		
+		equiv = (BoolExpr) this.getConverter().getQfpaGen().mkExistsQuantifier(exists, equiv);
+		/*equiv = this.getConverter().getQfpaGen().mkAndBool(
 			this.getConverter().getQfpaGen().mkEqBool(sVar, this.getConverter().getQfpaGen().mkConstantInt(1)),
 			this.getConverter().getQfpaGen().mkEqBool(tVar, this.getConverter().getQfpaGen().mkConstantInt(1))
 			
-		);
+		);*/
 		BoolExpr resultExpr = this.getConverter().getQfpaGen().mkAndBool(
 			this.getConverter().getQfpaGen().mkImplies(equiv, tempResult),
 			this.getConverter().getQfpaGen().mkImplies(tempResult, equiv)

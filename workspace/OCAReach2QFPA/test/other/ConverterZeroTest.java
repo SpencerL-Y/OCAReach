@@ -144,7 +144,8 @@ public class ConverterZeroTest {
 		oca.setInitIndex(0);
 		oca.setTargetIndex(2);
 		*/
-		
+		// Example 11
+		/*
 		oca.addTransition(0, OCAOp.Sub, 1);
 		oca.addTransition(1, OCAOp.Zero, 2);
 		oca.addTransition(2, OCAOp.Add, 3);
@@ -159,8 +160,36 @@ public class ConverterZeroTest {
 		oca.setInitIndex(0);
 		oca.setTargetIndex(9);
 
+		*/
 		
+		//Example 12
+		/*
+		oca.addTransition(0, OCAOp.Sub, 1);
+		oca.addTransition(1, OCAOp.Sub, 2);
+		oca.addTransition(2, OCAOp.Sub, 3);
+		oca.addTransition(2, OCAOp.Add, 1);
+		oca.addTransition(3, OCAOp.Zero, 4);
+		oca.addTransition(4, OCAOp.Add, 5);
+		oca.addTransition(5, OCAOp.Sub, 6);
+		oca.addTransition(6, OCAOp.Zero, 7);
+		oca.addTransition(7, OCAOp.Add, 8);
+		oca.addTransition(8, OCAOp.Add, 7);
+		oca.addTransition(7, OCAOp.Sub, 9);
+		oca.setInitIndex(0);
+		oca.setTargetIndex(9);
+		*/
 		
+		//Example 13
+		/*
+		oca.addTransition(0, OCAOp.Sub, 1);
+		oca.addTransition(1, OCAOp.Sub, 2);
+		oca.addTransition(1, OCAOp.Add, 1);
+		oca.addTransition(2, OCAOp.Zero, 3);
+		oca.addTransition(3, OCAOp.Add, 4);
+		oca.addTransition(4, OCAOp.Add, 3);
+		oca.setInitIndex(0);
+		oca.setTargetIndex(4);
+		*/
 		
 		ConverterZero cz = new ConverterZero(oca);
 		String resultStr = cz.convert();

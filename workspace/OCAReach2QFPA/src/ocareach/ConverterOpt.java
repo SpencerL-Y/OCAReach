@@ -235,7 +235,7 @@ public class ConverterOpt extends Converter {
 			goal.add(resultExpr);
 			Tactic qeTac = this.getQfpaGen().getCtx().mkTactic("qe");
 			ApplyResult ar = applyTactic(this.getQfpaGen().getCtx(), qeTac, goal);
-			resultExpr = ar.getSubgoals()[0].AsBoolExpr();
+			//resultExpr = ar.getSubgoals()[0].AsBoolExpr();
 			// ----------------------EQUIV DEBUG-----------------------
 			resultExpr = this.equivDebug(sVar, tVar, resultExpr);
 			
@@ -288,9 +288,9 @@ public class ConverterOpt extends Converter {
 				this.getQfpaGen().mkGeBool(this.getQfpaGen().mkAddInt(sVar, this.getQfpaGen().mkScalarTimes(iVar, this.getQfpaGen().mkConstantInt(-2))), this.getQfpaGen().mkConstantInt(0)),
 				this.getQfpaGen().mkRequireNonNeg(tVar)
 			);
-			IntExpr[] exists = new IntExpr[2];
+			IntExpr[] exists = new IntExpr[1];
 			exists[0] = iVar;
-			exists[1] = jVar;
+			//exists[1] = jVar;
 			equiv = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(exists, equiv);
 			equiv = this.getQfpaGen().mkAndBool(
 				this.getQfpaGen().mkRequireNonNeg(sVar),
@@ -298,6 +298,18 @@ public class ConverterOpt extends Converter {
 				this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(1)),
 				this.getQfpaGen().mkEqBool(sVar, tVar)
 			);
+			equiv = this.getQfpaGen().mkAndBool(
+				this.getQfpaGen().mkRequireNonNeg(sVar),
+				this.getQfpaGen().mkRequireNonNeg(tVar),
+				this.getQfpaGen().mkEqBool(
+					tVar, 
+					this.getQfpaGen().mkAddInt(sVar, this.getQfpaGen().mkAddInt(
+								this.getQfpaGen().mkConstantInt(1), 
+								this.getQfpaGen().mkScalarTimes(iVar, this.getQfpaGen().mkConstantInt(2))
+						))
+				),
+				this.getQfpaGen().mkRequireNonNeg(iVar)
+			); 
 			resultExpr = this.getQfpaGen().mkAndBool(this.getQfpaGen().getCtx().mkImplies(tempResult, equiv), this.getQfpaGen().getCtx().mkImplies(equiv, tempResult));
 			resultExpr = this.getQfpaGen().mkNotBool(resultExpr);
 			return resultExpr;
