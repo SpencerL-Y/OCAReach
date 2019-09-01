@@ -1,6 +1,5 @@
 package ocareach;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -11,7 +10,6 @@ import com.microsoft.z3.Status;
 
 import automata.State;
 import automata.counter.OCA;
-import graph.directed.DGraph;
 import graph.directed.zerograph.ZTPath;
 import graph.directed.zerograph.ZTVertex;
 import graph.directed.zerograph.ZeroEdgeDGraph;
@@ -235,6 +233,7 @@ public class ConverterZero {
 	}
 	
 	
+	@SuppressWarnings("unused")
 	public BoolExpr equivDebug(IntExpr sVar, IntExpr tVar, BoolExpr tempResult) {
 		//TODO: add equiv debug
 		BoolExpr equiv = null;

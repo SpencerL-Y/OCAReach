@@ -21,6 +21,7 @@ public class OCAParserTest extends TestCase {
 		this.ocdg = new OCDGenerator();
 	}
 	
+	@SuppressWarnings("resource")
 	public final void testParse() throws IOException {
 		for(int i = 0; i < 100; i++) {
 			int ch = 0;

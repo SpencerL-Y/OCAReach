@@ -130,6 +130,7 @@ public class Converter {
 		return (solveResult == null) ? result : result + solveResult;
 	}
 	
+	@SuppressWarnings("unused")
 	public BoolExpr equivDebug(IntExpr sVar, IntExpr tVar, BoolExpr tempResult) {
 		BoolExpr resultExpr = null;
 		IntExpr iVar = this.getQfpaGen().mkVariableInt("i");

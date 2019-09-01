@@ -1,15 +1,14 @@
 package other;
 
 import java.io.DataOutputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
 import automata.counter.OCA;
-import automata.counter.OCAOp;
 import ocareach.ConverterZero;
 
 public class ConverterZeroTest {
+	@SuppressWarnings("resource")
 	public static void main(String[] args) throws IOException {
 		OCA oca = new OCA();
 		for(int i = 0; i < 15; i++) {

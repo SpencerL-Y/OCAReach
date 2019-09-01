@@ -234,6 +234,7 @@ public class ConverterOpt extends Converter {
 			Goal goal = this.getQfpaGen().getCtx().mkGoal(true, false, false);
 			goal.add(resultExpr);
 			Tactic qeTac = this.getQfpaGen().getCtx().mkTactic("qe");
+			@SuppressWarnings("unused")
 			ApplyResult ar = applyTactic(this.getQfpaGen().getCtx(), qeTac, goal);
 			//resultExpr = ar.getSubgoals()[0].AsBoolExpr();
 			// ----------------------EQUIV DEBUG-----------------------
@@ -317,11 +318,6 @@ public class ConverterOpt extends Converter {
 		
 		
 		public BoolExpr genFlatFormulae(ASDGPath p, int startIndex, int endIndex, IntExpr sVar, IntExpr tVar) {
-			BoolExpr sVarTVarNonNeg = this.getQfpaGen().mkAndBool(
-					this.getQfpaGen().mkRequireNonNeg(tVar),
-					this.getQfpaGen().mkRequireNonNeg(sVar)
-				);
-			
 			List<IntExpr> varList = new ArrayList<IntExpr>();
 			// remember the last borderedge 
 			BorderEdge lastOutEdge = null;
