@@ -46,6 +46,7 @@ public class ConverterGen {
 		if(debug) {
 			return this.convertDebug(this.getOca().getInitState(), this.getOca().getTargetState(), sVar, tVar);
 		} else {
+			//return this.genType1RCForm(this.getDgraph(false).getStartVertexIndex(), this.getDgraph(false).getEndingVertexIndex(), sVar, tVar, edgeFlowVarFirst, isSkew)
 			return convertExpr(sVar, tVar).toString();			
 		}
 	}
@@ -68,7 +69,7 @@ public class ConverterGen {
 		IntExpr[] edgeFlowVarsBound = new IntExpr[edgeFlowVars.size()];
 		edgeFlowVars.values().toArray(edgeFlowVarsBound);
 		
-		BoolExpr resultExpr = this.genReachabilityCertificateBack(startState.getIndex(), endState.getIndex(), sVar, tVar, edgeFlowVars);
+		BoolExpr resultExpr = this.genReachabilityCertificate(startState.getIndex(), endState.getIndex(), sVar, tVar, edgeFlowVars);
 		resultExpr = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(edgeFlowVarsBound, resultExpr);
 		/*System.out.println("-----------APPLY TACTIC---------");*/
 		Goal goal = this.getQfpaGen().getCtx().mkGoal(true, false, false);
@@ -95,7 +96,7 @@ public class ConverterGen {
 		IntExpr[] edgeFlowVarsBound = new IntExpr[edgeFlowVars.size()];
 		edgeFlowVars.values().toArray(edgeFlowVarsBound);
 		
-		BoolExpr resultExpr = this.genReachabilityCertificateBack(startState.getIndex(), endState.getIndex(), sVar, tVar, edgeFlowVars);
+		BoolExpr resultExpr = this.genReachabilityCertificate(startState.getIndex(), endState.getIndex(), sVar, tVar, edgeFlowVars);
 		resultExpr = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(edgeFlowVarsBound, resultExpr);
 
 		BoolExpr xsXtPosRequirements = this.getQfpaGen().mkAndBool(
@@ -104,7 +105,7 @@ public class ConverterGen {
 		);
 		resultExpr = this.getQfpaGen().mkAndBool(resultExpr, xsXtPosRequirements);
 		System.out.println("Origin: ");
-		/*{----------------------------QUANTIFIER ELIMINATION-----------------------------------*/
+		/*{----------------------------QUANTIFIER ELIMINATION-----------------------------------
 		System.out.println("-----------APPLY TACTIC---------");
 		Goal goal = this.getQfpaGen().getCtx().mkGoal(true, false, false);
 		goal.add(resultExpr);
@@ -573,7 +574,7 @@ public class ConverterGen {
 		type123CertForm = (BoolExpr)this.getQfpaGen().mkExistsQuantifier(thirdBoundVars, type123CertForm);
 		
 		BoolExpr result = this.getQfpaGen().mkOrBool(
-			this.getQfpaGen().mkImplies(
+			this.getQfpaGen().mkAndBool(
 				this.getQfpaGen().mkEqBool(this.getQfpaGen().mkConstantInt(startIndex), this.getQfpaGen().mkConstantInt(endIndex)),
 				this.getQfpaGen().mkEqBool(sVar, tVar)
 			),
@@ -585,10 +586,11 @@ public class ConverterGen {
 			type2CertForm,
 			type3CertForm
 		);
-		//result = type1CertForm;
+		//result = (BoolExpr)type1CertForm;
 		return result;
+		//return result;
 	}
-	
+	/*
 	public BoolExpr genReachabilityCertificateBack(int startIndex, int endIndex,
 			   IntExpr sVar, IntExpr tVar, HashMap<String, IntExpr> edgeFlowVars) {
 		BoolExpr result = this.getQfpaGen().mkTrue();
@@ -631,7 +633,7 @@ public class ConverterGen {
 		result = (BoolExpr)this.getQfpaGen().mkExistsQuantifier(midVars, result);
 		return result;
 	}
-	
+	*/
 	public BoolExpr genType1RCForm(int startIndex, int endIndex,
 								   IntExpr s1, IntExpr t1, HashMap<String, IntExpr> edgeFlowVarFirst,
 								   Boolean isSkew) {
@@ -893,7 +895,7 @@ public class ConverterGen {
 		}
 		BoolExpr startVertexMinForm = this.getQfpaGen().mkFalse();
 		for(DGEdge e : this.getDgraph(isSkew).getEdges()) {
-			if(e.getFrom().getIndex() == startIndex) {
+			//TODO debug
 				BoolExpr temp = this.getQfpaGen().mkGtBool(
 					edgeFlowVarFirst.get("y_" + e.getFrom().getIndex() + "_" + e.getTo().getIndex() + appendStr),
 					this.getQfpaGen().mkConstantInt(0)
@@ -906,7 +908,6 @@ public class ConverterGen {
 					)
 				);
 				startVertexMinForm = this.getQfpaGen().mkOrBool(startVertexMinForm, tempTemp);
-			}
 		}
 		BoolExpr result = this.getQfpaGen().mkAndBool(
 			edgeFlowImpliesForm,
