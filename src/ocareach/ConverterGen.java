@@ -68,7 +68,7 @@ public class ConverterGen {
 		IntExpr[] edgeFlowVarsBound = new IntExpr[edgeFlowVars.size()];
 		edgeFlowVars.values().toArray(edgeFlowVarsBound);
 		
-		BoolExpr resultExpr = this.genReachabilityCertificate(startState.getIndex(), endState.getIndex(), sVar, tVar, edgeFlowVars);
+		BoolExpr resultExpr = this.genReachabilityCertificateBack(startState.getIndex(), endState.getIndex(), sVar, tVar, edgeFlowVars);
 		resultExpr = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(edgeFlowVarsBound, resultExpr);
 		/*System.out.println("-----------APPLY TACTIC---------");*/
 		Goal goal = this.getQfpaGen().getCtx().mkGoal(true, false, false);
@@ -76,7 +76,7 @@ public class ConverterGen {
 		Tactic qeTac = this.getQfpaGen().getCtx().mkTactic("qe");
 		ApplyResult ar = applyTactic(this.getQfpaGen().getCtx(), qeTac, goal);
 		resultExpr = ar.getSubgoals()[0].AsBoolExpr();
-		/*----------------------------------------------------------------*/
+		//----------------------------------------------------------------*/
 		result = (BoolExpr) resultExpr;
 		return result;
 	}
@@ -95,10 +95,16 @@ public class ConverterGen {
 		IntExpr[] edgeFlowVarsBound = new IntExpr[edgeFlowVars.size()];
 		edgeFlowVars.values().toArray(edgeFlowVarsBound);
 		
-		BoolExpr resultExpr = this.genReachabilityCertificate(startState.getIndex(), endState.getIndex(), sVar, tVar, edgeFlowVars);
+		BoolExpr resultExpr = this.genReachabilityCertificateBack(startState.getIndex(), endState.getIndex(), sVar, tVar, edgeFlowVars);
 		resultExpr = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(edgeFlowVarsBound, resultExpr);
+
+		BoolExpr xsXtPosRequirements = this.getQfpaGen().mkAndBool(
+			this.getQfpaGen().mkRequireNonNeg(sVar),
+			this.getQfpaGen().mkRequireNonNeg(tVar)
+		);
+		resultExpr = this.getQfpaGen().mkAndBool(resultExpr, xsXtPosRequirements);
 		System.out.println("Origin: ");
-		/*{----------------------------QUANTIFIER ELIMINATION-----------------------------------
+		/*{----------------------------QUANTIFIER ELIMINATION-----------------------------------*/
 		System.out.println("-----------APPLY TACTIC---------");
 		Goal goal = this.getQfpaGen().getCtx().mkGoal(true, false, false);
 		goal.add(resultExpr);
@@ -106,11 +112,6 @@ public class ConverterGen {
 		ApplyResult ar = applyTactic(this.getQfpaGen().getCtx(), qeTac, goal);
 		resultExpr = ar.getSubgoals()[0].AsBoolExpr();
 		//-------------------------------------------------------------------------------------}*/
-		BoolExpr xsXtPosRequirements = this.getQfpaGen().mkAndBool(
-			this.getQfpaGen().mkRequireNonNeg(sVar),
-			this.getQfpaGen().mkRequireNonNeg(tVar)
-		);
-		resultExpr = this.getQfpaGen().mkAndBool(resultExpr, xsXtPosRequirements);
 		result = resultExpr.toString();
 		System.out.println(result);
 
@@ -137,8 +138,8 @@ public class ConverterGen {
 		/*-------------EQUIV FORMULA-------------*/
 		equiv = this.getQfpaGen().mkAndBool(
 			this.getQfpaGen().mkRequireNonNeg(tVar),
-			this.getQfpaGen().mkRequireNonNeg(sVar),
-			this.getQfpaGen().mkLeBool(tVar, sVar)
+			this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(2)),
+			this.getQfpaGen().mkEqBool(tVar, this.getQfpaGen().mkAddInt(sVar, this.getQfpaGen().mkConstantInt(-2)))
 		);
 
 		resultExpr = this.getQfpaGen().mkAndBool(this.getQfpaGen().getCtx().mkImplies(tempResult, equiv), this.getQfpaGen().getCtx().mkImplies(equiv, tempResult));
@@ -203,7 +204,7 @@ public class ConverterGen {
 						maxWeightVarsFirst.put(v.getIndex() + "_" + w.getIndex() + "_" + k + appendStr, this.getQfpaGen().mkVariableInt("z_" + v.getIndex() + "_" + w.getIndex() + "_" + k + appendStr));
 					}
 					if(!maxWeightVarsFirst.containsKey(v.getIndex() + "_" + w.getIndex() + "_" + (k-1) + appendStr)) {
-						maxWeightVarsFirst.put(v.getIndex() + "_" + w.getIndex() + "_" + (k+1) + appendStr, this.getQfpaGen().mkVariableInt("z_" + v.getIndex() + "_" + w.getIndex() + "_" + (k+1) + appendStr));
+						maxWeightVarsFirst.put(v.getIndex() + "_" + w.getIndex() + "_" + (k-1) + appendStr, this.getQfpaGen().mkVariableInt("z_" + v.getIndex() + "_" + w.getIndex() + "_" + (k-1) + appendStr));
 					}
 					remainUnchangedForm = this.getQfpaGen().mkAndBool(
 						remainUnchangedForm, 
@@ -897,18 +898,14 @@ public class ConverterGen {
 					edgeFlowVarFirst.get("y_" + e.getFrom().getIndex() + "_" + e.getTo().getIndex() + appendStr),
 					this.getQfpaGen().mkConstantInt(0)
 				);
-				BoolExpr tempTemp = this.getQfpaGen().mkTrue();
-				for(DGEdge ep : this.getDgraph(isSkew).getEdges()) {
-					tempTemp = this.getQfpaGen().mkAndBool(
-						tempTemp,
-						this.getQfpaGen().mkGeBool(
-							indexVars.get("idx_" + ep.getFrom().getIndex() + "_" + ep.getTo().getIndex() + appendStr),
-							indexVars.get("idx_" + e.getFrom().getIndex() + "_" + e.getTo().getIndex() + appendStr)
-						)
-					);
-				}
-				temp = this.getQfpaGen().mkAndBool(temp, tempTemp);
-				startVertexMinForm = this.getQfpaGen().mkOrBool(startVertexMinForm, temp);
+				BoolExpr tempTemp = this.getQfpaGen().mkAndBool(
+					temp,
+					this.getQfpaGen().mkEqBool(
+						indexVars.get("idx_" + e.getFrom().getIndex() + "_" + e.getTo().getIndex() + appendStr), 
+						this.getQfpaGen().mkConstantInt(1)
+					)
+				);
+				startVertexMinForm = this.getQfpaGen().mkOrBool(startVertexMinForm, tempTemp);
 			}
 		}
 		BoolExpr result = this.getQfpaGen().mkAndBool(
@@ -983,22 +980,19 @@ public class ConverterGen {
 		}
 		BoolExpr flowVarCorrectSumForm = this.getQfpaGen().mkTrue();
 		for(DGEdge e : this.getDgraph(isSkew).getEdges()) {
-			IntExpr sum = this.getQfpaGen().mkConstantInt(0);
-			for(DGEdge ep : this.getDgraph(isSkew).getEdges()) {
-				sum = this.getQfpaGen().mkAddInt(
-					sum, 
-					edgeDecomVars.get("y_" + e.getFrom().getIndex() + "_" + e.getTo().getIndex() + "_edge(" + ep.getFrom().getIndex() + "," + ep.getTo().getIndex() + ")" + appendStr)
-				);
-			}
-			// add y_{e}^1 to the flow
-			sum = this.getQfpaGen().mkAddInt(sum, this.getQfpaGen().mkConstantInt(1));
-			flowVarCorrectSumForm = this.getQfpaGen().mkAndBool(
-				flowVarCorrectSumForm,
-				this.getQfpaGen().mkEqBool(
-					sum,
-					edgeFlowVarFirst.get("y_" + e.getFrom().getIndex() + "_" + e.getTo().getIndex() + appendStr)
-				)
+			BoolExpr impliesFrom = this.getQfpaGen().mkGtBool(
+				edgeFlowVarFirst.get("y_" + e.getFrom().getIndex() + "_" + e.getTo().getIndex() + appendStr),
+				this.getQfpaGen().mkConstantInt(0)
 			);
+			IntExpr sumExpr = this.getQfpaGen().mkConstantInt(0);
+			for(DGEdge ep : this.getDgraph(isSkew).getEdges()) {
+				sumExpr = this.getQfpaGen().mkAddInt(sumExpr, edgeDecomVars.get("y_" + ep.getFrom().getIndex() + "_" + ep.getTo().getIndex() + "_edge(" + e.getFrom().getIndex() + "," + e.getTo().getIndex() + ")" + appendStr));
+			}
+			BoolExpr implieTo = this.getQfpaGen().mkEqBool(
+				this.getQfpaGen().mkAddInt(sumExpr, this.getQfpaGen().mkConstantInt(1)),
+				edgeFlowVarFirst.get("y_" + e.getFrom().getIndex() + "_" + e.getTo().getIndex() + appendStr)
+			);
+			flowVarCorrectSumForm = this.getQfpaGen().mkAndBool(flowVarCorrectSumForm, this.getQfpaGen().mkImplies(impliesFrom, implieTo));
 		}
 		
 		BoolExpr result = this.getQfpaGen().mkAndBool(
