@@ -139,8 +139,8 @@ public class ConverterGen {
 		/*-------------EQUIV FORMULA-------------*/
 		equiv = this.getQfpaGen().mkAndBool(
 			this.getQfpaGen().mkRequireNonNeg(tVar),
-			this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(2)),
-			this.getQfpaGen().mkEqBool(tVar, this.getQfpaGen().mkAddInt(sVar, this.getQfpaGen().mkConstantInt(-2)))
+			this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(0)),
+			this.getQfpaGen().mkLeBool(tVar, this.getQfpaGen().mkAddInt(sVar, this.getQfpaGen().mkConstantInt(1)))
 		);
 
 		resultExpr = this.getQfpaGen().mkAndBool(this.getQfpaGen().getCtx().mkImplies(tempResult, equiv), this.getQfpaGen().getCtx().mkImplies(equiv, tempResult));
@@ -702,13 +702,10 @@ public class ConverterGen {
 		BoolExpr existBody = this.genType1RCForm(startIndex, endIndex, s2, t2, edgeFlowVarSecSkew, true);
 		existBody = this.getQfpaGen().mkAndBool(
 			existBody,
+			flowVarSkewEqualForm,
 			this.getQfpaGen().mkRequireNonNeg(bound)
 		);
-		BoolExpr existForm = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(bound, existBody);
-		BoolExpr result = this.getQfpaGen().mkAndBool(
-			flowVarSkewEqualForm,
-			existForm
-		);
+		BoolExpr result = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(bound, existBody);
 		return result;
 	}
 	
