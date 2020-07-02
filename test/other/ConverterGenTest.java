@@ -19,7 +19,7 @@ import ocareach.ConverterGen;
 public class ConverterGenTest {
 	public static void main(String[] args) throws IOException {
 		OCAGen oca = new OCAGen(1);
-		for(int i = 0; i < 2; i++) {
+		for(int i = 0; i < 3; i++) {
 			oca.addState(i);
 		}
 		//Trivial Example Done
@@ -29,6 +29,7 @@ public class ConverterGenTest {
 		oca.setInitIndex(0);
 		oca.setTargetIndex(2);
 		*/
+		
 		oca.addTransition(0, 1, 1);
 		oca.addTransition(1, -1, 1);
 		oca.setInitIndex(0);

@@ -138,7 +138,7 @@ public class ConverterGen {
 		BoolExpr resultExpr = null;
 		/*-------------EQUIV FORMULA-------------*/
 		equiv = this.getQfpaGen().mkAndBool(
-			this.getQfpaGen().mkRequireNonNeg(tVar),
+			this.getQfpaGen().mkGeBool(tVar, this.getQfpaGen().mkConstantInt(0)),
 			this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(0)),
 			this.getQfpaGen().mkLeBool(tVar, this.getQfpaGen().mkAddInt(sVar, this.getQfpaGen().mkConstantInt(1)))
 		);
@@ -578,13 +578,13 @@ public class ConverterGen {
 				this.getQfpaGen().mkEqBool(this.getQfpaGen().mkConstantInt(startIndex), this.getQfpaGen().mkConstantInt(endIndex)),
 				this.getQfpaGen().mkEqBool(sVar, tVar)
 			),
-			type1CertForm,
-			type12CertForm,
-			type13CertForm,
-			type23CertForm,
-			type123CertForm,
-			type2CertForm,
-			type3CertForm
+			type1CertForm
+			//type12CertForm,
+			//type13CertForm,
+			//type23CertForm,
+			//type123CertForm,
+			//type2CertForm,
+			//type3CertForm
 		);
 		//result = (BoolExpr)type1CertForm;
 		return result;
@@ -672,7 +672,8 @@ public class ConverterGen {
 		sumVars.values().toArray(sumVarsArray);
 		residue = this.getQfpaGen().mkAndBool(
 			residue,
-			this.getQfpaGen().mkRequireNonNeg(indexVarsArray)
+			this.getQfpaGen().mkRequireNonNeg(indexVarsArray),
+			this.getQfpaGen().mkRequireNonNeg(edgeDecomVarsArray)
 		);
 		residue = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(sumVarsArray, residue);
 		residue = (BoolExpr) this.getQfpaGen().mkExistsQuantifier(indexVarsArray, residue);
