@@ -215,17 +215,6 @@ public class Experiment {
 			System.out.println(resultStr);
 			System.out.println("------------------------------------------------------");
 
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
 		} else {
 			for(int i = 0; i < 50; i ++) {
 					int stateNum = 4;
