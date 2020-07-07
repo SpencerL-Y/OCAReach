@@ -29,11 +29,33 @@ public class ConverterGenTest {
 		oca.setInitIndex(0);
 		oca.setTargetIndex(2);
 		*/
-		
+		// target loop Done
+		/*
 		oca.addTransition(0, 1, 1);
 		oca.addTransition(1, -1, 1);
 		oca.setInitIndex(0);
 		oca.setTargetIndex(1);
+		*/
+		// init loop 
+		/*
+		oca.addTransition(0, -1, 0);
+		oca.addTransition(0, 1, 1);
+		oca.setInitIndex(0);
+		oca.setTargetIndex(1);
+		*/
+		//Trivial add done
+		/*
+		oca.addTransition(0, 1, 1);
+		oca.setInitIndex(0);
+		oca.setTargetIndex(1);
+		*/
+		
+		oca.addTransition(0, -1, 1);
+		oca.addTransition(1, 1, 2);
+		oca.setInitIndex(0);
+		oca.setTargetIndex(2);
+		
+		
 		
 		ConverterGen con = new ConverterGen(oca); 
 
@@ -60,7 +82,7 @@ public class ConverterGenTest {
 		//System.out.println(result.toString());
 		//System.out.println(resultExpr.toString());
 		//}
-		System.out.println(resultExpr.toString());
+		//sSystem.out.println(resultExpr.toString());
 	}
 	
 

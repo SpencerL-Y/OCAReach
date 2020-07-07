@@ -65,12 +65,15 @@ public class OCDGenerator {
 		for(int i = 0; i < stateNum; i ++) {
 			for(int j = 0; j < stateNum; j ++) {
 				//change here to control the number of edges
-				if(r.nextInt() % 5 == 0) {
-					int op = r.nextInt(2);
+				int num = r.nextInt();
+				if(num % 10 == 1 ) {
+					int op = r.nextInt(8);
 					if(op == 0) {
-						this.getTempOca().addTransition(i, OCAOp.Add, j);
-					} else {
+						this.getTempOca().addTransition(i, OCAOp.Zero, j);
+					} else if (op < 5){
 						this.getTempOca().addTransition(i, OCAOp.Sub, j);
+					} else {
+						this.getTempOca().addTransition(i, OCAOp.Add, j);
 					}
 				}
 			}

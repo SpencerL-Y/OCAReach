@@ -139,10 +139,11 @@ public class ConverterGen {
 		/*-------------EQUIV FORMULA-------------*/
 		equiv = this.getQfpaGen().mkAndBool(
 			this.getQfpaGen().mkGeBool(tVar, this.getQfpaGen().mkConstantInt(0)),
-			this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(0)),
-			this.getQfpaGen().mkLeBool(tVar, this.getQfpaGen().mkAddInt(sVar, this.getQfpaGen().mkConstantInt(1)))
+			this.getQfpaGen().mkGeBool(sVar, this.getQfpaGen().mkConstantInt(1)),
+			this.getQfpaGen().mkEqBool(tVar, this.getQfpaGen().mkAddInt(sVar, this.getQfpaGen().mkConstantInt(0)))
 		);
-
+		//equiv = this.getQfpaGen().mkFalse()
+		//equiv = this.getQfpaGen().mkOrBool(equiv, this.getQfpaGen().mkAndBool(this.getQfpaGen().mkEqBool(sVar, this.getQfpaGen().mkConstantInt(0)), this.getQfpaGen().mkEqBool(tVar, this.getQfpaGen().mkConstantInt(3))));
 		resultExpr = this.getQfpaGen().mkAndBool(this.getQfpaGen().getCtx().mkImplies(tempResult, equiv), this.getQfpaGen().getCtx().mkImplies(equiv, tempResult));
 		resultExpr = this.getQfpaGen().mkNotBool(resultExpr);
 		return resultExpr;
@@ -467,18 +468,21 @@ public class ConverterGen {
 		// certificates for different types
 		BoolExpr type1CertForm = this.getQfpaGen().mkAndBool(
 			this.genType1RCForm(startIndex, endIndex, sVar, tVar, edgeFlowVarFirst, false),
+			this.getQfpaGen().mkRequireNonNeg(firstBoundVars),
 			type1FlowSumEqualForm
 		);
 		type1CertForm = (BoolExpr)this.getQfpaGen().mkExistsQuantifier(firstBoundVars, type1CertForm);
 		
 		BoolExpr type2CertForm = this.getQfpaGen().mkAndBool(
 				this.genType2RCForm(startIndex, endIndex, sVar, tVar, edgeFlowVarSec),
+				this.getQfpaGen().mkRequireNonNeg(secondBoundVars),
 				type2FlowSumEqualForm
 			);
 		type2CertForm = (BoolExpr)this.getQfpaGen().mkExistsQuantifier(secondBoundVars, type2CertForm);
 		
 		BoolExpr type3CertForm = this.getQfpaGen().mkAndBool(
 				this.genType3RCForm(startIndex, endIndex, sVar, tVar, edgeFlowVarThird),
+				this.getQfpaGen().mkRequireNonNeg(thirdBoundVars),
 				type3FlowSumEqualForm
 			);
 		type3CertForm = (BoolExpr)this.getQfpaGen().mkExistsQuantifier(thirdBoundVars, type3CertForm);
@@ -497,6 +501,10 @@ public class ConverterGen {
 			);
 		}
 		BoolExpr type12CertForm = this.getQfpaGen().mkAndBool(
+				this.getQfpaGen().mkRequireNonNeg(firstBoundVars),
+				this.getQfpaGen().mkRequireNonNeg(secondBoundVars),
+				this.getQfpaGen().mkRequireNonNeg(thirdBoundVars),
+				this.getQfpaGen().mkRequireNonNeg(type12MidBound),
 			type12CertPathForm,
 			type12FlowSumEqualForm
 		);
@@ -518,6 +526,10 @@ public class ConverterGen {
 			);
 		}
 		BoolExpr type13CertForm = this.getQfpaGen().mkAndBool(
+				this.getQfpaGen().mkRequireNonNeg(firstBoundVars),
+				this.getQfpaGen().mkRequireNonNeg(secondBoundVars),
+				this.getQfpaGen().mkRequireNonNeg(thirdBoundVars),
+				this.getQfpaGen().mkRequireNonNeg(type13MidBound),
 			type13CertPathForm,
 			type13FlowSumEqualForm
 		);
@@ -539,6 +551,10 @@ public class ConverterGen {
 			);
 		}
 		BoolExpr type23CertForm = this.getQfpaGen().mkAndBool(
+				this.getQfpaGen().mkRequireNonNeg(firstBoundVars),
+				this.getQfpaGen().mkRequireNonNeg(secondBoundVars),
+				this.getQfpaGen().mkRequireNonNeg(thirdBoundVars),
+				this.getQfpaGen().mkRequireNonNeg(type23MidBound),				
 			type23CertPathForm,
 			type23FlowSumEqualForm
 		);
@@ -565,6 +581,10 @@ public class ConverterGen {
 			}
 		}
 		BoolExpr type123CertForm = this.getQfpaGen().mkAndBool(
+			this.getQfpaGen().mkRequireNonNeg(firstBoundVars),
+			this.getQfpaGen().mkRequireNonNeg(secondBoundVars),
+			this.getQfpaGen().mkRequireNonNeg(thirdBoundVars),
+			this.getQfpaGen().mkRequireNonNeg(type123MidBound),	
 			type123CertPathForm,
 			type123FlowSumEqualForm
 		);
@@ -923,6 +943,10 @@ public class ConverterGen {
 							   Boolean isSkew) {
 		//TODO: DEBUG
 		String appendStr = isSkew ? "_second_skew" : "_first"; 
+		IntExpr[] edgeDecomVarsArray = new IntExpr[edgeDecomVars.values().size()];
+		edgeDecomVars.values().toArray(edgeDecomVarsArray);
+		BoolExpr edgeDecomNonNegForm = this.getQfpaGen().mkRequireNonNeg(edgeDecomVarsArray);
+
 		BoolExpr startEdgeForm = this.getQfpaGen().mkTrue();
 		for(DGEdge e : this.getDgraph(isSkew).getEdges()) { 
 			BoolExpr impliesTemp = this.getQfpaGen().mkImplies(
@@ -995,6 +1019,7 @@ public class ConverterGen {
 		}
 		
 		BoolExpr result = this.getQfpaGen().mkAndBool(
+			edgeDecomNonNegForm,
 			startEdgeForm,
 			edgeToEdgeForm,
 			edgeDecomOrderForm,

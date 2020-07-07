@@ -49,7 +49,7 @@ public class Converter {
 	public String convert() {
 		IntExpr sVar = this.getQfpaGen().mkVariableInt("xs");
 		IntExpr tVar = this.getQfpaGen().mkVariableInt("xt");
-		boolean debug = true;
+		boolean debug = false;
 		if(debug) {
 			return this.convertDebug(this.oca.getInitState(), this.oca.getTargetState(), sVar, tVar);
 		} else {

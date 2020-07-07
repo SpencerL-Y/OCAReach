@@ -217,7 +217,7 @@ public class ConverterZero {
 		resultStr = resultExpr.toString();
 		String result = null;
 		String solveResult = null;
-		// ----------------------EQUIV DEBUG-----------------------
+		/*// ----------------------EQUIV DEBUG-----------------------
 		resultExpr = this.equivDebug(sVar, tVar, resultExpr);
 					
 		result = resultExpr.toString();

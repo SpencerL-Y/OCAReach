@@ -245,7 +245,7 @@ public class ConverterOpt extends Converter {
 			@SuppressWarnings("unused")
 			ApplyResult ar = applyTactic(this.getQfpaGen().getCtx(), qeTac, goal);
 			//resultExpr = ar.getSubgoals()[0].AsBoolExpr();
-			// ----------------------EQUIV DEBUG-----------------------
+			/* ----------------------EQUIV DEBUG-----------------------
 			resultExpr = this.equivDebug(sVar, tVar, resultExpr);
 			
 			result = resultExpr.simplify().toString();
