@@ -47,7 +47,7 @@ public class ZTVertex {
 	// TODO: debug
 	public void dfsFindZTPath(List<ZTPath> foundList, Stack<ZTVertex> searched, int targetIndex) {
 		if(this.isTargetVertex()) {
-			System.out.println("push " + this.getIndex());
+			//System.out.println("push " + this.getIndex());
 			searched.push(this);
 			foundList.add(new ZTPath(searched));
 			searched.pop();
@@ -56,7 +56,7 @@ public class ZTVertex {
 		
 		for(ZTEdge e : this.getEdges()) {
 			if(!searched.contains(this)) {
-				System.out.println("push " + this.getIndex());
+				//System.out.println("push " + this.getIndex());
 				searched.push(this);
 				e.getTo().dfsFindZTPath(foundList, searched, targetIndex);
 				searched.pop();

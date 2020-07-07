@@ -5,5 +5,6 @@
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
 	<classpathentry kind="lib" path="/home/clexma/Desktop/Disk_D/gitRepos/OCAReach2QFPA/lib/com.microsoft.z3.jar"/>
+	<classpathentry kind="lib" path="/home/clexma/Desktop/Disk_D/gitRepos/OCAReach2QFPA/lib/commons-cli-1.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

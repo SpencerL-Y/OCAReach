@@ -82,9 +82,9 @@ public class Converter {
 		List<BoolExpr> formulae = new ArrayList<BoolExpr>();
 		for(ASDGPath p : paths) {
 			for(ASDGVertex v : p.getPath()) {
-				System.out.print(v.getSccIndex());
+				//System.out.print(v.getSccIndex());
 			}
-			System.out.println();
+			//System.out.println();
 			
 			// there is no cycle in  SCCs (trivial case: every SCC is a concrete vertex)
 			boolean trivial = !p.containsCycledVertex();
@@ -145,9 +145,9 @@ public class Converter {
 		List<BoolExpr> formulae = new ArrayList<BoolExpr>();
 		for(ASDGPath p : paths) {
 			for(ASDGVertex v : p.getPath()) {
-				System.out.print(v.getSccIndex());
+				//System.out.print(v.getSccIndex());
 			}
-			System.out.println();
+			//System.out.println();
 			
 			// there is no cycle in  SCCs (trivial case: every SCC is a concrete vertex)
 			boolean trivial = !p.containsCycledVertex();
@@ -299,9 +299,9 @@ public class Converter {
 		BoolExpr type1FormBody = this.getQfpaGen().mkFalse();
 		for(List<SDGVertex> l : allPossibleInOut) {
 			for(int i = 0; i < l.size(); i++) {
-				System.out.print(l.get(i).getVertexIndex());
+				//System.out.print(l.get(i).getVertexIndex());
 			}
-			System.out.println();
+			//System.out.println();
 			// for every possible inport-outport sequence
 			BoolExpr type1FormBodyItem = this.getQfpaGen().mkTrue();
 			if(p.length() > 0) {

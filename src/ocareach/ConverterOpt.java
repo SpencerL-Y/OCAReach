@@ -47,7 +47,7 @@ public class ConverterOpt extends Converter {
 		}
 		
 		public BoolExpr convertExpr(State startState, State endState, IntExpr sVar, IntExpr tVar) {
-			System.out.println("ConvertToForm");
+			//System.out.println("ConvertToForm");
 			int originalStart = this.getOca().getInitIndex();
 			int originalEnd = this.getOca().getTargetIndex();
 			if(!(this.getOca().containsState(startState) && this.getOca().containsState(endState))) {
@@ -60,12 +60,12 @@ public class ConverterOpt extends Converter {
 			this.dgraph = this.getOca().toDGraph();
 			//this.getDgraph().setStartVertexIndex(startState.getIndex());
 			//this.getDgraph().setEndingVertexIndex(endState.getIndex());
-			System.out.println(this.getDgraph().getStartVertexIndex() + ", " + this.getDgraph().getEndingVertexIndex());
+			//System.out.println(this.getDgraph().getStartVertexIndex() + ", " + this.getDgraph().getEndingVertexIndex());
 			// run tarjan and get SCC marks
 			this.sdg = new SDGraph(this.dgraph);
 			this.getSdg().tarjan();
-			System.out.println("vertexNum: " + this.getSdg().getVertices().size());
-			System.out.println("sccNum: " + this.getSdg().getSccNum());
+			//System.out.println("vertexNum: " + this.getSdg().getVertices().size());
+			//System.out.println("sccNum: " + this.getSdg().getSccNum());
 			// construct abstract SDG
 			this.asdg = new ASDGraph(this.getSdg());
 			ASDGVertex absStart = this.getAsdg().getVertex(this.getSdg().getStartingVertex().getSccMark());
@@ -161,7 +161,7 @@ public class ConverterOpt extends Converter {
 			resultExpr = ar.getSubgoals()[0].AsBoolExpr();
 			/*----------------------------------------------------------------*/
 			//System.out.println("RETURN");
-			System.out.println("RESULT: " + resultExpr.toString());
+			//System.out.println("RESULT: " + resultExpr.toString());
 			this.getOca().setInitIndex(originalStart);
 			this.getOca().setTargetIndex(originalEnd);
 			return resultExpr;
@@ -350,9 +350,9 @@ public class ConverterOpt extends Converter {
 			//System.out.println("allPossible Inout: " + allPossibleInOut.size());
 			for(List<SDGVertex> list : allPossibleInOut) {
 				for(SDGVertex v : list) {
-					System.out.print(v.getVertexIndex());
+					//System.out.print(v.getVertexIndex());
 				}
-				System.out.println();
+				//System.out.println();
 				AtomicInteger loopNum = new AtomicInteger();
 				loopNum.set(0);
 				BoolExpr pathForm = this.getQfpaGen().mkTrue();
@@ -516,9 +516,9 @@ public class ConverterOpt extends Converter {
 					)
 				);
 				IntExpr weightI2O = this.getQfpaGen().mkConstantInt(i2oPath.getWeight());
-				System.out.println("weightI2O: " + weightI2O);
+				//System.out.println("weightI2O: " + weightI2O);
 				IntExpr weightO2O = this.getQfpaGen().mkConstantInt(o2oPath.getWeight());
-				System.out.println("weightO2O: " + weightO2O);
+				//System.out.println("weightO2O: " + weightO2O);
 				IntExpr weightLoop = this.getQfpaGen().mkScalarTimes(loopTimeVar, weightO2O);
 				IntExpr weightPreAndLoop = this.getQfpaGen().mkAddInt(weightI2O, weightLoop);
 				IntExpr con0 = this.getQfpaGen().mkConstantInt(0);
@@ -552,7 +552,7 @@ public class ConverterOpt extends Converter {
 			} else {
 				DGVertex currentV = g.getVertex(outportIndex);
 				DGPath o2oPath = new DGPath(currentV);
-				System.out.print("o2oPath: " + outportIndex);
+				//System.out.print("o2oPath: " + outportIndex);
 				// find the next vertex of the loop path
 				for(DGEdge e : currentV.getEdges()) {
 					if(this.getSdg().getVertex(e.getTo().getIndex()).getSccMark() == 
@@ -563,7 +563,7 @@ public class ConverterOpt extends Converter {
 				}
 				while(currentV.getIndex() != outportIndex) {
 					o2oPath.concatVertex(currentV);
-					System.out.print(currentV.getIndex());
+					//System.out.print(currentV.getIndex());
 					for(DGEdge e : currentV.getEdges()) {
 						if(this.getSdg().getVertex(e.getTo().getIndex()).getSccMark() == 
 						   this.getSdg().getVertex(currentV.getIndex()).getSccMark()) {
@@ -573,8 +573,8 @@ public class ConverterOpt extends Converter {
 					}
 				}
 				o2oPath.concatVertex(currentV);
-				System.out.print(currentV.getIndex());
-				System.out.println();
+				//System.out.print(currentV.getIndex());
+				//System.out.println();
 				IntExpr dropFirstO2O = this.getQfpaGen().mkConstantInt(o2oPath.getDrop());
 				IntExpr dropFinal = this.getQfpaGen().mkAddInt(
 							this.getQfpaGen().mkConstantInt(o2oPath.getDrop()), 
@@ -585,9 +585,9 @@ public class ConverterOpt extends Converter {
 				);
 				
 				IntExpr weightO2O = this.getQfpaGen().mkConstantInt(o2oPath.getWeight());
-				System.out.println("weightO2O: " + weightO2O);
-				System.out.println("dropFirst: " + dropFirstO2O.toString());
-				System.out.println("dropFinal: " + dropFinal.toString());
+				//System.out.println("weightO2O: " + weightO2O);
+				//System.out.println("dropFirst: " + dropFirstO2O.toString());
+				//System.out.println("dropFinal: " + dropFinal.toString());
 				IntExpr weightLoop = this.getQfpaGen().mkScalarTimes(loopTimeVar, weightO2O);
 
 				IntExpr con0 = this.getQfpaGen().mkConstantInt(0);

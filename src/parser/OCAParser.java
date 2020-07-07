@@ -29,7 +29,7 @@ public class OCAParser {
 		return oca; 
 	}
 	private String[] parseBlock(String origin) {
-		System.out.println("parseBlock");
+		//System.out.println("parseBlock");
 		String[] first = origin.split("]");
 		for(int i = 0; i < 4; i ++) {
 			String s = first[i];
@@ -43,41 +43,41 @@ public class OCAParser {
 				assert(false);
 			}
 			s = s.substring(1).trim();
-			System.out.println(s);
+			//System.out.println(s);
 		}
 		
 		return first;
 	}
 	
 	private boolean parseTag(String[] text, OCA oca) {
-		System.out.println("parseTag");
+		//System.out.println("parseTag");
 		String ocaStr = text[0];
 		ocaStr = ocaStr.trim().substring(1);
 		if(ocaStr.equals("OCA")) {
-			System.out.println(true);
+			//System.out.println(true);
 			return true;
   		} else {
-  			System.out.println(false);
+  			//System.out.println(false);
 			return false;
 		}
 	}
 	
 	private boolean parseStates(String[] text, OCA oca) {
-		System.out.println("parseStates");
+		//System.out.println("parseStates");
 		String states = text[1].trim();
 		String[] statesFmt = states.split(":");
 		String stateStr = statesFmt[0].trim().substring(1);
 
-		System.out.println(stateStr);
+		//System.out.println(stateStr);
 		if(!stateStr.equals("State")) {
-			System.out.println(false);
+			//System.out.println(false);
 			return false;
 		}
 		String[] statesEnum = statesFmt[1].trim().split(",");
 		for(String state : statesEnum) {
 			state = state.trim();
 
-			System.out.println(state);
+			//System.out.println(state);
 			int id = Integer.parseInt(state);
 			oca.addState(id);
 		}
@@ -87,8 +87,8 @@ public class OCAParser {
 		String initStr = initFmt[0].trim().substring(1);
 		if(!initStr.equals("Init")) {
 
-			System.out.println(initStr);
-			System.out.println(false);
+			//System.out.println(initStr);
+			//System.out.println(false);
 			return false;
 		}
 		String initNum = initFmt[1].trim();
@@ -98,49 +98,49 @@ public class OCAParser {
 		String[] targetFmt = target.split(":");
 		String targetStr = targetFmt[0].trim().substring(1);
 		if(!targetStr.equals("Target")) {
-			System.out.println(targetStr);
-			System.out.println(false);
+			//System.out.println(targetStr);
+			//System.out.println(false);
 			return false;
 		}
 		String targetNum = targetFmt[1].trim();
 		int targetId = Integer.parseInt(targetNum);
 		oca.setTargetIndex(targetId);
-		System.out.println(true);
+		//System.out.println(true);
 		return true;
 	}
 	
 	private boolean parseTransitions(String[] text, OCA oca) {
-		System.out.println("parseTransitions");
+		//System.out.println("parseTransitions");
 		String trans = text[4].trim();
 		String[] transFmt = trans.split(":");
 		String transStr = transFmt[0].trim().substring(1);
 		if(!transStr.equals("Delta")) {
-			System.out.println(false + "Delta" + transStr);
+			//System.out.println(false + "Delta" + transStr);
 			return false;
 		}
 		if(transFmt.length == 1) {
 			return true;
 		}
-		System.out.println(transFmt[1]);	
+		//System.out.println(transFmt[1]);	
 		String[] tuples =  transFmt[1].trim().split(";");
 
-		System.out.println(tuples[0]);
+		//System.out.println(tuples[0]);
 		for(String t : tuples) {
 			t = t.trim();
 			if(t == "") {
 				break;
 			}
-			System.out.println(t);
+			//System.out.println(t);
 			String[] tMem = t.split(",");
 			String tFrom = tMem[0].trim();
 			String tLabel = tMem[1].trim();
 			String tTo = tMem[2].trim();
 
-			System.out.println(tFrom + " "+tTo);
+			//System.out.println(tFrom + " "+tTo);
 			if(!(tFrom.toCharArray()[0] =='(' && 
 				(tLabel.equals("add") || tLabel.equals("sub") || tLabel.equals("zero")) && 
 				 tTo.toCharArray()[tTo.length() - 1] == ')' )) {
-				System.out.println(false);
+				//System.out.println(false);
 				return false;
 			}
 			int tFromNum = Integer.parseInt(tFrom.substring(1));
@@ -148,9 +148,9 @@ public class OCAParser {
 			OCAOp op = (OCAOp) OCAOpUtil.parseOpSimple(tLabel);
 			oca.addTransition(tFromNum, op, tToNum);
 
-			System.out.println("add");
+			//System.out.println("add");
 		}
-		System.out.println(true);
+		//System.out.println(true);
 		return true;
 	}
 	

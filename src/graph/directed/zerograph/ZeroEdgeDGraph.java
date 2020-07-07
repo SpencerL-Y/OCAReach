@@ -32,7 +32,7 @@ public class ZeroEdgeDGraph {
 			for(DGEdge e : v.getEdges()) {
 				if(e.getWeight() == 0) {
 					ZTVertex newV = new ZTVertex(this, index, e.getFrom().getIndex(), e.getTo().getIndex());
-					System.out.println("ZTVertex: " + newV.getIndex());
+					//System.out.println("ZTVertex: " + newV.getIndex());
 					newV.printZeroEdge();
 					this.addVertex(newV);
 					index ++;
@@ -140,7 +140,7 @@ public class ZeroEdgeDGraph {
 			return;
 		}
 		//TODO
-		System.out.println("Add zt edge: " + from + " to " + to);
+		//System.out.println("Add zt edge: " + from + " to " + to);
 		this.getVertex(from).addEdge(to);
 	}
 	

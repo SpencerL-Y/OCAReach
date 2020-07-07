@@ -49,7 +49,7 @@ public class OCAGen extends OCA{
 	}
 	
 	public OCAGen removeZeroTransitionOCAGen() {
-		System.out.println("Original: start: " + this.getInitIndex() + " end: " +  this.getTargetIndex());
+		//System.out.println("Original: start: " + this.getInitIndex() + " end: " +  this.getTargetIndex());
 		OCAGen newOca = new OCAGen(this.getMaxAbsVal());
 		for(State s : this.getStates()) {
 			newOca.addState(s.getIndex());
@@ -65,7 +65,7 @@ public class OCAGen extends OCA{
 		}
 		newOca.setInitIndex(this.getInitIndex());
 		newOca.setTargetIndex(this.getTargetIndex());
-		System.out.println("New: start: " + newOca.getInitIndex() + " end: " +  newOca.getTargetIndex());
+		//System.out.println("New: start: " + newOca.getInitIndex() + " end: " +  newOca.getTargetIndex());
 		return newOca;
 	}
 	

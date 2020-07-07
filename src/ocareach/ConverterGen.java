@@ -104,7 +104,7 @@ public class ConverterGen {
 			this.getQfpaGen().mkRequireNonNeg(tVar)
 		);
 		resultExpr = this.getQfpaGen().mkAndBool(resultExpr, xsXtPosRequirements);
-		System.out.println("Origin: ");
+		//System.out.println("Origin: ");
 		/*{----------------------------QUANTIFIER ELIMINATION-----------------------------------
 		System.out.println("-----------APPLY TACTIC---------");
 		Goal goal = this.getQfpaGen().getCtx().mkGoal(true, false, false);
@@ -114,7 +114,7 @@ public class ConverterGen {
 		resultExpr = ar.getSubgoals()[0].AsBoolExpr();
 		//-------------------------------------------------------------------------------------}*/
 		result = resultExpr.toString();
-		System.out.println(result);
+		//System.out.println(result);
 
 //		result = resultExpr.simplify().toString();
 		String solveResult = null;
