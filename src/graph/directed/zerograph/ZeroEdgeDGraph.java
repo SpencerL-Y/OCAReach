@@ -33,7 +33,7 @@ public class ZeroEdgeDGraph {
 				if(e.getWeight() == 0) {
 					ZTVertex newV = new ZTVertex(this, index, e.getFrom().getIndex(), e.getTo().getIndex());
 					//System.out.println("ZTVertex: " + newV.getIndex());
-					newV.printZeroEdge();
+					//newV.printZeroEdge();
 					this.addVertex(newV);
 					index ++;
 				}

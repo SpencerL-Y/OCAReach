@@ -77,16 +77,16 @@ public class ConverterOpt extends Converter {
 			//System.out.println("path size: " + paths.size());
 			for(ASDGPath p : paths) {
 				for(ASDGVertex v : p.getPath()) {
-					System.out.print(v.getSccIndex());
+					//System.out.print(v.getSccIndex());
 				}
-				System.out.println();
+				//System.out.println();
 			}
 			for(ASDGPath p : paths) {
 				//System.out.println("test");
 				for(ASDGVertex v : p.getPath()) {
-					System.out.print(v.getSccIndex());
+					//System.out.print(v.getSccIndex());
 				}
-				System.out.println();
+				//System.out.println();
 				
 				// there is no cycle in  SCCs (trivial case: every SCC is a concrete vertex)
 				boolean trivial = !p.containsCycledVertex();
@@ -105,31 +105,31 @@ public class ConverterOpt extends Converter {
 				BoolExpr type132Form = this.getQfpaGen().mkFalse();
 				boolean debugSignal = true;
 				if(trivial) {
-					System.out.println("TRIVIAL");
+					//System.out.println("TRIVIAL");
 					trivialForm = this.genTrivialFormula(p, sVar, tVar);
 					System.out.println(trivialForm.toString());
 					debugSignal = false;
 				}
 				if(isFlat && !trivial) {
-					System.out.println("FLAT");
+					//System.out.println("FLAT");
 					flatForm = this.genFlatFormulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar);
 					System.out.println(flatForm.toString());
 					debugSignal = false;
 				}
 				if(type1 && !trivial && !isFlat) {
-					System.out.println("TYPE 1");
+					//System.out.println("TYPE 1");
 					type1Form = this.genType1Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar, false);
 					System.out.println(type1Form.toString());
 					debugSignal = false;
 				}
 				if(type12 && !trivial && !isFlat) {
-					System.out.println("TYPE 12");
+					//System.out.println("TYPE 12");
 					type12Form = this.genType12Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar);
 					System.out.println(type12Form.toString());
 					debugSignal = false;
 				}
 				if(type132 && !trivial && !isFlat) {
-					System.out.println("TYPE 132");
+					//System.out.println("TYPE 132");
 					type132Form = this.genType132Formulae(p, startState.getIndex(), endState.getIndex(), sVar, tVar);
 					System.out.println(type132Form);
 					debugSignal = false;

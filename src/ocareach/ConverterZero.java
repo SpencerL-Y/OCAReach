@@ -165,7 +165,7 @@ public class ConverterZero {
 				for(ZTVertex w : z.getVertices()) {
 					if(v.getIndex() != w.getIndex() && w.getFrom() >= 0 && w.getTo() >= 0) {
 						//System.out.println("EDGES: ");
-						v.printZeroEdge(); w.printZeroEdge();
+						//v.printZeroEdge(); w.printZeroEdge();
 						BoolExpr preForm = this.getConverter().convertExpr(this.getConverter().getOca().getInitState(), 
 																			 this.getConverter().getOca().getState(v.getFrom()),
 																			 sVar,
@@ -214,7 +214,7 @@ public class ConverterZero {
 		//resultStr = longForm.simplify().toString();
 		
 		String resultStr = null;
-		resultStr = resultExpr.toString();
+		resultStr = resultExpr.simplify().toString();
 		String result = null;
 		String solveResult = null;
 		/*// ----------------------EQUIV DEBUG-----------------------

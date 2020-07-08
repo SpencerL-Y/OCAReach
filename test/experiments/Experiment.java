@@ -1,3 +1,4 @@
+package experiments;
 import java.io.DataOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -18,8 +19,8 @@ public class Experiment {
 			OCA oca = new OCA();
 			for(int i = 0; i < 15; i++) {
 				oca.addState(i);
-			}/*
-			index = 1;
+			}
+			index = 0;
 			oca.addTransition(0, OCAOp.Add, 1);
 			oca.addTransition(0, OCAOp.Sub, 2);
 			oca.addTransition(0, OCAOp.Zero, 3);
@@ -31,7 +32,7 @@ public class Experiment {
 			oca.addTransition(3, OCAOp.Sub, 5);
 			oca.setInitIndex(0);
 			oca.setTargetIndex(5);
-			*/
+			
 			// example 1 
 			/*
 			oca.addTransition(0, OCAOp.Sub, 1);
@@ -87,33 +88,34 @@ public class Experiment {
 			oca.setInitIndex(0);
 			oca.setTargetIndex(4);
 			*/
-			index = 6;/*
+			//index = 6;
+			/*
 			//Exmaple 6
 			oca.addTransition(0, OCAOp.Zero, 1);
 			oca.setInitIndex(0);
 			oca.setTargetIndex(1);*/
 			//Example 7
-			index = 7;
+			//index = 7;
 			/*
 			oca.addTransition(0, OCAOp.Sub, 1);
 			oca.addTransition(1, OCAOp.Zero, 2);
 			oca.addTransition(2, OCAOp.Sub, 3);
 			oca.setInitIndex(0);
 			oca.setTargetIndex(3);*/
-			index = 8;
+			//index = 8;
 			//Example 8
 			/*oca.addTransition(0, OCAOp.Zero, 1);
 			oca.addTransition(0, OCAOp.Sub, 1);
 			oca.setInitIndex(0);
 			oca.setTargetIndex(1);*/
-			index = 9;
+			//index = 9;
 			//Example 9
 			/*
 			oca.addTransition(0, OCAOp.Sub, 0);
 			oca.addTransition(0, OCAOp.Zero, 1);
 			oca.setInitIndex(0);
 			oca.setTargetIndex(1);*/
-			index = 10;
+			//index = 10;
 			//Example 10
 			/*
 			oca.addTransition(0, OCAOp.Sub, 1);
@@ -121,7 +123,7 @@ public class Experiment {
 			oca.addTransition(1, OCAOp.Zero, 2);
 			oca.setInitIndex(0);
 			oca.setTargetIndex(2);*/
-			index = 11;
+			/*index = 11;
 			//Example 11
 			
 			oca.addTransition(0, OCAOp.Add, 1);
@@ -137,8 +139,8 @@ public class Experiment {
 			oca.setTargetIndex(6);
 			
 			//Example 12
-			index = 12;
-			/*
+			/*index = 12;
+			
 			oca.addTransition(0, OCAOp.Zero, 1);
 			oca.addTransition(1, OCAOp.Add, 2);
 			oca.addTransition(2, OCAOp.Sub, 3);
@@ -146,9 +148,9 @@ public class Experiment {
 			oca.addTransition(3, OCAOp.Sub, 0);
 			oca.setInitIndex(0);
 			oca.setTargetIndex(1);*/
-			index = 13;
+			/*index = 13;
 			//Example 13
-			/*
+			
 			oca.addTransition(0, OCAOp.Sub, 1);
 			//oca.addTransition(1, OCAOp.Zero, 1);
 			oca.addTransition(1, OCAOp.Add, 2);
@@ -156,8 +158,9 @@ public class Experiment {
 			oca.setTargetIndex(2);
 			*/
 			// Example 14
-			index = 14;
 			/*
+			index = 14;
+			
 			oca.addTransition(0, OCAOp.Sub, 1);
 			oca.addTransition(1, OCAOp.Zero, 2);
 			oca.addTransition(2, OCAOp.Add, 3);
@@ -175,8 +178,8 @@ public class Experiment {
 			*/
 			
 			//Example 15
-			index = 15;
-			/*
+			/*index = 15;
+			
 			oca.addTransition(0, OCAOp.Sub, 1);
 			oca.addTransition(1, OCAOp.Sub, 2);
 			oca.addTransition(2, OCAOp.Sub, 3);
@@ -203,20 +206,19 @@ public class Experiment {
 			oca.addTransition(4, OCAOp.Add, 3);
 			oca.setInitIndex(0);
 			oca.setTargetIndex(4);*/
-			index = 11;
 			long startTime = System.currentTimeMillis();
 			ConverterZero cz = new ConverterZero(oca);
 			String resultStr = cz.convert();
 			long endTime = System.currentTimeMillis();
 			DataOutputStream out = new DataOutputStream(new FileOutputStream("/home/clexma/Desktop/handcraft.csv", true));
-			out.writeChars(index + "," + (endTime - startTime) + "," + resultStr.length() + "\n");
+			out.writeChars(index + "," + (endTime - startTime) + "," + resultStr.trim().length()+ "\n");
 			System.out.println();
 			System.out.println("--------------------FORMULA OUTPUT--------------------");
 			System.out.println(resultStr);
 			System.out.println("------------------------------------------------------");
 
 		} else {
-			for(int i = 0; i < 50; i ++) {
+			for(int i = 0; i < 550; i ++) {
 					int stateNum = 4;
 					OCDGenerator ocdg = new OCDGenerator();
 					OCA oca = ocdg.genRandomOca(stateNum);
@@ -224,7 +226,7 @@ public class Experiment {
 					ConverterZero cz = new ConverterZero(oca);
 					String resultStr = cz.convert();
 					long endTime = System.currentTimeMillis();
-					DataOutputStream out = new DataOutputStream(new FileOutputStream("/home/clexma/Desktop/etaResult10.csv", true));
+					DataOutputStream out = new DataOutputStream(new FileOutputStream("/home/clexma/Desktop/stateResult4.csv", true));
 					out.writeChars(i + "," + stateNum + "," + (oca.toDGraph().getEdges().size()) +"," +(endTime - startTime) + "," + resultStr.length() + "\n");
 					
 			}

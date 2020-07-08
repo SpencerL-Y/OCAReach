@@ -53,7 +53,7 @@ public class Converter {
 		if(debug) {
 			return this.convertDebug(this.oca.getInitState(), this.oca.getTargetState(), sVar, tVar);
 		} else {
-			return convertExpr(sVar, tVar).toString();
+			return convertExpr(sVar, tVar).simplify().toString();
 		}
 	}
 	

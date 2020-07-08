@@ -18,6 +18,11 @@ public class OCDGenerator {
 		return this.generateOcd();
 	}
 	
+	public String generateRandomOcdEta(int stateNum, double eta) {
+		this.generateRandomOcaEta(stateNum, eta);
+		return this.generateOcd();
+	}
+	
 	public String generateOcd() {
 		String ocd = "[OCA]";
 		ocd += "\n";
@@ -55,8 +60,11 @@ public class OCDGenerator {
 		return ocd;
 	}
 	
-	private void generateRandomOca(int stateNum) {
-		assert(stateNum > 0);
+	private void generateRandomOcaEta(int stateNum, double eta) {
+		if(!(stateNum > 0) || !(eta >= 0 && eta <= 1)) {
+			System.out.println("argument error");
+			return;
+		}
 		Random r = new Random();
 		this.tempOca = new OCA();
 		for(int i = 0; i < stateNum; i ++) {
@@ -66,9 +74,9 @@ public class OCDGenerator {
 			for(int j = 0; j < stateNum; j ++) {
 				//change here to control the number of edges
 				int num = r.nextInt();
-				if(num % 10 == 1 ) {
-					int op = r.nextInt(8);
-					if(op == 0) {
+				if(num % 10== 1  ) {
+					int op = r.nextInt(10000);
+					if(op <= 10000*eta) {
 						this.getTempOca().addTransition(i, OCAOp.Zero, j);
 					} else if (op < 5){
 						this.getTempOca().addTransition(i, OCAOp.Sub, j);
@@ -80,6 +88,10 @@ public class OCDGenerator {
 		}
 		tempOca.setInitIndex(0);
 		tempOca.setTargetIndex(r.nextInt(stateNum));
+	}
+	
+	private void generateRandomOca(int stateNum) {
+		this.generateRandomOcaEta(stateNum, 0.3);
 	}
 	
 	public OCA genRandomOca(int stateNum) {

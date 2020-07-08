@@ -11,14 +11,18 @@ import org.apache.commons.cli.*;
 import automata.counter.OCA;
 import ocareach.ConverterZero;
 import parser.OCAParser;
+import parser.OCDGenerator;
 
 public class CLI {
 	public static void main(String[] args) throws ParseException, IOException {
-		String[] testargs = new String[3];
-		testargs[0] = "-con";
-		testargs[1] = "/home/clexma/Desktop/test.ocd";
-		testargs[2] = "/home/clexma/Desktop/testFormula.txt";
-		CLI.handleArgs(testargs);
+		/*String[] testargs = new String[4];
+		testargs[0] = "-gen";
+		testargs[1] = "/home/clexma/Desktop/my.ocd";
+		testargs[2] = "10";
+		testargs[3] = "0.5";
+		CLI.handleArgs(testargs);*/
+		System.out.println("OCAReach Version 1.0 ------ Author: CLEXMA");
+		CLI.handleArgs(args);
 	}
 	
 	public static void handleArgs(String[] args) throws ParseException, IOException {
@@ -31,6 +35,9 @@ public class CLI {
 		convertOpt.setRequired(false);
 		options.addOption(convertOpt);
 		
+		Option genOpt = Option.builder("gen").numberOfArgs(3).argName("dst> <stateNum> <eta").desc("generate a OCA randomly with number of state and edge sparsity").build();
+		genOpt.setRequired(false);
+		options.addOption(genOpt);
 		
 		HelpFormatter hf = new HelpFormatter();
 		hf.setWidth(110);
@@ -64,7 +71,26 @@ public class CLI {
 				fo.write(result.getBytes());
 				System.out.println("DONE");
 			}
+		
+		} else if(commandLine.hasOption("gen")) {
 			
+			for(String s : args) {
+				System.out.print(s + '\t');
+			}
+			String[] searchArgs = commandLine.getOptionValues("gen");
+			if(searchArgs.length != 3) {
+				System.out.println("OCDGenerator arguments error, src path and dst path needed.");
+				return;
+			} else {
+				String dst = searchArgs[0];
+				int stateNum = Integer.parseInt(searchArgs[1]);
+				double eta = Double.parseDouble(searchArgs[2]);
+				OCDGenerator ocdg = new OCDGenerator();
+				String result = ocdg.generateRandomOcdEta(stateNum, eta);
+				FileOutputStream fo = new FileOutputStream(searchArgs[0]);
+				fo.write(result.getBytes());
+				System.out.println("DONE");
+			}
 		} else {
 			hf.printHelp("java OCAReach.jar ", options, true);
 		}
