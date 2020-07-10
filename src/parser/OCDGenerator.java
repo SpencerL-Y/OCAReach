@@ -74,7 +74,7 @@ public class OCDGenerator {
 			for(int j = 0; j < stateNum; j ++) {
 				//change here to control the number of edges
 				int num = r.nextInt();
-				if(num % 10== 1  ) {
+				if(num % 10 == 1  ) {
 					int op = r.nextInt(10000);
 					if(op <= 10000*eta) {
 						this.getTempOca().addTransition(i, OCAOp.Zero, j);
